@@ -1,10 +1,10 @@
 package captors;
 
-import api.Observable;
-import api.Observer;
 import lejos.nxt.ColorSensor;
 import lejos.nxt.SensorPort;
 import lejos.robotics.Color;
+import api.Observable;
+import api.Observer;
 
 public class LineDetectors extends Observable implements Runnable {
 	
@@ -36,6 +36,7 @@ public class LineDetectors extends Observable implements Runnable {
 			this.detectLine();
 			this.detectEndLine();
 		}
+		System.out.println("LD stopped");
 	}
 	
 	private boolean isLine (ColorSensor cs) {
@@ -47,7 +48,7 @@ public class LineDetectors extends Observable implements Runnable {
 	private void detectLine () {
 		while (this.lastDetectLeft == 0 || this.lastDetectRight == 0) {
 			if (this.stopped)
-				break;
+				return;
 			if (this.lastDetectLeft == 0 && this.isLine(this.leftSensor)) {
 				this.lastDetectLeft = System.currentTimeMillis();
 			}
@@ -61,7 +62,7 @@ public class LineDetectors extends Observable implements Runnable {
 	private void detectEndLine () {
 		while (this.lastDetectLeft != 0 || this.lastDetectRight != 0) {
 			if (this.stopped)
-				break;
+				return;
 			if (this.lastDetectLeft != 0 && !this.isLine(this.leftSensor)) {
 				this.lastDetectLeft = 0;
 			}

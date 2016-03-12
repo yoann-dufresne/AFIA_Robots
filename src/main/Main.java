@@ -3,6 +3,7 @@ package main;
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import captors.LineDetectors;
+import captors.LineObserver;
 import captors.Movement;
 import captors.WallDetectors;
 
@@ -13,30 +14,38 @@ public class Main {
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
 		
-		System.out.println("Go");
-		
 		WallDetectors wd = new WallDetectors ();
-		wd.changePosition ();
 		Thread wdThread = new Thread(wd);
 		wdThread.start();
+				
 		
-		Movement move = new Movement(ld, wd);
-		//move.goToNextWall();
-		move.goToNextWall();
-		move.turnRight();
-		move.goToNextWall();
-		move.uTurn();
-		move.goToNextWall();
+		System.out.println("Go");
+		
+		Movement move = new Movement();
+		LineObserver lo = new LineObserver(move);
+		ld.addObserver(lo);
+		
+		wd.changeHeadPosition();
+		wd.changeHeadPosition();
+
+		move.forward(2*Config.TILE_SIZE, false); 
 		move.turnLeft();
-		move.goToNextLine(true);/**/
-		move.rotate(360);
+		move.forward(Config.TILE_SIZE, false);
+		move.turnLeft();
+		move.forward(2*Config.TILE_SIZE, false);
+		move.turnLeft();
+		move.forward(Config.TILE_SIZE, true);
+		move.turnLeft();/**/
 		
 		System.out.println("Ended");
 		
 		Motor.C.rotateTo(0);
 		ld.stop();
 		wd.stop();
-		Button.waitForAnyEvent(10000);
+		
+		System.out.println("Main ended");
+		System.out.println(Motor.A.isMoving());
+		Button.waitForAnyPress(5000);
 	}
 	
 }

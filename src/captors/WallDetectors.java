@@ -8,19 +8,22 @@ import api.Observer;
 
 public class WallDetectors extends Observable implements Runnable {
 	
-	public static final int MIN_DIST = 15;
+	public static final int MIN_DIST = 10;
 	
 	private boolean stopped;
 	private boolean isInFrontPosition;
 	private UltrasonicSensor front;
+
+	private boolean testSides;
 	
 	public WallDetectors () {
 		this.front = new UltrasonicSensor(SensorPort.S2);
 		this.front.continuous();
 		this.isInFrontPosition = false;
+		this.testSides = true;
 	}
 	
-	public void changePosition () {
+	public void changeHeadPosition () {
 		if (this.isInFrontPosition)
 			Motor.C.rotateTo(0, false);
 		else
@@ -41,10 +44,15 @@ public class WallDetectors extends Observable implements Runnable {
 	@Override
 	public void run() {
 		this.stopped = false;
+		
 		while (!this.stopped) {
-			int dist = this.front.getDistance();
-			if (dist <= MIN_DIST)
-				this.notifyObservers();
+			if (this.testSides) {
+				
+			} else {
+				int dist = this.front.getDistance();
+				if (dist <= MIN_DIST)
+					this.notifyObservers();
+			}
 		}
 	}
 	
