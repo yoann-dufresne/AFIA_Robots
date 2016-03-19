@@ -34,24 +34,28 @@ public class LineObserver implements Observer {
 		Sound.beep();
 		Sound.setVolume(0);
 		
-		if (angle > 1.0)
+		if (Math.abs(angle) > 1.0)
 			this.move.correctAngle(angle);
 		
 		switch (this.pos.getDirection()) {
 		case NORTH:
+			this.pos.setX(Math.round(this.pos.getX()) + Config.CORRECTION_RATIO);
+			break;
 		case SOUTH:
-			this.pos.setX(Math.round(this.pos.getX()));
-			break;	
+			this.pos.setX(Math.round(this.pos.getX()) - Config.CORRECTION_RATIO);
+			break;
 		case EAST:
+			this.pos.setY(Math.round(this.pos.getY()) - Config.CORRECTION_RATIO);
+			break;
 		case WEST:
-			this.pos.setY(Math.round(this.pos.getY()));
+			this.pos.setY(Math.round(this.pos.getY()) + Config.CORRECTION_RATIO);
 			break;
 		}
 		
-		System.out.print(Math.round(this.pos.getX()*100)/100.0 + " ");
+		/*System.out.print(Math.round(this.pos.getX()*100)/100.0 + " ");
 		System.out.print(Math.round(this.pos.getY()*100)/100.0 + " ");
 		System.out.print(this.pos.getDirection());
-		System.out.println();
+		System.out.println();/**/
 		
 		return;
 	}

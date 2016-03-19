@@ -50,6 +50,61 @@ public class Movement {
 		}
 	}
 	
+	public void forward (int nbTiles){
+		double xInit = this.position.getX();
+		double yInit = this.position.getY();
+		
+		double distance = nbTiles * Config.TILE_SIZE;
+		
+		this.interrupted = false;
+		
+		// Circonf / 360 == Distance / xxx 
+		int angle = new Double(360.0 * (distance+Config.TILE_SIZE) / Config.WHEEL_CIRCUMFERENCE).intValue();
+		
+		this.prevAngle = this.left.getPosition();
+		
+		this.right.rotateTo(this.right.getPosition() + angle, true);
+		this.left.rotateTo(this.left.getPosition() + angle, true);
+
+		double currentPosition = -1, stopPosition= -1;
+
+		while (this.interrupted || this.right.isMoving() ) {
+			try {
+				Thread.sleep(10);
+				this.updateModel ();
+				
+				switch (this.position.getDirection()) {
+				case NORTH:
+					currentPosition = this.position.getX();
+					stopPosition = Math.floor(xInit) - nbTiles + 0.5;
+					break;
+				case SOUTH:
+					currentPosition = this.position.getX();
+					stopPosition = Math.floor(xInit) + nbTiles + 0.5;
+					break;
+				case EAST:
+					currentPosition = this.position.getY();
+					stopPosition = Math.floor(yInit) + nbTiles + 0.5;
+					break;
+				case WEST:
+					currentPosition = this.position.getY();
+					stopPosition = Math.floor(yInit) - nbTiles + 0.5;
+					break;
+				}
+				
+				double delta = 0.01;
+				if (Math.abs(currentPosition - stopPosition) <= delta){
+					this.right.stop(true);
+					this.left.stop(false);
+				}
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}/**/
+
+	}
+	
 	public void updateModel() {
 		int newAngle = this.left.getPosition();
 		

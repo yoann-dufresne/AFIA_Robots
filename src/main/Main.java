@@ -31,15 +31,21 @@ public class Main {
 		wd.changeHeadPosition();
 		wd.changeHeadPosition();
 
-		move.forward(2*Config.TILE_SIZE, false); 
+		move.forward(2); 
+		move.turnRight();/**/
+		move.forward(1);
 		move.turnRight();
-		move.forward(Config.TILE_SIZE, false);
+		move.forward(2);
 		move.turnRight();
-		move.forward(2*Config.TILE_SIZE, false);
-		move.turnRight();
-		move.forward(Config.TILE_SIZE, true);
+		move.forward(1);
 		move.turnRight();/**/
 		
+		
+		System.out.print(Math.round(position.getX()*100)/100.0 + " ");
+		System.out.print(Math.round(position.getY()*100)/100.0 + " ");
+		System.out.print(position.getDirection());
+		System.out.println();
+
 		System.out.println("Ended");
 		
 		Motor.C.rotateTo(0);

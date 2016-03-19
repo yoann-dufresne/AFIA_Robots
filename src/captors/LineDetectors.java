@@ -36,7 +36,7 @@ public class LineDetectors extends Observable implements Runnable {
 			this.detectLine();
 			this.detectEndLine();
 		}
-		System.out.println("LD stopped");
+		//System.out.println("LD stopped");
 	}
 	
 	private boolean isLine (ColorSensor cs) {
