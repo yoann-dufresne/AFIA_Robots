@@ -1,6 +1,9 @@
 package model;
 
-public class Position {
+import api.Observable;
+import api.Observer;
+
+public class Position extends Observable {
 	
 	private double posX;
 	private double posY;
@@ -25,11 +28,16 @@ public class Position {
 	}
 	
 	public void updateX(double dx) {
-		posX += dx;
+		this.posX += dx;
+		
+		double floatPart = this.posX - Math.round(this.posX);
+		if(abs(floatPart - 0.5) < 0.1){
+			this.notifyObservers();
+		}
 	}
 	
 	public void updateY(double dy) {
-		posY += dy;
+		this.posY += dy;
 	}
 	
 	public void turnRight () {
@@ -46,5 +54,11 @@ public class Position {
 
 	public void setY(double y) {
 		this.posY = y;
+	}
+
+	@Override
+	public void notifyObservers() {
+		for (Observer obs : this.observers)
+			obs.update(this, null);
 	}
 }

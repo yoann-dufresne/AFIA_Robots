@@ -8,6 +8,7 @@ import captors.LineDetectors;
 import captors.LineObserver;
 import captors.Movement;
 import captors.WallDetectors;
+import captors.WallObserver;
 
 public class Main {
 
@@ -28,9 +29,9 @@ public class Main {
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 		
-		wd.changeHeadPosition();
-		wd.changeHeadPosition();
-
+		WallObserver wo = new WallObserver();
+		wd.addObserver(wo);
+		
 		move.forward(2); 
 		move.turnRight();/**/
 		move.forward(1);
