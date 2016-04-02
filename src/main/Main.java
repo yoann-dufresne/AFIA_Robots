@@ -1,8 +1,13 @@
 package main;
 
+import java.awt.Point;
+import java.util.List;
+
+import ia.IA;
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import model.Direction;
+import model.Grid;
 import model.Position;
 import captors.LineDetectors;
 import captors.LineObserver;
@@ -21,7 +26,7 @@ public class Main {
 		Thread wdThread = new Thread(wd);
 		wdThread.start();
 		
-		Position position = new Position(1.5, 1.5, Direction.EAST);
+		Position position = new Position(1.5, 0.5, Direction.EAST);
 		
 		System.out.println("Go");
 		
@@ -32,21 +37,20 @@ public class Main {
 		WallObserver wo = new WallObserver();
 		wd.addObserver(wo);
 		
-		move.forward(2); 
-		move.turnRight();/**/
-		move.forward(1);
-		move.turnRight();
-		move.forward(2);
-		move.turnRight();
-		move.forward(1);
-		move.turnRight();/**/
+		// actions
+		Grid g = new Grid(3, 4);
+		g.addWall(0, 1, Direction.SOUTH);
+		g.addWall(1, 1, Direction.EAST);
+		g.addWall(2, 3, Direction.NORTH);
+		
+		IA ia = new IA(position, g);
+		//RConsole.open();
+		List<Point> path = ia.goTo(1, 2);
+		
+		//move.followPath(path);
+		// end actions
 		
 		
-		System.out.print(Math.round(position.getX()*100)/100.0 + " ");
-		System.out.print(Math.round(position.getY()*100)/100.0 + " ");
-		System.out.print(position.getDirection());
-		System.out.println();
-
 		System.out.println("Ended");
 		
 		Motor.C.rotateTo(0);

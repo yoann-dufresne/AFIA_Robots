@@ -1,5 +1,8 @@
 package captors;
 
+import java.awt.Point;
+import java.util.List;
+
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import main.Config;
@@ -22,7 +25,63 @@ public class Movement {
 		this.position = position;
 	}
 	
+	public void followPath(List<Point> path) {
+		for(Point p: path){
+			if(p == this.position.getPoint()){
+				continue;
+			}
+			
+			this.moveTo(p);
+		}
+	}
+	
 	// ----------- Basic movements -----------
+	
+	private void moveTo(Point p) {
+		Direction wantedDir = null;
+		int diff = 0;
+		
+		
+		if(p.x == this.position.getPoint().x){
+			diff = p.y - this.position.getPoint().y;
+			if (diff > 0)
+				wantedDir = Direction.EAST;
+			else 
+				wantedDir = Direction.WEST;
+		}
+		else {
+			// same Y
+			diff =  p.x - this.position.getPoint().x;
+			if (diff > 0)
+				wantedDir = Direction.SOUTH;
+			else
+				wantedDir = Direction.NORTH;
+		}
+		
+		this.turn(wantedDir);
+		this.forward(diff);
+	}
+
+	public void turn(Direction wantedDir) {
+		if(wantedDir == this.position.getDirection())
+			return;
+
+		int turnValue = this.position.getDirection().turnTo(wantedDir);
+		if(turnValue < 0)
+			this.turnLeft(-turnValue);
+		else 
+			this.turnRight(turnValue);
+	}
+
+	private void turnLeft(int repeat) {
+		for(int i= 0; i < repeat; i++)
+			this.turnLeft();
+	}
+
+	private void turnRight(int repeat) {
+		for(int i= 0; i < repeat; i++)
+			this.turnRight();
+	}
 	
 	public void forward (double distance, boolean stop) {
 		this.interrupted = false;

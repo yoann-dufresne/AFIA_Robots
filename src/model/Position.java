@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.Point;
+
 import api.Observable;
 import api.Observer;
 
@@ -23,6 +25,13 @@ public class Position extends Observable {
 		return posY;
 	}
 	
+	public Point getPoint () {
+		return new Point(
+				new Double(Math.floor(this.getX())).intValue(),
+				new Double(Math.floor(this.getY())).intValue()
+		);
+	}
+	
 	public Direction getDirection() {
 		return direction;
 	}
@@ -31,7 +40,7 @@ public class Position extends Observable {
 		this.posX += dx;
 		
 		double floatPart = this.posX - Math.round(this.posX);
-		if(abs(floatPart - 0.5) < 0.1){
+		if(Math.abs(floatPart - 0.5) < 0.1){
 			this.notifyObservers();
 		}
 	}
