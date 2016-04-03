@@ -29,10 +29,9 @@ public class IA {
 		Point dest = new Point(row, col);
 		values = this.parkoor(values, pos, dest);
 		
-		List<Point> path = new ArrayList<Point>();
+		List<Point> path = new ArrayList<Point>(1);
 		if (values.containsKey(dest)) {
-			path.add(dest);
-			this.traceback(values, path);
+			path = this.traceback(values, dest);
 		}
 		
 		return path;
@@ -66,27 +65,31 @@ public class IA {
 		positions.add(idx, p);
 	}
 	
-	private void traceback(Map<Point, Integer> values, List<Point> path) {
-		Point lastPoint = path.get(0);
-		if (values.get(lastPoint) == 0)
-			return;
+	private List<Point> traceback(Map<Point, Integer> values, Point first) {
+		Point currentPoint = first;
+		List<Point> path = new ArrayList<Point>();
+		path.add(first);
 		
-		int lastVal = values.get(lastPoint);
-		List<Point> possibleProvenance = this.grid.getAllPaths(lastPoint);
-		for (Point tile : possibleProvenance) {
-			if (!values.containsKey(tile) || path.contains(tile))
-				continue;
+		while (values.get(currentPoint) != 0) {
+			int currentVal = values.get(currentPoint);
 			
-			int val = values.get(tile);
-			int dist = new Double(lastPoint.distance(tile)).intValue();
-			if (val > lastVal - dist)
-				continue;
-			
-			path.add(0, tile);
-			break;
+			List<Point> possibleProvenance = this.grid.getAllPaths(currentPoint);
+			for (Point tile : possibleProvenance) {
+				if (!values.containsKey(tile) || path.contains(tile))
+					continue;
+				
+				int val = values.get(tile);
+				int dist = new Double(currentPoint.distance(tile)).intValue();
+				if (val > currentVal - dist)
+					continue;
+				
+				path.add(0, tile);
+				currentPoint = tile;
+				break;
+			}
 		}
 		
-		this.traceback(values, path);
+		return path;
 	}
 	
 }
