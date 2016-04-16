@@ -12,11 +12,32 @@ public enum Direction {
 	}
 
 	public int turnTo(Direction wantedDir) {
-		int diff = (this.ordinal() - wantedDir.ordinal() + Direction.values().length) % Direction.values().length;
-		int diff2 = (this.ordinal() + wantedDir.ordinal()) % Direction.values().length;
-		if (Math.abs(diff) < Math.abs(diff2))
-			return diff;
-		else 
-			return diff2;
+		if (Math.abs(this.ordinal() - wantedDir.ordinal()) == 2)
+			return 2;
+		
+		if (this.ordinal() - wantedDir.ordinal() == 0)
+			return 0;
+		 
+		if (this == NORTH) {
+			if (wantedDir == WEST)
+				return -1;
+			else
+				return 1;
+		} else if (this == EAST) {
+			if (wantedDir == NORTH)
+				return -1;
+			else
+				return 1;
+		} else if (this == SOUTH) {
+			if (wantedDir == EAST)
+				return -1;
+			else
+				return 1;
+		} else {
+			if (wantedDir == SOUTH)
+				return -1;
+			else
+				return 1;
+		}
 	}
 }

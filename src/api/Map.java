@@ -35,4 +35,8 @@ public class Map<K, V> {
 	public boolean containsKey(K key) {
 		return this.keys.contains(key);
 	}
+
+	public int size() {
+		return this.keys.size();
+	}
 }

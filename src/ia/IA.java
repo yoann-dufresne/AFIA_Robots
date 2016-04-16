@@ -36,12 +36,42 @@ public class IA {
 		
 		return path;
 	}
+	
+	public Map<Point, Integer> allPossibleDestinations (Map<Point, Integer> values, Point start) {
+		List<Point> positions = new ArrayList<Point>();
+		positions.add(start);
+		
+		while (positions.size() != 0) {
+			Point first = positions.remove(0);
+			int prevVal = values.get(first);
+			
+			Point[] tiles = this.grid.getAllFarthests(first);
+			for (Point tile : tiles) {
+				int dist = new Double(first.distance(tile)).intValue();
+				if (!values.containsKey(tile) || values.get(tile) > prevVal + dist) {
+					values.put(tile, prevVal + dist);
+					this.insertInList(tile, positions, values);
+				}
+			}
+		}
+		
+		return values;
+	}
 
 	public Map<Point, Integer> parkoor (Map<Point, Integer> values, Point start, Point destination) {
 		List<Point> positions = new ArrayList<Point>();
 		positions.add(start);
 		
 		while (positions.size() != 0 && !positions.get(0).equals(destination)) {
+			if (positions.size() > 1) {
+				//System.out.println(values.get(positions.get(0)) + " " + values.get(positions.get(1)));
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			Point first = positions.remove(0);
 			int prevVal = values.get(first);
 			
@@ -60,7 +90,7 @@ public class IA {
 
 	private void insertInList(Point p, List<Point> positions, Map<Point, Integer> values) {
 		int idx = 0;
-		while (positions.size() > idx && values.get(p) < values.get(positions.get(idx)))
+		while (positions.size() > idx && values.get(p) > values.get(positions.get(idx)))
 			idx++;
 		positions.add(idx, p);
 	}

@@ -27,7 +27,8 @@ public class Movement {
 	
 	public void followPath(List<Point> path) {
 		for(Point p: path){
-			if(p == this.position.getPoint()){
+			if(p.equals(this.position.getPoint())){
+				System.out.println("Ici !");
 				continue;
 			}
 			
@@ -59,7 +60,7 @@ public class Movement {
 		}
 		
 		this.turn(wantedDir);
-		this.forward(diff);
+		this.forward(Math.abs(diff));
 	}
 
 	public void turn(Direction wantedDir) {
@@ -67,9 +68,10 @@ public class Movement {
 			return;
 
 		int turnValue = this.position.getDirection().turnTo(wantedDir);
-		if(turnValue < 0)
+		
+		if(turnValue < 0) {
 			this.turnLeft(-turnValue);
-		else 
+		} else 
 			this.turnRight(turnValue);
 	}
 
@@ -205,7 +207,7 @@ public class Movement {
 	
 	public void turnLeft () {
 		this.rotate(-90);
-		this.position.turnRight();
+		this.position.turnLeft();
 	}
 	
 	public void uTurn () {
