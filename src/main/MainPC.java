@@ -146,6 +146,7 @@ public class MainPC {
 				dos2.close();
 				conn2.close();
 			}
+
 		} catch (IOException ioe) {
 			System.out.println("IOException closing connection:");
 			System.out.println(ioe.getMessage());

@@ -1,4 +1,6 @@
 package main;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 import java.awt.Point;
 import java.io.PrintStream;
@@ -27,7 +29,15 @@ import lejos.nxt.*;
 import lejos.nxt.comm.*;
 
 /**
- * sample of selecting channel at run time
+ * Receive data from another NXT, a PC, a phone,
+ * or another bluetooth device.
+ *
+ * Waits for a connection, receives an int and returns
+ * its negative as a reply, 100 times, and then closes
+ * the connection, and waits for a new one.
+ *
+ * @author Lawrie Griffiths
+ *
  */
 public class Main
 {
@@ -117,5 +127,4 @@ public class Main
 //		System.out.println(Motor.A.isMoving());
 		Button.waitForAnyPress(20000);
 	}
-
 }
