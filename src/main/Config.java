@@ -3,8 +3,8 @@ package main;
 public class Config {
 	
 	/* Units :
-	 * ¥ angles : degree
-	 * ¥ distances : meters
+	 * angles : degree
+	 * distances : meters
 	 */
 
 	/* Maze config */
@@ -21,4 +21,7 @@ public class Config {
 	public static final double LIGHT_CENTER_DISTANCE = 0.04;
 	
 	public static final double CORRECTION_RATIO = LIGHT_CENTER_DISTANCE / TILE_SIZE;
+	
+	public static final int GRID_WIDTH = 23;
+	public static final int GRID_HEIGHT = 11;
 }

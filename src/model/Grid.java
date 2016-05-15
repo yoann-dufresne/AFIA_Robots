@@ -11,16 +11,20 @@ public class Grid {
 	private int height;
 	private int width;
 	
-	public Grid(int height, int width) { // height = Xmax, width = Ymax
+	public Grid(int height, int width, WallState state) { // height = Xmax, width = Ymax
 		this.tiles = new Tile[height][width];
 		this.height = height;
 		this.width = width;
 		
 		for (int line=0 ; line<height ; line++)
 			for (int col=0 ; col<width ; col++)
-				this.tiles[line][col] = new Tile(line, col);
+				this.tiles[line][col] = new Tile(line, col, state);
 	
 		makeBorders();
+	}
+	
+	public Grid(int height, int width){
+		this(height, width, WallState.Undiscovered);
 	}
 	
 	public int getHeight() {
@@ -31,34 +35,26 @@ public class Grid {
 		return this.width;
 	}
 	
+	
+	public Tile getTile(Point p){
+		return this.getTile(p.x, p.y);
+	}
+	
 	public Tile getTile(int x, int y) {
-		return tiles[x][y];
+		if(x >= 0 && x < height && y >= 0 && y < width)
+			return tiles[x][y];
+		else 
+			return null;
 	}
 	
 	public void addWall(int x, int y, Direction direction) {
-		switch (direction) {
-		case NORTH:
-			this.getTile(x, y).north = true;
-			if(x-1 >= 0)
-				this.getTile(x-1, y).south = true;
-			break;
-		case SOUTH:
-			this.getTile(x, y).south = true;
-			if(x+1 < this.height)
-				this.getTile(x+1, y).north = true;
-			break;
-		case EAST:
-			this.getTile(x, y).east = true;
-			if(y+1 < this.width)
-				this.getTile(x, y+1).west = true;
-			break;
-		case WEST:
-			this.getTile(x, y).west = true;
-			if(y-1 >= 0)
-				this.getTile(x, y-1).east = true;
-			break;
-		}
+		this.setTile(x, y, direction, WallState.Wall);
 	}
+	
+	public void removeWall(int x, int y, Direction direction) {
+		this.setTile(x, y, direction, WallState.Empty);
+	}
+
 	
 	public void makeBorders(){
 		for(int row=0; row < this.height; row++){
@@ -81,22 +77,22 @@ public class Grid {
 	private Point getFarthest (Point tile, Direction dir) {
 		switch (dir) {
 		case NORTH:
-			if (this.tiles[tile.x][tile.y].north)
+			if (this.tiles[tile.x][tile.y].north == WallState.Wall)
 				return tile;
 			else return this.getFarthest(new Point(tile.x-1, tile.y), dir);
 			
 		case SOUTH:
-			if (this.tiles[tile.x][tile.y].south)
+			if (this.tiles[tile.x][tile.y].south == WallState.Wall)
 				return tile;
 			else return this.getFarthest(new Point(tile.x+1, tile.y), dir);
 			
 		case WEST: 
-			if (this.tiles[tile.x][tile.y].west)
+			if (this.tiles[tile.x][tile.y].west == WallState.Wall)
 				return tile;
 			else return this.getFarthest(new Point(tile.x, tile.y-1), dir);
 			
 		case EAST:
-			if (this.tiles[tile.x][tile.y].east)
+			if (this.tiles[tile.x][tile.y].east == WallState.Wall)
 				return tile;
 			else return this.getFarthest(new Point(tile.x, tile.y+1), dir);
 			
@@ -143,7 +139,7 @@ public class Grid {
 		
 		switch (dir) {
 		case NORTH:
-			if (this.tiles[tile.x][tile.y].north)
+			if (this.tiles[tile.x][tile.y].north == WallState.Wall)
 				tiles = new ArrayList<Point>();
 			else
 				tiles = this.getAllOnPath(new Point(tile.x-1, tile.y), dir);
@@ -151,7 +147,7 @@ public class Grid {
 			break;
 			
 		case SOUTH:
-			if (this.tiles[tile.x][tile.y].south)
+			if (this.tiles[tile.x][tile.y].south == WallState.Wall)
 				tiles = new ArrayList<Point>();
 			else
 				tiles = this.getAllOnPath(new Point(tile.x+1, tile.y), dir);
@@ -159,7 +155,7 @@ public class Grid {
 			break;
 			
 		case WEST:
-			if (this.tiles[tile.x][tile.y].west)
+			if (this.tiles[tile.x][tile.y].west == WallState.Wall)
 				tiles = new ArrayList<Point>();
 			else
 				tiles = this.getAllOnPath(new Point(tile.x, tile.y-1), dir);
@@ -167,7 +163,7 @@ public class Grid {
 			break;
 			
 		case EAST:
-			if (this.tiles[tile.x][tile.y].east)
+			if (this.tiles[tile.x][tile.y].east == WallState.Wall)
 				tiles = new ArrayList<Point>();
 			else
 				tiles = this.getAllOnPath(new Point(tile.x, tile.y+1), dir);
@@ -200,7 +196,7 @@ public class Grid {
 	 * @return All the points
 	 */
 	public List<Point> getAllPaths (Point tile) {
-		List<Point> tiles = new ArrayList<Point>(33);
+		List<Point> tiles = new ArrayList<Point>();
 		tiles.addAll(this.getAllOnEastPath(tile));
 		tiles.addAll(this.getAllOnWestPath(tile));
 		tiles.addAll(this.getAllOnNorthPath(tile));
@@ -208,4 +204,36 @@ public class Grid {
 		
 		return tiles;
 	}
+	
+	public void setTile(int x, int y, Direction direction, WallState state) {	
+		switch (direction) {
+		case NORTH:
+			this.getTile(x, y).north = state;
+			if(x-1 >= 0)
+				this.getTile(x-1, y).south = state;
+			break;
+		case SOUTH:
+			this.getTile(x, y).south = state;
+			if(x+1 < this.height)
+				this.getTile(x+1, y).north = state;
+			break;
+		case EAST:
+			this.getTile(x, y).east = state;
+			if(y+1 < this.width)
+				this.getTile(x, y+1).west = state;
+			break;
+		case WEST:
+			this.getTile(x, y).west = state;
+			if(y-1 >= 0)
+				this.getTile(x, y-1).east = state;
+			break;
+		}
+	}
+	
+	public void setDiscovered(int x, int y, Direction direction) {
+		if(x >= 0 && y >= 0 && 
+		   x < this.height && y < this.width)
+			setTile(x, y, direction, WallState.Empty);
+	}
+
 }

@@ -4,9 +4,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import api.Map;
+import main.Config;
+import model.Direction;
 import model.Grid;
 import model.Position;
+import model.Tile;
+import model.WallState;
 
 public class IA {
 
@@ -18,38 +21,98 @@ public class IA {
 		this.grid = grid;
 	}
 	
-	public List<Point> goTo (int row, int col) {
-		Point pos = new Point(
-				new Double(Math.floor(this.position.getX())).intValue(),
-				new Double(Math.floor(this.position.getY())).intValue()
+	/**
+	 * Compute the path from the actual location (in the position attribute) to
+	 * the point (row, col)
+	 * @param row Goal row
+	 * @param col Goal column
+	 * @return The path to the goal represented by the intermediate points.
+	 */
+	public Solution goTo (int row, int col) {
+		Solution sol = new Solution();
+		Point destination = new Point(row, col);
+		
+		sol.aloneParkoor = this.allPossibleDestinations(position.getPoint());
+		//sol.alonePath = this.traceback(sol.aloneParkoor, destination);
+		
+		int aloneCost = sol.aloneParkoor[destination.x][destination.y];
+		this.parkoor(this.position.getPoint(), destination, sol, aloneCost);
+		
+		int coopCost = sol.coopParkoor == null ? 255 : Math.max(
+				sol.coopParkoor[destination.x][destination.y],
+				sol.aloneParkoor[sol.coopTile.x][sol.coopTile.y]
 		);
-		Map<Point, Integer> values = new Map<Point, Integer>();
-		values.put(pos, 0);
 		
-		Point dest = new Point(row, col);
-		values = this.parkoor(values, pos, dest);
+		if (aloneCost <= coopCost) {
+			sol.alonePath = this.traceback(sol.aloneParkoor, destination);
+		} else {
+			Tile t = this.grid.getTile(sol.coopTile.x, sol.coopTile.y);
+			
+			List<Direction> emptyWalls = new ArrayList<Direction>(4);
+			if (t.east == WallState.Empty)
+				emptyWalls.add(Direction.EAST);
+			if (t.west == WallState.Empty)
+				emptyWalls.add(Direction.WEST);
+			if (t.north == WallState.Empty)
+				emptyWalls.add(Direction.NORTH);
+			if (t.south == WallState.Empty)
+				emptyWalls.add(Direction.SOUTH);
+
+			for (Direction dir : emptyWalls)
+				this.grid.addWall(sol.coopTile.x, sol.coopTile.y, dir);
+			sol.myCoopPath = this.traceback(sol.coopParkoor, destination);
+			for (Direction dir : emptyWalls)
+				this.grid.removeWall(sol.coopTile.x, sol.coopTile.y, dir);
+			sol.otherCoopPath = this.traceback(sol.aloneParkoor, sol.coopTile);
+		}
 		
+		return sol;
+	}
+	
+	/**
+	 * Compute the path from the current location (in the position attribute) to
+	 * the point (row, col)
+	 * @param row Goal row
+	 * @param col Goal column
+	 * @return The path to the goal represented by the intermediate points.
+	 */
+	public List<Point> getPathTo (Point end, char[][] values) {
 		List<Point> path = new ArrayList<Point>(1);
-		if (values.containsKey(dest)) {
-			path = this.traceback(values, dest);
+		if (values[end.x][end.y] != 255) {
+			path = this.traceback(values, end);
 		}
 		
 		return path;
 	}
 	
-	public Map<Point, Integer> allPossibleDestinations (Map<Point, Integer> values, Point start) {
+	/**
+	 * A dijkstra exploration for finding all the possible destinations from the start point
+	 * @param values
+	 * @param start
+	 * @return
+	 */
+	public char[][] allPossibleDestinations (Point start) {
 		List<Point> positions = new ArrayList<Point>();
+		char[][] values = new char[Config.GRID_HEIGHT][Config.GRID_WIDTH];
+		for (int i=0 ; i<values.length ; i++)
+			for (int j=0 ; j<values[i].length ; j++)
+				values[i][j] = 255;
+		values[start.x][start.y] = 0;
 		positions.add(start);
 		
 		while (positions.size() != 0) {
 			Point first = positions.remove(0);
-			int prevVal = values.get(first);
+			char firstVal = values[first.x][first.y];//values.get(first);
 			
 			Point[] tiles = this.grid.getAllFarthests(first);
 			for (Point tile : tiles) {
 				int dist = new Double(first.distance(tile)).intValue();
-				if (!values.containsKey(tile) || values.get(tile) > prevVal + dist) {
-					values.put(tile, prevVal + dist);
+				if (firstVal + dist >= 255)
+					continue;
+				
+				if (values[tile.x][tile.y] == 255 ||
+						values[tile.x][tile.y] > firstVal + dist) {
+					values[tile.x][tile.y] = (char) (firstVal + dist);
 					this.insertInList(tile, positions, values);
 				}
 			}
@@ -58,28 +121,32 @@ public class IA {
 		return values;
 	}
 
-	public Map<Point, Integer> parkoor (Map<Point, Integer> values, Point start, Point destination) {
+	public char[][] parkoor (Point start, Point destination) {
+		return this.parkoor(start, destination, 255);
+	}
+	
+	public char[][] parkoor (Point start, Point destination, int limit) {
+		char[][] values = new char[Config.GRID_HEIGHT][Config.GRID_WIDTH];
+		for (int i=0 ; i<values.length ; i++)
+			for (int j=0 ; j<values[i].length ; j++)
+				values[i][j] = 255;
+		values[start.x][start.y] = 0;
+		
 		List<Point> positions = new ArrayList<Point>();
 		positions.add(start);
 		
 		while (positions.size() != 0 && !positions.get(0).equals(destination)) {
-			if (positions.size() > 1) {
-				//System.out.println(values.get(positions.get(0)) + " " + values.get(positions.get(1)));
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			
 			Point first = positions.remove(0);
-			int prevVal = values.get(first);
+			char prevVal = values[first.x][first.y];
 			
 			Point[] tiles = this.grid.getAllFarthests(first);
 			for (Point tile : tiles) {
 				int dist = new Double(first.distance(tile)).intValue();
-				if (!values.containsKey(tile) || values.get(tile) > prevVal + dist) {
-					values.put(tile, prevVal + dist);
+				if (prevVal + dist >= limit)
+					continue;
+				
+				if (values[tile.x][tile.y]==255 || values[tile.x][tile.y] > prevVal + dist) {
+					values[tile.x][tile.y] = (char)(prevVal + dist);
 					this.insertInList(tile, positions, values);
 				}
 			}
@@ -87,30 +154,86 @@ public class IA {
 		
 		return values;
 	}
+	
+	public void parkoor (Point start, Point destination, Solution sol, int limit) {
+		char[][] robotPositions = sol.aloneParkoor;
+		char[][] best = null;
+		Point bestTile = null;
+		char minVal = 255;
+		
+		for (int i=0 ; i<robotPositions.length ; i++)
+			for (int j=0 ; j<robotPositions[i].length ; j++) {
+				if (robotPositions[i][j] == 255)
+					continue;
 
-	private void insertInList(Point p, List<Point> positions, Map<Point, Integer> values) {
+				Tile t = this.grid.getTile(i, j);
+				
+				List<Direction> emptyWalls = new ArrayList<Direction>(4);
+				if (t.east == WallState.Empty)
+					emptyWalls.add(Direction.EAST);
+				if (t.west == WallState.Empty)
+					emptyWalls.add(Direction.WEST);
+				if (t.north == WallState.Empty)
+					emptyWalls.add(Direction.NORTH);
+				if (t.south == WallState.Empty)
+					emptyWalls.add(Direction.SOUTH);
+	
+				for (Direction dir : emptyWalls)
+					this.grid.addWall(i, j, dir);
+				
+				char[][] tmp = this.parkoor(start, destination, limit);
+				char score = (char)Math.max(
+						tmp[destination.x][destination.y],
+						robotPositions[i][j]
+				);
+				// TODO : Modifier le score en fonction du temps d'arrivée de l'autre robot
+				if (score < minVal) {
+					best = tmp;
+					minVal = score;
+					bestTile = new Point(i, j);
+				}
+				
+				for (Direction dir : emptyWalls)
+					this.grid.removeWall(i, j, dir);
+			}
+		
+		sol.coopParkoor = best;
+		sol.coopTile = bestTile;
+	}
+
+	private void insertInList(Point p, List<Point> positions, char[][] possibleDestinations) {
 		int idx = 0;
-		while (positions.size() > idx && values.get(p) > values.get(positions.get(idx)))
+		
+		for (Point current : positions) {
+			if (possibleDestinations[current.x][current.y] >= possibleDestinations[p.x][p.y]) {
+				break;
+			}
+			
 			idx++;
+		}
+				
 		positions.add(idx, p);
 	}
 	
-	private List<Point> traceback(Map<Point, Integer> values, Point first) {
-		Point currentPoint = first;
+	public List<Point> traceback(char[][] values, Point destination) {
+		Point currentPoint = destination;
 		List<Point> path = new ArrayList<Point>();
-		path.add(first);
+		if (values[destination.x][destination.y] == 255)
+			return path;
 		
-		while (values.get(currentPoint) != 0) {
-			int currentVal = values.get(currentPoint);
+		path.add(destination);
+		
+		while (values[currentPoint.x][currentPoint.y] != 0) {
+			int currentVal = values[currentPoint.x][currentPoint.y];
 			
-			List<Point> possibleProvenance = this.grid.getAllPaths(currentPoint);
+			List<Point> possibleProvenance = this.getProvenances(currentPoint);
 			for (Point tile : possibleProvenance) {
-				if (!values.containsKey(tile) || path.contains(tile))
+				if (values[tile.x][tile.y] == 255 || path.contains(tile))
 					continue;
 				
-				int val = values.get(tile);
+				int val = values[tile.x][tile.y];
 				int dist = new Double(currentPoint.distance(tile)).intValue();
-				if (val > currentVal - dist)
+				if (val != currentVal - dist)
 					continue;
 				
 				path.add(0, tile);
@@ -120,6 +243,22 @@ public class IA {
 		}
 		
 		return path;
+	}
+
+	private List<Point> getProvenances(Point currentPoint) {
+		List<Point> prov = new ArrayList<Point>();
+		
+		Tile tile = this.grid.getTile(currentPoint.x, currentPoint.y);
+		if (tile.east == WallState.Wall)
+			prov.addAll(this.grid.getAllOnWestPath(currentPoint));
+		if (tile.west  == WallState.Wall)
+			prov.addAll(this.grid.getAllOnEastPath(currentPoint));
+		if (tile.north  == WallState.Wall)
+			prov.addAll(this.grid.getAllOnSouthPath(currentPoint));
+		if (tile.south  == WallState.Wall)
+			prov.addAll(this.grid.getAllOnNorthPath(currentPoint));
+		
+		return prov;
 	}
 	
 }

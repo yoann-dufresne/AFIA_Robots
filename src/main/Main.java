@@ -5,10 +5,12 @@ import java.util.List;
 
 import api.Map;
 import ia.IA;
+import ia.Solution;
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import model.Direction;
 import model.Grid;
+import model.GridExample;
 import model.GridGenerator;
 import model.Position;
 import captors.LineDetectors;
@@ -28,7 +30,7 @@ public class Main {
 		Thread wdThread = new Thread(wd);
 		wdThread.start();
 		
-		Position position = new Position(1.5, 0.5, Direction.EAST);
+		Position position = new Position(0.5, 0.5, Direction.EAST);
 		
 		System.out.println("Go");
 		
@@ -40,22 +42,42 @@ public class Main {
 		wd.addObserver(wo);
 		
 		// actions
-		//Grid g = GridGenerator.generate(23, 11, 0.2);
-		Grid g = new Grid(3, 4);
-		g.addWall(0, 1, Direction.SOUTH);
-		g.addWall(1, 1, Direction.EAST);
-		g.addWall(2, 3, Direction.NORTH);/**/
+//		Grid g = GridGenerator.generate(23, 11, 0.2);
+		//Grid g = new Grid(3, 4);
+//		g.addWall(0, 1, Direction.SOUTH);
+//		g.addWall(1, 1, Direction.EAST);
+//		g.addWall(2, 3, Direction.NORTH);/**/
+		Grid g = GridExample.g;
 		
 		IA ia = new IA(position, g);
-		List<Point> path = ia.goTo(1, 2);
+		Point dest = new Point(9, 22);
+		Solution sol = ia.goTo(dest.x, dest.y);
+		List<Point> path1 = null;
+		List<Point> path2 = null;
+		int cost = 2323;
+		if (sol.alonePath != null){
+			path1 = sol.alonePath;
+			cost = sol.aloneParkoor[dest.x][dest.y];
+		}
+		else{
+			cost = Math.max(
+					sol.coopParkoor[dest.x][dest.y],
+					sol.aloneParkoor[sol.coopTile.x][sol.coopTile.y]
+			);
+			path1 = sol.otherCoopPath;
+			path2 = sol.myCoopPath;
+		}
+		System.out.println("avant gc : " + Runtime.getRuntime().freeMemory());
 		System.gc();
+		System.out.println("apres gc : " + Runtime.getRuntime().freeMemory());
+		
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("path size : " + path.size());
-		move.followPath(path);
+		System.out.println("cost : " + cost);
+//		move.followPath(path);
 		//System.out.println(Runtime.getRuntime().freeMemory());
 		
 		/*Map<Point, Integer> tests = new Map<Point, Integer>();
@@ -68,12 +90,12 @@ public class Main {
 		System.out.println(ia.allPossibleDestinations(tests, position.getPoint()).size());
 		System.out.println(Runtime.getRuntime().freeMemory());/**/
 		
-		Motor.C.rotateTo(0);
+//		Motor.C.rotateTo(0);
 		ld.stop();
 		wd.stop();
-		
+//		
 		System.out.println("Main ended");
-		System.out.println(Motor.A.isMoving());
+//		System.out.println(Motor.A.isMoving());
 		Button.waitForAnyPress(20000);
 	}
 	

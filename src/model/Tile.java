@@ -5,15 +5,25 @@ public class Tile {
 	private int line;
 	private int col;
 	
-	public boolean north;
-	public boolean south;
-	public boolean east;
-	public boolean west;
+	public WallState north;
+	public WallState south;
+	public WallState east;
+	public WallState west;
 	
-	public Tile(int line, int col) {
+	public Tile(int line, int col, WallState state) {
 		this.line = line;
 		this.col = col;
+
+		this.north = state;
+		this.south = state;
+		this.east = state;
+		this.west = state;
 	}
+	
+	public Tile(int line, int col) {
+		this(line, col, WallState.Undiscovered);
+	}
+	
 	
 	public int getLine() {
 		return line;
@@ -23,4 +33,15 @@ public class Tile {
 		return col;
 	}
 	
+	public WallState getState(Direction d){
+		if(d == Direction.NORTH)
+			return this.north;
+		else if(d == Direction.WEST)
+			return this.west;
+		else if(d == Direction.EAST)
+			return this.east;
+		else 
+			return this.south;
+
+	}
 }
