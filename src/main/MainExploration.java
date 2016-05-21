@@ -2,10 +2,10 @@ package main;
 
 import ia.AbstractExplorer;
 import ia.WallValuesExplorer;
-import ia.ZigZagExplorer;
-import model.Movement;
-import model.WallDetectors;
-import model.WallObserver;
+//import ia.ZigZagExplorer;
+import captors.Movement;
+import captors.WallDetectors;
+import captors.WallObserver;
 import model.Direction;
 import model.Grid;
 import model.GridExample;
@@ -20,8 +20,8 @@ public class MainExploration {
 	
 	public static void main(String[] args) {
 		Position position = new Position(0.5, 0.5, Direction.EAST);
-		Grid trueGrid = new Grid(11, 23, WallState.Empty);
-		Grid gridToExplore = new Grid(11, 23);
+		Grid trueGrid = new Grid(4, 3, WallState.Empty);
+		Grid gridToExplore = new Grid(4, 3);
 		trueGrid.addWall(0, 1, Direction.EAST);
 		
 		//Grid trueGrid = GridExample.g;

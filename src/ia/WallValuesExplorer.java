@@ -1,14 +1,14 @@
 package ia;
 
 import java.awt.Point;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import mock.Movement;
-import mock.WallDetectors;
-import mock.WallObserver;
+import captors.Movement;
+import captors.WallDetectors;
+import captors.WallObserver;
 import model.Direction;
 import model.Grid;
 import model.Position;

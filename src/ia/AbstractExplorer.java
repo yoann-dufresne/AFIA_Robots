@@ -1,12 +1,10 @@
 package ia;
 
-import graphicalInterface.Window;
-
 import java.awt.Point;
 
-import mock.Movement;
-import mock.WallDetectors;
-import mock.WallObserver;
+import captors.Movement;
+import captors.WallDetectors;
+import captors.WallObserver;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -50,7 +48,7 @@ public abstract class AbstractExplorer{
 		nb_case_detected_left = this.wo.getNbCase_B();
 		addDetectedWall(
 				this.wo.getOrientation(false),
-				nb_case_detected_right);
+			nb_case_detected_right);
 
 		addDetectedWall(
 				this.wo.getOrientation(true), 

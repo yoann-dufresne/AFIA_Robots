@@ -47,6 +47,29 @@ public class Grid {
 			return null;
 	}
 	
+	//replace the point coordinate by the next one on the given direction
+	public void translatePoint(Point p, Direction d){
+		switch(d){
+		case NORTH:
+			if (p.x>0)
+				p.translate(-1,0);
+			break;				
+		case EAST:
+			if (p.y<width)
+				p.translate(0,1);
+			break;				
+		case SOUTH:
+			if (p.x<height)
+				p.translate(1,0);
+			break;
+		case WEST:
+			if (p.y>0)
+				p.translate(0,-1);
+			break;
+		}
+	}
+
+
 	public void addWall(int x, int y, Direction direction) {
 		this.setTile(x, y, direction, WallState.Wall);
 	}
