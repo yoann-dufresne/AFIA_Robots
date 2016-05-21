@@ -1,7 +1,5 @@
 package ia;
 
-import graphicalInterface.Window;
-
 import java.awt.Point;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,8 +19,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 
 	protected int tileValues[][];
 	
-	public WallValuesExplorer(Position position, Movement move, WallDetectors wd, WallObserver wo, Grid grid, Window w) {		
-		super(position, move, wd, wo, grid, w);
+	public WallValuesExplorer(Position position, Movement move, WallDetectors wd, WallObserver wo, Grid grid) {		
+		super(position, move, wd, wo, grid);
 		this.tileValues = new int[XMax][YMax];
 	}
 

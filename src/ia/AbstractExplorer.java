@@ -23,13 +23,12 @@ public abstract class AbstractExplorer{
 	protected Movement move;
 
 	protected Grid grid;
-	protected Window window;
 
 	protected int XMax;
 	protected int YMax;
 
 
-	public AbstractExplorer(Position position, Movement move, WallDetectors wd, WallObserver wo, Grid grid, Window w){
+	public AbstractExplorer(Position position, Movement move, WallDetectors wd, WallObserver wo, Grid grid){
 		this.position = position;
 		this.move = move;
 
@@ -37,8 +36,6 @@ public abstract class AbstractExplorer{
 
 		this.wd = wd;
 		this.wo = wo;
-
-		this.window = w;
 
 		XMax = grid.getHeight();
 		YMax = grid.getWidth();
@@ -97,8 +94,6 @@ public abstract class AbstractExplorer{
 		}
 		if(nb_case < 6)
 			this.grid.addWall(point.x, point.y, direction);
-
-		window.refreshWithPause(100);
 	}
 }
 
