@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
 
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
