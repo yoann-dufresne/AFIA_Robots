@@ -1,13 +1,17 @@
 package main;
 
 import java.awt.Point;
+import java.io.PrintStream;
 import java.util.List;
 
+import bluetooth.BluetoothRobot;
 import api.Map;
 import ia.IA;
 import ia.Solution;
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
+import lejos.nxt.comm.Bluetooth;
+import lejos.nxt.comm.RConsole;
 import model.Direction;
 import model.Grid;
 import model.GridExample;
@@ -22,6 +26,15 @@ import captors.WallObserver;
 public class Main {
 
 	public static void main(String[] args) {
+		RConsole.openUSB(0);
+		System.setOut(new PrintStream(RConsole.getPrintStream()));
+		System.out.println("caca prout");
+		
+		
+		BluetoothRobot br = new BluetoothRobot();
+		Thread btThread = new Thread(br);
+		btThread.start();
+		
 		LineDetectors ld = new LineDetectors ();
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
