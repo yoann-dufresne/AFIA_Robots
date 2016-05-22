@@ -18,8 +18,6 @@ class/main/MainPC.class: src/main/MainPC.java
 runPC: class/main/MainPC.class
 	nxjpc -cp ./class  main.MainPC
 
-
-
 clean:
 	rm -rf class/
 	mkdir class
@@ -28,6 +26,16 @@ clean:
 send: all
 	nxjupload -r -u MainExplorer.nxj
 
-send-bt: all
-	nxjupload -b -r Main.nxj
+send-bt0: all
+	-nxjupload -b -r -d 00:16:53:13:EF:A9 Main.nxj
+	@echo "--------------------\n"
 
+send-bt1: all
+	-nxjupload -b -r -d 00:16:53:0E:F7:5F Main.nxj
+	@echo "--------------------\n"
+
+send-bt2: all
+	-nxjupload -b -r -d 00:16:53:0F:F5:A9 Main.nxj
+	@echo "--------------------\n"
+
+send-bt: send-bt0 send-bt1 send-bt2
