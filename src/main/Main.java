@@ -51,11 +51,9 @@ import lejos.nxt.comm.*;
  * @author Lawrie Griffiths
  *
  */
-public class Main
-{
+public class Main {
 
 	public static void main(String[] args) {
-		System.setOut(new PrintStream(RConsole.getPrintStream()));
 		System.out.println("caca prout");
 
 

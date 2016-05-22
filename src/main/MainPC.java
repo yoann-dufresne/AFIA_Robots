@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
-
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
@@ -78,8 +77,6 @@ public class MainPC {
 			dis2 = new DataInputStream(conn2.getInputStream());
 		}
 
-
-
 		try {
 			if (connected0) {
 				bw0.write("DISCOVERED\n");
@@ -147,7 +144,6 @@ public class MainPC {
 				dos2.close();
 				conn2.close();
 			}
-
 		} catch (IOException ioe) {
 			System.out.println("IOException closing connection:");
 			System.out.println(ioe.getMessage());
