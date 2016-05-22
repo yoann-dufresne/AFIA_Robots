@@ -39,4 +39,3 @@ send-bt2: all
 	@echo "--------------------\n"
 
 send-bt: send-bt0 send-bt1 send-bt2
-
