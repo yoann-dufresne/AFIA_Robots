@@ -126,8 +126,9 @@ public class MainPC {
 				bw2.flush();
 			}
 			System.out.println("wrote stop");
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
