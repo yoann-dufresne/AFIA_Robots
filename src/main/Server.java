@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
+import util.Spliter;
 import bluetooth.BluetoothServer;
 
 public class Server {
@@ -46,23 +48,28 @@ public class Server {
 		while (!stopped) {
 			try {
 				Socket sock = this.tcp.accept();
-				new SocketHandler(sock).start();
+				new SocketHandler(sock, this).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
+
+	public void stop() {
+		this.stopped = true;
+	}
+	
 	
 	private class SocketHandler extends Thread {
 		
 		private Socket sock;
-		private boolean ended;
+		private Server server;
 		private BufferedReader br;
 
-		public SocketHandler(Socket sock) {
+		public SocketHandler(Socket sock, Server serv) {
 			this.sock = sock;
-			this.ended = true;
+			this.server = serv;
 			
 			try {
 				this.br = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
@@ -73,16 +80,26 @@ public class Server {
 		
 		@Override
 		public void run() {
-			this.ended = false;
-			
 			String line = null;
 			try {
-				while ((line = this.br.readLine()) != null) {
+				while (true) {
+					line = this.br.readLine();
+					List<String> split = Spliter.split(line, ';');
 					
+					if (line.startsWith("STOP")) {
+						this.stop(split);
+						break;
+					}
 				}
+				
+				this.br.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		private void stop(List<String> words) {
+			this.server.stop();
 		}
 	}
 	

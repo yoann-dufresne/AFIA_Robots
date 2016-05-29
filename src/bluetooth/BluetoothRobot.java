@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import util.Spliter;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 
@@ -46,7 +47,7 @@ public class BluetoothRobot implements Runnable  {
 				e.printStackTrace();
 			}
 			
-			List<String> words = split(received, ';'); 
+			List<String> words = Spliter.split(received, ';'); 
 			String command = words.get(0);
 			System.out.println("received command : " + command);
 			
@@ -76,26 +77,6 @@ public class BluetoothRobot implements Runnable  {
 
 	private void discover(List<String> words) {
 		System.out.println("DISCOVERED");
-	}
-
-	
-	public List<String> split(String line, char sep){
-		List<String> res = new ArrayList<String>();
-		StringBuffer sb = new StringBuffer();
-		
-		for(int idx=0 ; idx<line.length() ; idx++) {
-			char c = line.charAt(idx);
-			
-			if (c == sep){
-				res.add(sb.toString());
-				sb.delete(0, sb.length());
-			} else {
-				sb.append(c);
-			}
-		}
-		res.add(sb.toString());
-		
-		return res;	
 	}
 
 }
