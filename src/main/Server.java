@@ -14,9 +14,9 @@ public class Server {
 	
 	public static final String[] macAddresses = {
 		"00:16:53:13:EF:A9",
-		"",
+		"00:16:53:00:00:00",
 		"00:16:53:0F:F5:A9",
-		""
+		"00:16:53:00:00:00"
 	};
 	private static int port;
 	
