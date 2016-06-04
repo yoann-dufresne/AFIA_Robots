@@ -1,9 +1,9 @@
 package captors;
 
+import java.awt.Point;
+
 import api.Observable;
 import api.Observer;
-
-
 import model.Direction;
 import model.Grid;
 

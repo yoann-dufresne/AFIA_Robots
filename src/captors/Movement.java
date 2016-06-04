@@ -17,7 +17,7 @@ public class Movement {
 	private int prevAngle;
 	
 	private boolean interrupted;
-	private Position position;
+	public Position position;
 
 	public Movement(Position position) {
 		this.right = Motor.A;
