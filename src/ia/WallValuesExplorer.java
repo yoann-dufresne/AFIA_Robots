@@ -32,10 +32,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 		//  --> Si on rencontre un mur, on stoppe et on update les valeurs
 		this.exploreTurningHead();
 		this.computeScores(this.position.getPoint());
-		this.printTiles();
+//		this.printTiles();
 		this.goToBest();
 		this.computeScores(this.position.getPoint());
-		this.printTiles();
+//		this.printTiles();
 	}
 	
 	public void goToBest(){
@@ -58,7 +58,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			this.move.forward(1);
 			this.exploreTurningHead();
 			this.computeScores(this.position.getPoint());
-			this.printTiles();
+//			this.printTiles();
 		}
 		
 		this.position.turnLeft();
@@ -66,7 +66,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			this.move.forward(1);
 			this.exploreTurningHead();
 			this.computeScores(this.position.getPoint());
-			this.printTiles();
+//			this.printTiles();
 		}
 
 		this.position.turnLeft();
@@ -74,7 +74,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			this.move.forward(1);
 			this.exploreTurningHead();
 			this.computeScores(this.position.getPoint());
-			this.printTiles();
+//			this.printTiles();
 		}
 
 	}
@@ -108,19 +108,19 @@ public class WallValuesExplorer extends AbstractExplorer {
 	}
 
 	
-	public void printTiles(){
-		for(int x = 0; x < XMax; x++){
-			for(int y = 0; y < YMax; y++){
-				if (x == this.position.getPoint().x && y == this.position.getPoint().y)
-					System.out.print(" x ");
-				else
-					System.out.print(String.format("%03d", tileValues[x][y]));
-				System.out.print(" ");
-			}
-			System.out.println(" ");
-		}
-		System.out.println("\n");
-	}
+//	public void printTiles(){
+//		for(int x = 0; x < XMax; x++){
+//			for(int y = 0; y < YMax; y++){
+//				if (x == this.position.getPoint().x && y == this.position.getPoint().y)
+//					System.out.print(" x ");
+//				else
+//					System.out.print(String.format("%03d", tileValues[x][y]));
+//				System.out.print(" ");
+//			}
+//			System.out.println(" ");
+//		}
+//		System.out.println("\n");
+//	}
 	
 	/** for a given point get the number of undiscovered wall in all directions
 	@return a mark corresponding to the max number of wall that can be discovered from this tile
