@@ -7,7 +7,7 @@ import api.Observer;
 import model.Direction;
 import model.Grid;
 
-public class WallObserver {
+public class WallObserver implements Observer{
 	
 	private Grid grid;
 	private Movement move;
@@ -70,4 +70,12 @@ public class WallObserver {
 	public int getNbCase_B(){
 		return this.getDistance(true) / TILE_SIZE_CM;
 	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		// TODO Auto-generated method stub
+		// /!\ Non fait
+	}
+	
+	
 }

@@ -51,9 +51,6 @@ public class Main {
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 		
-		WallObserver wo = new WallObserver();
-		wd.addObserver(wo);
-		
 		// actions
 //		Grid g = GridGenerator.generate(23, 11, 0.2);
 		//Grid g = new Grid(3, 4);
@@ -61,6 +58,11 @@ public class Main {
 //		g.addWall(1, 1, Direction.EAST);
 //		g.addWall(2, 3, Direction.NORTH);/**/
 		Grid g = GridExample.g;
+		
+		WallObserver wo = new WallObserver(g, move, wd);
+		wd.addObserver(wo);
+		
+
 		
 		IA ia = new IA(position, g);
 		Point dest = new Point(9, 22);
