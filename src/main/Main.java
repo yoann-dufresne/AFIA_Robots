@@ -88,24 +88,24 @@ public class Main {
 //		g.addWall(2, 3, Direction.NORTH);/**/
 		Grid g = GridExample.g;
 
-		IA ia = new IA(position, g);
-		Point dest = new Point(9, 22);
-		Solution sol = ia.goTo(dest.x, dest.y);
-		List<Point> path1 = null;
-		List<Point> path2 = null;
-		int cost = 2323;
-		if (sol.alonePath != null){
-			path1 = sol.alonePath;
-			cost = sol.aloneParkoor[dest.x][dest.y];
-		}
-		else{
-			cost = Math.max(
-					sol.coopParkoor[dest.x][dest.y],
-					sol.aloneParkoor[sol.coopTile.x][sol.coopTile.y]
-			);
-			path1 = sol.otherCoopPath;
-			path2 = sol.myCoopPath;
-		}
+//		IA ia = new IA(position, g);
+//		Point dest = new Point(9, 22);
+//		Solution sol = ia.goTo(dest.x, dest.y);
+//		List<Point> path1 = null;
+//		List<Point> path2 = null;
+//		int cost = 2323;
+//		if (sol.alonePath != null){
+//			path1 = sol.alonePath;
+//			cost = sol.aloneParkoor[dest.x][dest.y];
+//		}
+//		else{
+//			cost = Math.max(
+//					sol.coopParkoor[dest.x][dest.y],
+//					sol.aloneParkoor[sol.coopTile.x][sol.coopTile.y]
+//			);
+//			path1 = sol.otherCoopPath;
+//			path2 = sol.myCoopPath;
+//		}
 		System.out.println("avant gc : " + Runtime.getRuntime().freeMemory());
 		System.gc();
 		System.out.println("apres gc : " + Runtime.getRuntime().freeMemory());
@@ -136,6 +136,7 @@ public class Main {
 		System.out.println("Main ended");
 //		System.out.println(Motor.A.isMoving());
 		Button.waitForAnyPress(20000);
+		System.out.println("tout fini");
 	}
 }
 

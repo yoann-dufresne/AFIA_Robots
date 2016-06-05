@@ -50,19 +50,25 @@ public class BluetoothRobot implements Runnable  {
 			List<String> words = Spliter.split(received, ';'); 
 			String command = words.get(0);
 			System.out.println("received command : " + command);
-			
+			try {
+				bw.write("nxt : " +command);
+				bw.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			if("DISCOVERED".equals(command)){
 				this.discover(words);
 			} else if ("PARTIAL".equals(command)){
 				this.partial(words);
 			} else if ("STOP".equals(command)){
 				this.stop(words);
+				System.out.println("endif ended");
 			} else {
 				System.out.println("Unknown command");
 			}
 			
 		}
-		
+		System.out.println("BT ended");
 		this.btc.close();
 	}
 	
