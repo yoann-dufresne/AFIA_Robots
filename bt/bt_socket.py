@@ -13,6 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+from __future__ import unicode_literals, print_function
 try:
     import bluetooth
 except ImportError:
@@ -34,27 +35,28 @@ class BlueSock(object):
 
     def connect(self):
         if self.debug:
-            print 'Connecting via Bluetooth...'
+            print('Connecting via Bluetooth...')
         sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         sock.connect((self.host, BlueSock.PORT))
         self.sock = sock
         if self.debug:
-            print 'Connected.'
+            print('Connected.')
 
     def close(self):
         if self.debug:
-            print 'Closing Bluetooth connection...'
+            print('Closing Bluetooth connection...')
         self.sock.close()
         if self.debug:
-            print 'Bluetooth connection closed.'
+            print('Bluetooth connection closed.')
 
     def send(self, data):
         if self.debug:
-            print 'Send:',
-            print ':'.join('%02x' % ord(c) for c in data)
-        l0 = len(data) & 0xFF
-        l1 = (len(data) >> 8) & d
-        0xFF = chr(l0) + chr(l1) + data
+            print('Send:', end=' ')
+            print(':'.join('%02x' % ord(c) for c in data))
+        l0 = len(data.encode('utf-8')) & 0xFF
+        l1 = (len(data.encode('utf-8')) >> 8) & 0xFF
+        d = chr(l0) + chr(l1) + data
+        print("sent : {}".format(d))
         self.sock.send(d)
 
     def recv(self):
@@ -64,8 +66,8 @@ class BlueSock(object):
         plen = l0 + (l1 << 8)
         data = self.sock.recv(plen)
         if self.debug:
-            print 'Recv:',
-            print ':'.join('%02x' % ord(c) for c in data)
+            print('Recv:', end=" ")
+            print(':'.join('%02x' % ord(c) for c in data))
         return data
 
 def _check_brick(arg, value):
@@ -76,3 +78,11 @@ def find_bricks(host=None, name=None):
         if _check_brick(host, h) and _check_brick(name, n):
             yield BlueSock(h)
 
+
+if __name__ == '__main__':
+    bt = BlueSock("00:16:53:13:EF:A9")
+    bt.debug = True
+    bt.connect()
+    bt.send("PARTIAL\n")
+    print(bt.recv())
+    bt.send("STOP\n")
