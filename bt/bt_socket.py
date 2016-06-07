@@ -1,4 +1,7 @@
 # FROM : https://github.com/skorokithakis/nxt-python/blob/master/nxt/bluesock.py
+# python3 : https://github.com/Eelviny/nxt-python
+
+
 # nxt.bluesock module -- Bluetooth socket communication with LEGO Minstorms NXT
 # Copyright (C) 2006-2007  Douglas P Lau
 # Copyright (C) 2009  Marcus Wanner
@@ -14,21 +17,26 @@
 # GNU General Public License for more details.
 
 from __future__ import unicode_literals, print_function
-try:
-    import bluetooth
-except ImportError:
-    import lightblueglue as bluetooth
+from collections import deque
 import os
+from threading import Thread
+import time
 
-class BlueSock(object):
+import bluetooth
+
+class BlueSock(Thread):
 
     bsize = 118 # Bluetooth socket block size
     PORT = 1    # Standard NXT rfcomm port
 
-    def __init__(self, host):
+    def __init__(self, host, fifo_in):
+        Thread.__init__(self)
+
         self.host = host
         self.sock = None
         self.debug = False
+        self.running = True
+        self.fifo_in = fifo_in
 
     def __str__(self):
         return 'Bluetooth (%s)' % self.host
@@ -41,6 +49,7 @@ class BlueSock(object):
         self.sock = sock
         if self.debug:
             print('Connected.')
+        self.start()
 
     def close(self):
         if self.debug:
@@ -50,6 +59,9 @@ class BlueSock(object):
             print('Bluetooth connection closed.')
 
     def send(self, data):
+        if data[-1] != "\n":
+            data = data + "\n"
+
         if self.debug:
             print('Send:', end=' ')
             print(':'.join('%02x' % ord(c) for c in data))
@@ -59,12 +71,24 @@ class BlueSock(object):
         print("sent : {}".format(d))
         self.sock.send(d)
 
+    def run(self):
+        print("running")
+        while self.running:
+            try:
+                data = self.recv()
+            except bluetooth.BluetoothError:
+                print("exception bt")
+            else:
+                self.fifo_in.append(data)
+        print("end running")
+
     def recv(self):
         data = self.sock.recv(2)
         l0 = ord(data[0])
         l1 = ord(data[1])
         plen = l0 + (l1 << 8)
         data = self.sock.recv(plen)
+        print("received:", data)
         if self.debug:
             print('Recv:', end=" ")
             print(':'.join('%02x' % ord(c) for c in data))
@@ -80,9 +104,23 @@ def find_bricks(host=None, name=None):
 
 
 if __name__ == '__main__':
-    bt = BlueSock("00:16:53:13:EF:A9")
+    qin = deque()
+
+    bt = BlueSock("00:16:53:13:EF:A9", qin)
     bt.debug = True
     bt.connect()
+    time.sleep(1)
+
     bt.send("PARTIAL\n")
-    print(bt.recv())
+    time.sleep(1)
+
+    bt.send("DISCOVERED")
+    time.sleep(1)
+
     bt.send("STOP\n")
+    time.sleep(1)
+    bt.running = False
+    bt.close()
+    bt.join()
+
+    print(qin)
