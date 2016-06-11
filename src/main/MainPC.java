@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
+import java.io.InputStreamReader;
 import lejos.pc.comm.NXTCommLogListener;
 import lejos.pc.comm.NXTConnector;
 
@@ -55,7 +55,7 @@ public class MainPC {
 
 		DataOutputStream dos0 = null, dos2 = null;
 		DataInputStream dis0 = null, dis2 = null;
-		
+
 		if (!connected0) {
 			System.err.println("Failed to connect to: " + macNxt0);
 			//System.exit(1);
@@ -66,7 +66,7 @@ public class MainPC {
 			dis0 = new DataInputStream(conn0.getInputStream());
 
 		}
-		
+
 		if (!connected2) {
 			System.err.println("Failed to connect to: "  + macNxt2);
 			//System.exit(1);
@@ -76,8 +76,6 @@ public class MainPC {
 			bw2 = new BufferedWriter(new OutputStreamWriter(dos2));
 			dis2 = new DataInputStream(conn2.getInputStream());
 		}
-
-
 
 		try {
 			if (connected0) {
@@ -128,8 +126,9 @@ public class MainPC {
 				bw2.flush();
 			}
 			System.out.println("wrote stop");
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 

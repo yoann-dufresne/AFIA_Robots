@@ -3,3 +3,5 @@
 **/*.nxj
 **/*.dropbox.attr
 **/*.swp
+/bin/
+*.pyc
