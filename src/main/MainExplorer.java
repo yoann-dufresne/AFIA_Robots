@@ -7,12 +7,14 @@ import captors.LineDetectors;
 import captors.LineObserver;
 import captors.Movement;
 import captors.WallDiscoverer;
-import captors.WallObserver;
-import bluetooth.BluetoothRobot;
+import captors.WallDiscovererObserver;
 
 public class MainExplorer {
 
 	public static void main(String[] args) {
+		Position position = new Position(0.5, 0.5, Direction.EAST);
+		Grid g = new Grid(3, 4);
+		
 		/*BluetoothRobot br = new BluetoothRobot();
 		Thread btThread = new Thread(br);
 		btThread.start();/**/
@@ -21,20 +23,16 @@ public class MainExplorer {
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
 		
-		/*WallDetectors wd = new WallDetectors ();
+		WallDiscoverer wd = new WallDiscoverer(position);
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
-		
-		Position position = new Position(0.5, 0.5, Direction.EAST);
 		
 		Movement move = new Movement(position);
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 
-		/*WallObserver wo = new WallObserver();
+		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
 		wd.addObserver(wo);/**/
-		
-		Grid g = new Grid(3, 4);
 	}
 
 }

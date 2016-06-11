@@ -7,12 +7,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 
-import util.Spliter;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import util.Spliter;
 
 public class BluetoothRobot implements Runnable  {
 	private BTConnection btc;

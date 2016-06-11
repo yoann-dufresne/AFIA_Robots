@@ -1,26 +1,9 @@
 package main;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-
-import java.awt.Point;
-import java.io.PrintStream;
-import java.util.List;
-
-import bluetooth.BluetoothRobot;
-import api.Map;
-import ia.IA;
-import ia.Solution;
-import lejos.nxt.Button;
-import lejos.nxt.Motor;
-import lejos.nxt.comm.Bluetooth;
-import lejos.nxt.comm.RConsole;
 import model.Direction;
 import model.Grid;
 import model.GridExample;
-import model.GridGenerator;
 import model.Position;
+import bluetooth.BluetoothRobot;
 import captors.LineDetectors;
 import captors.LineObserver;
 import captors.Movement;
@@ -65,10 +48,6 @@ public class Main {
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
 
-		WallDetectors wd = new WallDetectors ();
-		Thread wdThread = new Thread(wd);
-		wdThread.start();
-
 		Position position = new Position(0.5, 0.5, Direction.EAST);
 
 		System.out.println("Go");
@@ -76,9 +55,6 @@ public class Main {
 		Movement move = new Movement(position);
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
-
-		WallObserver wo = new WallObserver();
-		wd.addObserver(wo);
 
 		// actions
 //		Grid g = GridGenerator.generate(23, 11, 0.2);

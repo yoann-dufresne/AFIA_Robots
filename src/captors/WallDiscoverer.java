@@ -1,10 +1,9 @@
 package captors;
 
-import java.awt.Point;
-
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
+import model.Direction;
 import model.Position;
 import api.Observable;
 import api.Observer;
@@ -19,6 +18,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private UltrasonicSensor back;
 	private Position robotPosition;
 	
+	private int[] previousDistances;
 	
 	public WallDiscoverer (Position robot) {
 		this.front = new UltrasonicSensor(SensorPort.S2);
@@ -28,6 +28,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 		this.isInFrontPosition = false;
 		
 		this.robotPosition = robot;
+		this.previousDistances = new int[4];
 	}
 	
 	public void changeHeadPosition () {
@@ -56,6 +57,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 			// Si le robot est au milieu de la case
 			if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
 				this.checkForWalls();
+				this.notifyObservers();
 			}
 			
 			try {
@@ -67,8 +69,23 @@ public class WallDiscoverer extends Observable implements Runnable {
 	}
 	
 	private void checkForWalls() {
-		// TODO Auto-generated method stub
+		Direction dir = this.robotPosition.getDirection();
 		
+		this.previousDistances[dir.ordinal()] = this.front.getDistance();
+		this.previousDistances[(dir.ordinal() + 2) % 4] = this.front.getDistance();
+		
+		this.changeHeadPosition();
+		
+		this.previousDistances[(dir.ordinal() + 1) % 4] = this.front.getDistance();
+		this.previousDistances[(dir.ordinal() + 3) % 4] = this.front.getDistance();
+		
+		this.changeHeadPosition();
+	}
+	
+	@Override
+	public void notifyObservers () {
+		for (Observer obs : this.observers)
+			obs.update(this, this.previousDistances);
 	}
 
 	public void stop () {
