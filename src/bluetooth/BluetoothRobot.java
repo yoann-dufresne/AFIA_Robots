@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Timer;
 
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
@@ -29,13 +30,16 @@ public class BluetoothRobot implements Runnable  {
 		this.ended = false;
 		
 		System.out.println("BT waiting");
-        this.btc = Bluetooth.waitForConnection();
+        this.btc = Bluetooth.waitForConnection(); 
 		System.out.println("BT connected");
 		
         DataInputStream dis = btc.openDataInputStream();
 		DataOutputStream dos = btc.openDataOutputStream();
 		this.br = new BufferedReader(new InputStreamReader(dis));
 		this.bw = new BufferedWriter(new OutputStreamWriter(dos));
+		
+		PeriodicBt ptbt = new PeriodicBt(bw);
+		ptbt.run();
 		
 		while(!this.ended){
 			String received = null;

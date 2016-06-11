@@ -59,6 +59,7 @@ class BlueSock(Thread):
             print('Bluetooth connection closed.')
 
     def send(self, data):
+        print("sending ", data)
         if data[-1] != "\n":
             data = data + "\n"
 

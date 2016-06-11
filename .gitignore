@@ -4,3 +4,4 @@
 **/*.dropbox.attr
 **/*.swp
 /bin/
+*.pyc
