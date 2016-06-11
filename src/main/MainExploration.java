@@ -1,38 +1,38 @@
 package main;
 
-import ia.AbstractExplorer;
-import ia.WallValuesExplorer;
-//import ia.ZigZagExplorer;
-import captors.Movement;
-import captors.WallDetectors;
-import captors.WallObserver;
 import model.Direction;
 import model.Grid;
-import model.GridExample;
 import model.Position;
-import model.WallState;
+import captors.LineDetectors;
+import captors.LineObserver;
+import captors.Movement;
+import captors.WallDiscoverer;
+import captors.WallDiscovererObserver;
 
 public class MainExploration {
 
-	// details des capteurs
-	// S1 == A == back
-	// S2 == B == front
-	
 	public static void main(String[] args) {
 		Position position = new Position(0.5, 0.5, Direction.EAST);
-		Grid trueGrid = new Grid(4, 3, WallState.Empty);
-		Grid gridToExplore = new Grid(4, 3);
-		trueGrid.addWall(0, 1, Direction.EAST);
+		Grid g = new Grid(3, 4);
 		
-		//Grid trueGrid = GridExample.g;
+		/*BluetoothRobot br = new BluetoothRobot();
+		Thread btThread = new Thread(br);
+		btThread.start();/**/
+		
+		LineDetectors ld = new LineDetectors ();
+		Thread ldThread = new Thread (ld);
+		ldThread.start ();
+		
+		WallDiscoverer wd = new WallDiscoverer(position);
+		Thread wdThread = new Thread(wd);
+		wdThread.start();/**/
 		
 		Movement move = new Movement(position);
-		WallDetectors wd = new WallDetectors();
-		WallObserver wo = new WallObserver(trueGrid, move, wd);
-	
-		
-		AbstractExplorer explorer = new WallValuesExplorer(position, move, wd, wo, gridToExplore);
-		explorer.explore();
+		LineObserver lo = new LineObserver(move, position);
+		ld.addObserver(lo);
+
+		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
+		wd.addObserver(wo);/**/
 	}
-	
+
 }
