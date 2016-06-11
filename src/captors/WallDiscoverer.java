@@ -72,12 +72,12 @@ public class WallDiscoverer extends Observable implements Runnable {
 		Direction dir = this.robotPosition.getDirection();
 		
 		this.previousDistances[dir.ordinal()] = this.front.getDistance();
-		this.previousDistances[(dir.ordinal() + 2) % 4] = this.front.getDistance();
+		this.previousDistances[(dir.ordinal() + 2) % 4] = this.back.getDistance();
 		
 		this.changeHeadPosition();
 		
-		this.previousDistances[(dir.ordinal() + 1) % 4] = this.front.getDistance();
 		this.previousDistances[(dir.ordinal() + 3) % 4] = this.front.getDistance();
+		this.previousDistances[(dir.ordinal() + 1) % 4] = this.back.getDistance();
 		
 		this.changeHeadPosition();
 	}
