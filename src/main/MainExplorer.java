@@ -24,6 +24,7 @@ public class MainExplorer {
 		ldThread.start ();
 		
 		WallDiscoverer wd = new WallDiscoverer(position);
+		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
 		
@@ -33,6 +34,18 @@ public class MainExplorer {
 
 		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
 		wd.addObserver(wo);/**/
+		
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		ld.stop();
+		wd.stop();
+		
+		if (wd.isInFrontPosition())
+			wd.changeHeadPosition();
 	}
 
 }

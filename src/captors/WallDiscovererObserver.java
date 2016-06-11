@@ -37,6 +37,9 @@ public class WallDiscovererObserver implements Observer {
 			
 			int dist = dists[i];
 			while (dist > TILE_SIZE_CM) {
+				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
+					break;
+				
 				this.grid.setDiscovered(x, y, dir);
 				dist -= TILE_SIZE_CM;
 				
@@ -56,8 +59,9 @@ public class WallDiscovererObserver implements Observer {
 				}
 			}
 			
-			if (dists[i] != 255)
-				this.grid.addWall(x, y, dir);
+			if (x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
+				if (dists[i] != 255)
+					this.grid.addWall(x, y, dir);
 		}
 	}
 
