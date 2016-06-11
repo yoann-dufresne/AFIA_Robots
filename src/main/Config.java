@@ -24,4 +24,6 @@ public class Config {
 	
 	public static final int GRID_WIDTH = 23;
 	public static final int GRID_HEIGHT = 11;
+	
+	public static final int MAX_DIST_US = 255;
 }
