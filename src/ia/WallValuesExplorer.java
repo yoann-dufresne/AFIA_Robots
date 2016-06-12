@@ -17,9 +17,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public String filename;
 
 	private char[][] dijTab;
+	private List<Point> parkoor;
 
-	public WallValuesExplorer(Position position, Movement move, Grid grid, String filename) {
- 		super(position, move, grid);
+	public WallValuesExplorer(Position position, Movement movement, Grid grid, String filename) {
+ 		super(position, movement, grid);
  		this.tileValues = new char[this.XMax][this.YMax];
 		this.filename = filename;
 		this.dijTab = new char[grid.getHeight()][grid.getWidth()];
@@ -32,12 +33,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 		this.computeScores(this.position.getPoint());
 		while (!this.isAllDiscovered()){
 			this.move();
-			System.out.println("ici");
-			try {
-				Thread.sleep(1500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			
 			//this.computeScores(this.position.getPoint());
 			break;
 		}
@@ -62,66 +58,32 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void move(){
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
-		/*char[][] grid = this.makeDijkstraGrid(currentPoint,destination);
-
-		System.out.println("Avant");
-		System.out.println(destination.x + " " + destination.y);
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		List<List<Point>> parkoors = this.solveDijktsra(grid, currentPoint, destination);
-		System.out.println(parkoors.size());
-		System.out.println("Parkoors ok");
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		List<Point> parkoor = this.chooseParkoor(parkoors);
-		System.out.println("Parkoor ok");
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		parkoor.remove(0);
 		
-		for (Point p : parkoor) {
-			System.out.println(p);
-		}
-		System.out.println(parkoor.size());/**/
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		/*for(Point p: parkoor){
-			int diff=0;
-			boolean canMoove = false;
-			
-			if(p.x == this.position.getPoint().x){
-				diff = p.y - this.position.getPoint().y;
-				if (diff > 0 && this.grid.getTile(this.position.getPoint()).east == WallState.Empty)
-						canMoove= true;
-				else if (diff < 0 && this.grid.getTile(this.position.getPoint()).west == WallState.Empty)
-						canMoove= true;
-			} else {
-				// same Y
-				diff =  p.x - this.position.getPoint().x;
-				if (diff>0 && this.grid.getTile(this.position.getPoint()).south == WallState.Empty)
-						canMoove= true;
-				else if (diff<0 && this.grid.getTile(this.position.getPoint()).north == WallState.Empty)
-						canMoove= true;
+		// Si pas de dŽplacements
+		if (currentPoint.equals(destination)) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 			
-			if (canMoove){
-				//this.move.moveTo(p);
-			} else
-				break;
-		}/**/
+			return;
+		}
+		
+		char[][] grid = this.makeDijkstraGrid(currentPoint,destination);
+
+		List<List<Point>> parkoors = this.solveDijktsra(grid, currentPoint, destination);
+		this.parkoor = this.chooseParkoor(parkoors);
+		parkoor.remove(0);
+		
+		System.out.println(parkoor.size());
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		this.movement.followPath(this.parkoor);
 	}
 
 	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
