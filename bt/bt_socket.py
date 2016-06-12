@@ -54,6 +54,7 @@ class BlueSock(Thread):
     def close(self):
         if self.debug:
             print('Closing Bluetooth connection...')
+        self.running = False
         self.sock.close()
         if self.debug:
             print('Bluetooth connection closed.')
@@ -82,6 +83,7 @@ class BlueSock(Thread):
             else:
                 self.fifo_in.append(data)
         print("end running")
+        self.close()
 
     def recv(self):
         data = self.sock.recv(2)
@@ -103,25 +105,34 @@ def find_bricks(host=None, name=None):
         if _check_brick(host, h) and _check_brick(name, n):
             yield BlueSock(h)
 
+def main():
+    try:
+        qin = deque()
+
+        bt = BlueSock("00:16:53:13:EF:A9", qin)
+        bt.debug = True
+        bt.connect()
+        time.sleep(1)
+
+        bt.send("PARTIAL\n")
+        time.sleep(1)
+
+        bt.send("DISCOVERED")
+        time.sleep(1)
+
+        bt.send("STOP\n")
+        time.sleep(1)
+        bt.running = False
+        bt.close()
+        bt.join()
+
+        print(qin)
+    except KeyboardInterrupt:
+        bt.running = False
+        bt.close()
+        bt.join()
 
 if __name__ == '__main__':
-    qin = deque()
+    main()
 
-    bt = BlueSock("00:16:53:13:EF:A9", qin)
-    bt.debug = True
-    bt.connect()
-    time.sleep(1)
-
-    bt.send("PARTIAL\n")
-    time.sleep(1)
-
-    bt.send("DISCOVERED")
-    time.sleep(1)
-
-    bt.send("STOP\n")
-    time.sleep(1)
-    bt.running = False
-    bt.close()
-    bt.join()
-
-    print(qin)
+    print("bluetooth program terminated")
