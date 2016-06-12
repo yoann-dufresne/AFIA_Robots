@@ -1,19 +1,15 @@
 package ia;
 
 import java.awt.Point;
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import captors.Movement;
-import captors.WallDiscoverer;
-import captors.WallDiscovererObserver;
 import model.Direction;
 import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
+import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer {
 
@@ -21,7 +17,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public String filename;
 
 	private char[][] dijTab;
-
 
 	public WallValuesExplorer(Position position, Movement move, Grid grid, String filename) {
  		super(position, move, grid);
@@ -35,10 +30,16 @@ public class WallValuesExplorer extends AbstractExplorer {
 	@Override
 	public void explore () {
 		this.computeScores(this.position.getPoint());
-		int cpt=0;
 		while (!this.isAllDiscovered()){
-			cpt = this.moveTo(cpt);
-			this.computeScores(this.position.getPoint());
+			this.move();
+			System.out.println("ici");
+			try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			//this.computeScores(this.position.getPoint());
+			break;
 		}
 	}
 
@@ -58,25 +59,56 @@ public class WallValuesExplorer extends AbstractExplorer {
 	}
 
 
-	public int moveTo(int cpt){
+	public void move(){
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
-		char[][] grid = this.makeDijkstraGrid(currentPoint,destination);
+		/*char[][] grid = this.makeDijkstraGrid(currentPoint,destination);
 
-		List<Point> parkoor = this.chooseParkoor(this.solveDijktsra(grid, currentPoint, destination,cpt));
+		System.out.println("Avant");
+		System.out.println(destination.x + " " + destination.y);
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<List<Point>> parkoors = this.solveDijktsra(grid, currentPoint, destination);
+		System.out.println(parkoors.size());
+		System.out.println("Parkoors ok");
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<Point> parkoor = this.chooseParkoor(parkoors);
+		System.out.println("Parkoor ok");
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		parkoor.remove(0);
+		
+		for (Point p : parkoor) {
+			System.out.println(p);
+		}
+		System.out.println(parkoor.size());/**/
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
-		for(Point p: parkoor){
+		/*for(Point p: parkoor){
 			int diff=0;
 			boolean canMoove = false;
+			
 			if(p.x == this.position.getPoint().x){
 				diff = p.y - this.position.getPoint().y;
 				if (diff > 0 && this.grid.getTile(this.position.getPoint()).east == WallState.Empty)
 						canMoove= true;
 				else if (diff < 0 && this.grid.getTile(this.position.getPoint()).west == WallState.Empty)
 						canMoove= true;
-			}
-			else {
+			} else {
 				// same Y
 				diff =  p.x - this.position.getPoint().x;
 				if (diff>0 && this.grid.getTile(this.position.getPoint()).south == WallState.Empty)
@@ -84,14 +116,12 @@ public class WallValuesExplorer extends AbstractExplorer {
 				else if (diff<0 && this.grid.getTile(this.position.getPoint()).north == WallState.Empty)
 						canMoove= true;
 			}
+			
 			if (canMoove){
 				//this.move.moveTo(p);
-				cpt++;
-			}
-			else
+			} else
 				break;
-		}
-		return cpt;
+		}/**/
 	}
 
 	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
@@ -100,14 +130,17 @@ public class WallValuesExplorer extends AbstractExplorer {
 		int maxValue =-20000;
 		for (List<Point> list : possibleParkoors){
 			value = 0;
-			for (int indexP=0; indexP<list.size(); indexP++){
-				Point p = list.get(indexP);
+			
+			int idxPoint = 0;
+			for (Point p : list){
 				value+= this.tileValues[p.x][p.y];
-				if (indexP>2){
-					if (!(list.get(indexP-1).x == list.get(indexP-2).x && list.get(indexP-1).x== p.x) &&
-							(!(list.get(indexP-2).y == list.get(indexP-1).y && list.get(indexP-1).y== p.y)))
+				if (idxPoint>2){
+					if (!(list.get(idxPoint-1).x == list.get(idxPoint-2).x && list.get(idxPoint-1).x== p.x) &&
+							(!(list.get(idxPoint-2).y == list.get(idxPoint-1).y && list.get(idxPoint-1).y== p.y)))
 						value-=10;
 				}
+				
+				idxPoint++;
 			}
 			if (value>maxValue){
 				parkoor=list;
@@ -120,9 +153,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 
 	/**
 	 */
-	public List<List<Point>> solveDijktsra(char[][] grid, Point begin, Point dest,int cpt){
+	public List<List<Point>> solveDijktsra(char[][] grid, Point begin, Point dest){
 		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
 		List<Point> tmp = new ArrayList<Point>(grid[begin.x][begin.y]);
+		
 		tmp.add(begin);
 		possibleParkoors.add(tmp);
 		for (int dist=grid[begin.x][begin.y]; dist>0; dist--){
@@ -243,18 +277,27 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public List<Point> findHighScores(){
 		List<Point> highPoints = new ArrayList<Point>(255);
 		int highScore = 0;
+		System.out.println("Scores");
 		for (int y=0; y<this.YMax; y++){
 			for (int x=0; x<this.XMax; x++){
+				System.out.println(x + " " + y + "   " + (int)this.tileValues[x][y]);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
 				if (this.tileValues[x][y] == highScore){
 					highPoints.add(new Point(x,y));
 				}
-				else if (this.tileValues[x][y]>= highScore){
+				else if (this.tileValues[x][y]> highScore){
 					highPoints.clear();
 					highPoints.add(new Point(x,y));
 					highScore= this.tileValues[x][y];
 				}
 			}
 		}
+		
 		return highPoints;
 	}
 
@@ -271,6 +314,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 				dest = p;
 			}
 		}
+		
 		return dest;
 	}
 

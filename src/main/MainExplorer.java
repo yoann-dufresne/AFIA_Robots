@@ -1,5 +1,6 @@
 package main;
 
+import ia.WallValuesExplorer;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -35,14 +36,17 @@ public class MainExplorer {
 		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
 		wd.addObserver(wo);/**/
 		
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
+		wve.explore();
 		
 		ld.stop();
 		wd.stop();
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 		if (wd.isInFrontPosition())
 			wd.changeHeadPosition();
