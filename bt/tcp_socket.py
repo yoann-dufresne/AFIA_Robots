@@ -7,6 +7,7 @@ from bt_socket import BlueSock
 
 def ctrl_c_handler(signal, frame):
     bt.running = False
+    bt.close()
     bt.join()
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
@@ -18,6 +19,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     client.
     """
 
+    allow_reuse_address = True
+
     def handle(self):
         # self.request is the TCP socket connected to the client
         while True:
@@ -28,10 +31,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 bt.send(self.data)
             else:
                 print(qin)
-                self.request.sendall(str(qin))
+                self.request.sendall(str(qin)+"\n")
             if self.data == "stop":
                 ctrl_c_handler(None, None)
                 break
+        print("end handle")
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
@@ -48,4 +52,7 @@ if __name__ == "__main__":
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        ctrl_c_handler(None, None)

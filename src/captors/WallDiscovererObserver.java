@@ -11,10 +11,10 @@ import api.Observable;
 import api.Observer;
 
 public class WallDiscovererObserver implements Observer {
-	
+
 	private static final int TILE_SIZE_CM = new Double(100*Config.TILE_SIZE).intValue();
-	
-	
+
+
 	private Grid grid;
 	private Position position;
 
@@ -29,20 +29,20 @@ public class WallDiscovererObserver implements Observer {
 	public void update(Observable o, Object arg) {
 		int[] dists = (int[])arg;
 		Point tile = this.position.getPoint();
-		
+
 		for (int i=0 ; i<4 ; i++) {
 			Direction dir = Direction.values()[i];
 			int x = tile.x;
 			int y = tile.y;
-			
+
 			int dist = dists[i];
 			while (dist > TILE_SIZE_CM) {
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;
-				
+
 				this.grid.setDiscovered(x, y, dir);
 				dist -= TILE_SIZE_CM;
-				
+
 				switch (dir) {
 				case NORTH:
 					x--;
@@ -58,7 +58,7 @@ public class WallDiscovererObserver implements Observer {
 					break;
 				}
 			}
-			
+
 			if (x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
 				if (dists[i] != 255)
 					this.grid.addWall(x, y, dir);

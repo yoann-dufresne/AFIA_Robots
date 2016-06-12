@@ -52,11 +52,6 @@ public class LineObserver implements Observer {
 			break;
 		}
 		
-		/*System.out.print(Math.round(this.pos.getX()*100)/100.0 + " ");
-		System.out.print(Math.round(this.pos.getY()*100)/100.0 + " ");
-		System.out.print(this.pos.getDirection());
-		System.out.println();/**/
-		
 		return;
 	}
 

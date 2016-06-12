@@ -48,6 +48,7 @@ public class BluetoothRobot implements Runnable  {
 				 System.out.println(received);
 			} catch (IOException e) {
 				e.printStackTrace();
+				this.ended = true;
 			}
 			
 			List<String> words = Spliter.split(received, ';'); 
@@ -58,6 +59,7 @@ public class BluetoothRobot implements Runnable  {
 				bw.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
+				this.ended = true;
 			}
 			if("DISCOVERED".equals(command)){
 				this.discover(words);

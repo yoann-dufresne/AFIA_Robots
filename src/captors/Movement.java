@@ -162,7 +162,7 @@ public class Movement {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}/**/
+		}
 
 	}
 	
