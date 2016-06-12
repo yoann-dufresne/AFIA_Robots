@@ -18,6 +18,7 @@ public class Movement {
 	
 	private boolean interrupted;
 	public Position position;
+	private boolean pathStopped;
 
 	public Movement(Position position) {
 		this.right = Motor.A;
@@ -26,9 +27,13 @@ public class Movement {
 	}
 	
 	public void followPath(List<Point> path) {
+		this.pathStopped = false;
+		
 		for(Point p: path){
+			if (this.pathStopped)
+				break;
+			
 			if(p.equals(this.position.getPoint())){
-				System.out.println("Ici !");
 				continue;
 			}
 			
@@ -111,7 +116,7 @@ public class Movement {
 		}
 	}
 	
-	public void forward (int nbTiles){
+	public void forward (double nbTiles){
 		double xInit = this.position.getX();
 		double yInit = this.position.getY();
 		
@@ -163,7 +168,38 @@ public class Movement {
 				e.printStackTrace();
 			}
 		}
-
+	}
+	
+	public void stopOnThisTile() {
+		double x = this.position.getX();
+		double y = this.position.getY();
+		double dx, dy;
+		
+		// Stop current movement
+		this.pathStopped = true;
+		this.left.rotateTo(this.left.getPosition());
+		this.right.rotateTo(this.right.getPosition());
+		
+		// Move to the center of the tile
+		Direction dir = this.position.getDirection();
+		switch (dir) {
+		case NORTH:
+			dx = x - Math.floor(x) - 0.5;
+			this.forward(dx);
+			break;
+		case SOUTH:
+			dx = Math.floor(x) + 0.5 - x;
+			this.forward(dx);
+			break;
+		case EAST:
+			dy = Math.floor(y) + 0.5 - y;
+			this.forward(dy);
+			break;
+		case WEST:
+			dy = y - Math.floor(y) - 0.5;
+			this.forward(dy);
+			break;
+		}
 	}
 	
 	public void updateModel() {

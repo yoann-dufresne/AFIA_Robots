@@ -9,12 +9,14 @@ import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
+import api.Observable;
+import api.Observer;
 import captors.Movement;
 
-public class WallValuesExplorer extends AbstractExplorer {
+public class WallValuesExplorer extends AbstractExplorer implements Observer {
 
 	protected char tileValues[][];
-	public String filename;
+	private String filename;
 
 	private char[][] dijTab;
 	private List<Point> parkoor;
@@ -74,9 +76,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 
 		List<List<Point>> parkoors = this.solveDijktsra(grid, currentPoint, destination);
 		this.parkoor = this.chooseParkoor(parkoors);
-		parkoor.remove(0);
 		
-		System.out.println(parkoor.size());
+		System.out.println(this.parkoor.size());
 		try {
 			Thread.sleep(1500);
 		} catch (InterruptedException e) {
@@ -84,6 +85,20 @@ public class WallValuesExplorer extends AbstractExplorer {
 		}
 
 		this.movement.followPath(this.parkoor);
+	}
+	
+	@Override
+	public void update(Observable o, Object arg) {
+		Point currentTile = this.position.getPoint();
+		Point nextTile = null;
+		
+		int currentIdx = this.parkoor.indexOf(currentTile);
+		nextTile = currentIdx == -1 ? this.parkoor.get(0) : this.parkoor.get(currentIdx+1);
+		
+		Direction dir = Direction.getDirectionBetween(currentTile, nextTile);
+		
+		if (this.grid.getTile(currentTile).getState(dir) == WallState.Wall)
+			this.movement.stopOnThisTile();
 	}
 
 	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){

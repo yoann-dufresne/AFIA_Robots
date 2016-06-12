@@ -4,16 +4,11 @@ package ia;
 import model.Grid;
 import model.Position;
 import captors.Movement;
-import captors.WallDiscoverer;
-import captors.WallDiscovererObserver;
 
 /**
  *	Class controlling the exploration phase
  */
 public abstract class AbstractExplorer{
-
-	protected WallDiscoverer wd;
-	protected WallDiscovererObserver wo;
 
 	protected Position position;
 	protected Movement movement;

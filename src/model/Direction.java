@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.Point;
+
 public enum Direction {
 	NORTH, EAST, SOUTH, WEST;
 	
@@ -39,5 +41,16 @@ public enum Direction {
 			else
 				return 1;
 		}
+	}
+	
+	public static Direction getDirectionBetween (Point from, Point to) {
+		if (from.x < to.x)
+			return SOUTH;
+		else if (from.x > to.x)
+			return NORTH;
+		else if (from.y > to.y)
+			return WEST;
+		else
+			return EAST;
 	}
 }
