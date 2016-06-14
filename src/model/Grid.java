@@ -259,4 +259,23 @@ public class Grid {
 		}
 	}
 
+	public Tile[] getNeighbors(Point current) {
+		Tile[] nei = new Tile[4];
+		
+		if (current.x > 0)
+			nei[Direction.NORTH.ordinal()] = this.getTile(current.x-1, current.y);
+		if (current.y > 0)
+			nei[Direction.WEST.ordinal()] = this.getTile(current.x, current.y-1);
+		if (current.x < this.height-1)
+			nei[Direction.SOUTH.ordinal()] = this.getTile(current.x+1, current.y);
+		if (current.x < this.height-1)
+			nei[Direction.EAST.ordinal()] = this.getTile(current.x, current.y+1);
+		
+		return nei;
+	}
+	
+	public Tile[] getNeighbors(Tile tile) {
+		return this.getNeighbors(new Point(tile.getLine(), tile.getCol()));
+	}
+
 }

@@ -15,10 +15,13 @@ import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer implements Observer {
 
+	public static final int MAX_DIST = 5;
+	
 	protected char tileValues[][];
 	private String filename;
 
 	private char[][] dijTab;
+	private char[][] manhattanDistances;
 	private List<Point> parkoor;
 
 	public WallValuesExplorer(Position position, Movement movement, Grid grid, String filename) {
@@ -26,6 +29,7 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
  		this.tileValues = new char[this.XMax][this.YMax];
 		this.filename = filename;
 		this.dijTab = new char[grid.getHeight()][grid.getWidth()];
+		this.manhattanDistances = new char[this.XMax][this.YMax];
  	}
 
 
@@ -33,16 +37,17 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	@Override
 	public void explore () {
 		this.computeScores(this.position.getPoint());
+		int idx = 0;
 		while (!this.isAllDiscovered()){
 			this.move();
-			
-			//this.computeScores(this.position.getPoint());
-			break;
+			this.computeScores(this.position.getPoint());
+			if (++idx>=2)
+				break;
 		}
 	}
 
 	/** tells if the grid is all discovered or not
-	 * TODO : Améliorer pour pas de n^2 !!!!
+	 * TODO : Am√©liorer pour pas de n^2 !!!!
 	 *
 	 * @return if all tiles values are equal to 0
 	 */
@@ -61,7 +66,9 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
 		
-		// Si pas de déplacements
+		System.out.println(destination.x + " " + destination.y);
+		
+		// Si pas de dÔøΩplacements
 		if (currentPoint.equals(destination)) {
 			try {
 				Thread.sleep(500);
@@ -72,9 +79,10 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 			return;
 		}
 		
-		char[][] grid = this.makeDijkstraGrid(currentPoint,destination);
+		char[][] distances = this.getManhattanDistances(currentPoint,destination);
 
-		List<List<Point>> parkoors = this.solveDijktsra(grid, currentPoint, destination);
+		// TODO : transformer pour faire les deux fonctions d'un seul coup pour √©viter les probl√®mes de RAM.
+		List<List<Point>> parkoors = this.solveDijktsra(distances, currentPoint, destination);
 		this.parkoor = this.chooseParkoor(parkoors);
 		
 		System.out.println(this.parkoor.size());
@@ -162,107 +170,60 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 			}
 		return possibleParkoors;
 	}
-
-
-
- 	public char[][] makeDijkstraGrid(Point begin,Point dest){
- 		char[][] grid = this.dijTab; // Pas besoin de le re-créer plein de fois
+	
+	public char[][] getManhattanDistances (Point current) {
+		return this.getManhattanDistances(current, null);
+	}
+	
+	public char[][] getManhattanDistances (Point current, Point destination) {
+		char[][] dists = this.manhattanDistances;
 		for (int x=0; x<this.XMax; x++){
 			for (int y=0; y<this.YMax; y++)
-				grid[x][y]= 255;
+				dists[x][y]= 255;
 		}
-
-
-		List<Point> prevPoints = new ArrayList<Point>(100);
-		prevPoints.add(dest);
-		char distance=0;
-		grid[dest.x][dest.y]=distance;
-		while (grid[begin.x][begin.y]==255){
-			distance ++;
-			List<Point> nextPoints = new ArrayList<Point>(255);
-			for (Point p : prevPoints){
-				List<Point> pointsReached= this.setNeighbourgValueDijkstra(p, grid, distance);
-				for (Point point : pointsReached){
-					nextPoints.add(point);
+		dists[current.x][current.y] = 0;
+		
+		List<Point> nextPoints = new ArrayList<Point>();
+		nextPoints.add(current);
+		
+		while (nextPoints.size() > 0) {
+			current = nextPoints.remove(0);
+			int val = dists[current.x][current.y];
+			
+			// Empeche les deplacements trop lointains quand pas de destination
+			if (destination == null && val == MAX_DIST)
+				continue;
+			
+			Tile[] neis = this.grid.getNeighbors(current);
+			for (Tile nei : neis) {
+				if (dists[nei.getLine()][nei.getCol()] > val+1) {
+					dists[nei.getLine()][nei.getCol()] = (char) (val+1);
+					nextPoints.add(current);
 				}
 			}
-			prevPoints = new ArrayList<Point>(255);
-			for (Point p: nextPoints){
-				prevPoints.add(p);
-			}
 		}
-		return grid;
+		
+		return dists;
 	}
 
-	public List<Point> setNeighbourgValueDijkstra(Point p,char[][] grid, char distance){
-
-		Tile t = this.grid.getTile(p);
-		List<Direction> emptyWalls = new ArrayList<Direction>(4);
-		List<Point> pointsReached = new ArrayList<Point>(4);
-		if (t.east != WallState.Wall)
-			emptyWalls.add(Direction.EAST);
-		if (t.west != WallState.Wall)
-			emptyWalls.add(Direction.WEST);
-		if (t.north != WallState.Wall)
-			emptyWalls.add(Direction.NORTH);
-		if (t.south != WallState.Wall)
-			emptyWalls.add(Direction.SOUTH);
-
-		for (Direction dir : emptyWalls){
-			Point tmp= new Point(p);
-			this.grid.translatePoint(tmp, dir);
-			if (grid[tmp.x][tmp.y] > distance){
-				grid[tmp.x][tmp.y]= distance;
-				pointsReached.add(tmp);
-			}
-		}
-		return pointsReached;
-	}
-
-	public char[][] getRealDistance(Point currentPoint){
-		char[][] grid = new char[this.XMax][this.YMax];
-		for (int x=0; x<this.XMax; x++){
-			for (int y=0; y<this.YMax; y++)
-				grid[x][y]= 255;
-		}
-
-		List<Point> prevPoints = new ArrayList<Point>(100);
-		prevPoints.add(currentPoint);
-		char distance=0;
-		grid[currentPoint.x][currentPoint.y]=distance;
-		while (distance<30){
-			distance ++;
-			List<Point> nextPoints = new ArrayList<Point>(255);
-			for (Point p : prevPoints){
-				List<Point> pointsReached= this.setNeighbourgValueDijkstra(p, grid, distance);
-				for (Point point : pointsReached){
-					nextPoints.add(point);
-				}
-			}
-			prevPoints = new ArrayList<Point>(255);
-			for (Point p: nextPoints){
-				prevPoints.add(p);
-			}
-		}
-		return grid;
-	}
+	
 
 	/**search for the point on the grid witch has the greatest value
 	 *
 	 * @return the point with the highest value
 	 */
 	public List<Point> findHighScores(){
-		List<Point> highPoints = new ArrayList<Point>(255);
+		List<Point> highPoints = new ArrayList<Point>();
 		int highScore = 0;
-		System.out.println("Scores");
+
 		for (int y=0; y<this.YMax; y++){
 			for (int x=0; x<this.XMax; x++){
-				System.out.println(x + " " + y + "   " + (int)this.tileValues[x][y]);
+				/*System.out.println(x + " " + y + "   " + (int)this.tileValues[x][y]);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
+				}/**/
 				
 				if (this.tileValues[x][y] == highScore){
 					highPoints.add(new Point(x,y));
@@ -301,7 +262,7 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	 * @param p the point to compute scores from
 	 */
 	public void computeScores(Point p){
-		char[][] realDistance= this.getRealDistance(p);
+		char[][] realDistance= this.getManhattanDistances(p);
 		for(int y = 0; y < this.YMax; y++){
 			for(int x = 0; x < this.XMax; x++){
 				int score = this.tileScore(x, y);
