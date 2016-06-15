@@ -20,7 +20,6 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	protected char tileValues[][];
 	private String filename;
 
-	private char[][] dijTab;
 	private char[][] manhattanDistances;
 	private List<Point> parkoor;
 
@@ -28,7 +27,6 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
  		super(position, movement, grid);
  		this.tileValues = new char[this.XMax][this.YMax];
 		this.filename = filename;
-		this.dijTab = new char[grid.getHeight()][grid.getWidth()];
 		this.manhattanDistances = new char[this.XMax][this.YMax];
  	}
 
@@ -39,11 +37,11 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		this.computeScores(this.position.getPoint());
 		int idx = 0;
 		while (!this.isAllDiscovered()){
-			this.move();
+			this.nextStep();
 			this.computeScores(this.position.getPoint());
 			if (++idx>=2)
 				break;
-		}
+		}/**/
 	}
 
 	/** tells if the grid is all discovered or not
@@ -62,13 +60,13 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	}
 
 
-	public void move(){
+	public void nextStep(){
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
 		
 		System.out.println(destination.x + " " + destination.y);
 		
-		// Si pas de d�placements
+		// Si pas de déplacements
 		if (currentPoint.equals(destination)) {
 			try {
 				Thread.sleep(500);
@@ -81,18 +79,30 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
 
-		// TODO : transformer pour faire les deux fonctions d'un seul coup pour éviter les problèmes de RAM.
-		List<List<Point>> parkoors = this.solveDijktsra(distances, currentPoint, destination);
+		List<List<Point>> parkoors = this.tracebackDijktsra(distances, currentPoint, destination);
+		for (List<Point> path : parkoors) {
+			for (Point p : path)
+				System.out.print("("+p.x+";"+p.y+")");
+			System.out.println();
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		this.parkoor = this.chooseParkoor(parkoors);
 		
 		System.out.println(this.parkoor.size());
+		for (Point p : this.parkoor)
+			System.out.println(p.x + " " + p.y);
 		try {
 			Thread.sleep(1500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		System.out.println();
 
-		this.movement.followPath(this.parkoor);
+		//this.movement.followPath(this.parkoor);
 	}
 	
 	@Override
@@ -109,6 +119,51 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 			this.movement.stopOnThisTile();
 	}
 
+
+	// --------------------------------------------------------------
+	// ----------------------- Path selection -----------------------
+	// --------------------------------------------------------------
+	
+	public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
+		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
+		List<Point> tmp = new ArrayList<Point>();
+		
+		tmp.add(begin);
+		possibleParkoors.add(tmp);
+		
+		for (int dist=dists[begin.x][begin.y]; dist>0; dist--){
+			List<List<Point>> toAdd = new ArrayList<List<Point>>();
+			
+			for(List<Point> list : possibleParkoors){
+				Point p = list.get(list.size()-1);
+				List<Point> pointsReached = new ArrayList<Point>(4);
+				
+				for (Tile nei : this.grid.getNeighbors(p)) {
+					if (nei == null || dists[nei.getLine()][nei.getCol()] != dist-1)
+						continue;
+					
+					pointsReached.add(new Point(nei.getLine(), nei.getCol()));
+				}
+
+				int idx=0;
+				for (Point reached : pointsReached) {
+					List<Point> current = list;
+					
+					if (idx++ != pointsReached.size()-1) {
+						current = new ArrayList<Point>(current);
+						toAdd.add(current);
+					}
+					
+					current.add(reached);
+				}
+			}
+			
+			possibleParkoors.addAll(toAdd);
+		}
+		
+		return possibleParkoors;
+	}
+	
 	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
 		List<Point> parkoor = new ArrayList<Point>();
 		int value;
@@ -135,41 +190,11 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 
 		return parkoor;
 	}
-
-	/**
-	 */
-	public List<List<Point>> solveDijktsra(char[][] grid, Point begin, Point dest){
-		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
-		List<Point> tmp = new ArrayList<Point>(grid[begin.x][begin.y]);
-		
-		tmp.add(begin);
-		possibleParkoors.add(tmp);
-		for (int dist=grid[begin.x][begin.y]; dist>0; dist--){
-			for(int nblist=0; nblist< possibleParkoors.size(); nblist++ ){
-				List<Point> list= possibleParkoors.get(nblist);
-				Point p = list.get(list.size()-1);
-				List<Point> pointsReached = new ArrayList<Point>(4);
-				if (p.y-1>=0 && grid[p.x][p.y-1] == dist-1 && this.grid.getTile(p).west!=WallState.Wall)
-					pointsReached.add(new Point(p.x,p.y-1));
-				if (p.x-1>=0 && grid[p.x-1][p.y] == dist-1 && this.grid.getTile(p).north!=WallState.Wall)
-					pointsReached.add(new Point(p.x-1,p.y));
-				if (p.y+1<this.YMax && grid[p.x][p.y+1] == dist-1 && this.grid.getTile(p).east!=WallState.Wall)
-					pointsReached.add(new Point(p.x,p.y+1));
-				if (p.x+1<this.XMax && grid[p.x+1][p.y] == dist-1 && this.grid.getTile(p).south!=WallState.Wall)
-					pointsReached.add(new Point(p.x+1,p.y));
-
-				for (int size=pointsReached.size(); size>1;size--){
-						@SuppressWarnings({ "unchecked", "rawtypes" })
-						List<Point> listcopy = new ArrayList(list);
-						listcopy.add(pointsReached.get(size-1));
-						possibleParkoors.add(listcopy);
-					}
-				if (pointsReached.size()>=1)
-					list.add(pointsReached.get(0));
-				}
-			}
-		return possibleParkoors;
-	}
+	
+	
+	// --------------------------------------------------------------
+	// ------------------ Distances computation ---------------------
+	// --------------------------------------------------------------
 	
 	public char[][] getManhattanDistances (Point current) {
 		return this.getManhattanDistances(current, null);
@@ -196,6 +221,9 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 			
 			Tile[] neis = this.grid.getNeighbors(current);
 			for (Tile nei : neis) {
+				if (nei == null)
+					continue;
+				
 				if (dists[nei.getLine()][nei.getCol()] > val+1) {
 					dists[nei.getLine()][nei.getCol()] = (char) (val+1);
 					nextPoints.add(current);
@@ -218,12 +246,6 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 
 		for (int y=0; y<this.YMax; y++){
 			for (int x=0; x<this.XMax; x++){
-				/*System.out.println(x + " " + y + "   " + (int)this.tileValues[x][y]);
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}/**/
 				
 				if (this.tileValues[x][y] == highScore){
 					highPoints.add(new Point(x,y));
@@ -262,15 +284,12 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	 * @param p the point to compute scores from
 	 */
 	public void computeScores(Point p){
-		char[][] realDistance= this.getManhattanDistances(p);
-		for(int y = 0; y < this.YMax; y++){
-			for(int x = 0; x < this.XMax; x++){
+		char[][] distances= this.getManhattanDistances(p);
+		for(int x = 0; x < distances.length; x++){
+			for(int y = 0; y < distances[x].length; y++){
 				int score = this.tileScore(x, y);
-				if (score != 0)
-					this.tileValues[x][y] =  (char) Math.max(1,score*3-new Double (Math.pow(realDistance[x][y],2)).intValue());
-				else
-					this.tileValues[x][y]= 0;
-//				this.tileValues[x][y]= score;
+				if (distances[x][y] != 0)
+					this.tileValues[x][y] =  (char) Math.max(1,score/distances[x][y]);
 			}
 		}
 	}
@@ -280,7 +299,8 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		int dx = Math.abs(p1.x - p2.x);
 		int dy = Math.abs(p1.y - p2.y);
 		res = score -(dx+dy);
-		if (dx!=0 && dy!=0)// si le robot doit tourner
+		// si le robot doit tourner
+		if (dx!=0 && dy!=0)
 			res-=2;
 		return res;
 	}

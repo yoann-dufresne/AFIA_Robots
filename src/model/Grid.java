@@ -260,22 +260,22 @@ public class Grid {
 	}
 
 	public Tile[] getNeighbors(Point current) {
-		Tile[] nei = new Tile[4];
-		
-		if (current.x > 0)
-			nei[Direction.NORTH.ordinal()] = this.getTile(current.x-1, current.y);
-		if (current.y > 0)
-			nei[Direction.WEST.ordinal()] = this.getTile(current.x, current.y-1);
-		if (current.x < this.height-1)
-			nei[Direction.SOUTH.ordinal()] = this.getTile(current.x+1, current.y);
-		if (current.x < this.height-1)
-			nei[Direction.EAST.ordinal()] = this.getTile(current.x, current.y+1);
-		
-		return nei;
+		return this.getNeighbors(this.getTile(current));
 	}
 	
 	public Tile[] getNeighbors(Tile tile) {
-		return this.getNeighbors(new Point(tile.getLine(), tile.getCol()));
+		Tile[] nei = new Tile[4];
+		
+		if (tile.getLine() > 0 && tile.north != WallState.Wall)
+			nei[Direction.NORTH.ordinal()] = this.getTile(tile.getLine()-1, tile.getCol());
+		if (tile.getCol() > 0 && tile.west != WallState.Wall)
+			nei[Direction.WEST.ordinal()] = this.getTile(tile.getLine(), tile.getCol()-1);
+		if (tile.getLine() < this.height-1 && tile.south != WallState.Wall)
+			nei[Direction.SOUTH.ordinal()] = this.getTile(tile.getLine()+1, tile.getCol());
+		if (tile.getCol() < this.width-1 && tile.east != WallState.Wall)
+			nei[Direction.EAST.ordinal()] = this.getTile(tile.getLine(), tile.getCol()+1);
+		
+		return nei;
 	}
 
 }
