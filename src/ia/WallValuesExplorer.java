@@ -39,7 +39,7 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		while (!this.isAllDiscovered()){
 			this.nextStep();
 			this.computeScores(this.position.getPoint());
-			if (++idx>=2)
+			if (++idx>=1)
 				break;
 		}/**/
 	}
