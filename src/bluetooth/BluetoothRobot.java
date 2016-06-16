@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.Timer;
 
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
@@ -38,40 +37,48 @@ public class BluetoothRobot implements Runnable  {
 		this.br = new BufferedReader(new InputStreamReader(dis));
 		this.bw = new BufferedWriter(new OutputStreamWriter(dos));
 		
-		PeriodicBt ptbt = new PeriodicBt(bw);
-		ptbt.run();
-		
 		while(!this.ended){
-			String received = null;
-			try {
-				 received = this.br.readLine();
-				 System.out.println(received);
-			} catch (IOException e) {
-				e.printStackTrace();
-				this.ended = true;
+			if (this.btc.available() > 0) {
+				String received = null;
+				try {
+					 received = this.br.readLine();
+					 System.out.println(received);
+				} catch (IOException e) {
+					e.printStackTrace();
+					this.ended = true;
+				}
+				
+				List<String> words = Spliter.split(received, ';'); 
+				String command = words.get(0);
+				System.out.println("received command : " + command);
+				try {
+					bw.write("nxt : " +command);
+					bw.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+					this.ended = true;
+				}
+				if("DISCOVERED".equals(command)){
+					this.discover(words);
+				} else if ("PARTIAL".equals(command)){
+					this.partial(words);
+				} else if ("STOP".equals(command)){
+					this.stop(words);
+					System.out.println("endif ended");
+				} else {
+					System.out.println("Unknown command");
+				}
 			}
 			
-			List<String> words = Spliter.split(received, ';'); 
-			String command = words.get(0);
-			System.out.println("received command : " + command);
 			try {
-				bw.write("nxt : " +command);
-				bw.flush();
+				this.bw.write(this.btc.getAddress());
+				System.out.println(this.btc.getAddress());
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
-				this.ended = true;
 			}
-			if("DISCOVERED".equals(command)){
-				this.discover(words);
-			} else if ("PARTIAL".equals(command)){
-				this.partial(words);
-			} else if ("STOP".equals(command)){
-				this.stop(words);
-				System.out.println("endif ended");
-			} else {
-				System.out.println("Unknown command");
-			}
-			
 		}
 		System.out.println("BT ended");
 		this.btc.close();
