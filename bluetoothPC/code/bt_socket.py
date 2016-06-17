@@ -21,6 +21,7 @@ from collections import deque
 import os
 from threading import Thread
 import time
+import signal
 
 import bluetooth
 
@@ -43,7 +44,7 @@ class BlueSock(Thread):
 
     def connect(self):
         if self.debug:
-            print('Connecting via Bluetooth...')
+            print('Connecting via Bluetooth to {}...'.format(self.host))
         sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         sock.connect((self.host, BlueSock.PORT))
         self.sock = sock
@@ -52,12 +53,14 @@ class BlueSock(Thread):
         self.start()
 
     def close(self):
+        import ipdb; ipdb.set_trace()
+
         if self.debug:
-            print('Closing Bluetooth connection...')
+            print('Closing Bluetooth connection to {}...'.format(self.host))
         self.running = False
         self.sock.close()
         if self.debug:
-            print('Bluetooth connection closed.')
+            print('Bluetooth connection closed to {}...'.format(self.host))
 
     def send(self, data):
         print("sending ", data)
@@ -71,27 +74,39 @@ class BlueSock(Thread):
         l1 = (len(data.encode('utf-8')) >> 8) & 0xFF
         d = chr(l0) + chr(l1) + data
         print("sent : {}".format(d))
-        self.sock.send(d)
+        try:
+            self.sock.send(d)
+        except bluetooth.BluetoothError:
+            print("exception while sending")
 
     def run(self):
-        print("running")
         while self.running:
             try:
                 data = self.recv()
             except bluetooth.BluetoothError:
-                print("exception bt")
+                print("bt exception bt on {}".format(self.host))
+                self.close()
+            except KeyboardInterrupt:
+                self.close()
+
             else:
+                data = {self.host: data}
                 self.fifo_in.append(data)
         print("end running")
         self.close()
 
     def recv(self):
+        print("first receive length")
+
         data = self.sock.recv(2)
+
         l0 = ord(data[0])
         l1 = ord(data[1])
         plen = l0 + (l1 << 8)
+        print("receive message")
+
         data = self.sock.recv(plen)
-        print("received:", data)
+
         if self.debug:
             print('Recv:', end=" ")
             print(':'.join('%02x' % ord(c) for c in data))
@@ -124,13 +139,20 @@ def main():
         time.sleep(1)
         bt.running = False
         bt.close()
-        bt.join()
+        bt.join(1)
 
         print(qin)
     except KeyboardInterrupt:
         bt.running = False
         bt.close()
-        bt.join()
+        bt.join(1)
+
+
+def ctrlC_handler(signal, frame):
+    print("In bt_socket ctrl c handler")
+
+signal.signal(signal.SIGINT, ctrlC_handler)
+
 
 if __name__ == '__main__':
     main()
