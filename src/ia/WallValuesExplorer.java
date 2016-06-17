@@ -31,16 +31,12 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
  	}
 
 
-
 	@Override
 	public void explore () {
 		this.computeScores(this.position.getPoint());
-		int idx = 0;
 		while (!this.isAllDiscovered()){
-			this.nextStep();
+			this.nextMove();
 			this.computeScores(this.position.getPoint());
-			if (++idx>=1)
-				break;
 		}/**/
 	}
 
@@ -60,11 +56,9 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	}
 
 
-	public void nextStep(){
+	public void nextMove(){
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
-		
-		System.out.println(destination.x + " " + destination.y);
 		
 		// Si pas de déplacements
 		if (currentPoint.equals(destination)) {
@@ -78,31 +72,10 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		}
 		
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
-
-		List<List<Point>> parkoors = this.tracebackDijktsra(distances, currentPoint, destination);
-		for (List<Point> path : parkoors) {
-			for (Point p : path)
-				System.out.print("("+p.x+";"+p.y+")");
-			System.out.println();
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.parkoor = this.chooseParkoor(parkoors);
+		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
 		
-		System.out.println(this.parkoor.size());
-		for (Point p : this.parkoor)
-			System.out.println(p.x + " " + p.y);
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println();
-
-		//this.movement.followPath(this.parkoor);
+		this.parkoor = this.chooseParkoor(parkoors);
+		this.movement.followPath(this.parkoor);/**/
 	}
 	
 	@Override
@@ -111,6 +84,8 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		Point nextTile = null;
 		
 		int currentIdx = this.parkoor.indexOf(currentTile);
+		if (this.parkoor.size() == currentIdx+1)
+			return;
 		nextTile = currentIdx == -1 ? this.parkoor.get(0) : this.parkoor.get(currentIdx+1);
 		
 		Direction dir = Direction.getDirectionBetween(currentTile, nextTile);
@@ -187,8 +162,12 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 			}
 		}
 
-
-		return parkoor;
+		// Revert the list
+		List<Point> reverted = new ArrayList<Point>(parkoor.size());
+		for (Point p : parkoor)
+			reverted.add(0, p);
+		
+		return reverted;
 	}
 	
 	
@@ -285,13 +264,23 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 	 */
 	public void computeScores(Point p){
 		char[][] distances= this.getManhattanDistances(p);
+		
 		for(int x = 0; x < distances.length; x++){
 			for(int y = 0; y < distances[x].length; y++){
-				int score = this.tileScore(x, y);
-				if (distances[x][y] != 0)
-					this.tileValues[x][y] =  (char) Math.max(1,score/distances[x][y]);
+				Tile t = this.grid.getTile(x, y);
+				
+				if (t.east == WallState.Undiscovered ||
+						t.west == WallState.Undiscovered ||
+						t.north == WallState.Undiscovered ||
+						t.south == WallState.Undiscovered) {
+					int score = this.tileScore(x, y);
+					this.tileValues[x][y] =  (char) Math.max(1,score/Math.max(1,distances[x][y]));
+				} else
+					this.tileValues[x][y] = 0;
 			}
 		}
+		
+		Tile t = this.grid.getTile(0, 0);
 	}
 
 	public int scoreDistanceModulation(Point p1, Point p2, int score){

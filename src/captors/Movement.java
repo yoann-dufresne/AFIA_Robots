@@ -28,7 +28,6 @@ public class Movement {
 	
 	public void followPath(List<Point> path) {
 		this.pathStopped = false;
-		System.out.println("Go !");
 		
 		for(Point p: path){
 			if (this.pathStopped) {
@@ -36,14 +35,10 @@ public class Movement {
 				break;
 			}
 			
-			System.out.println(p.x + " " + p.y);
-			System.out.println(this.position.getPoint().x + " " + this.position.getPoint().y);
 			if(p.equals(this.position.getPoint())){
-				System.out.println("Same !");
 				continue;
 			}
 			
-			System.out.println("Move !");
 			this.moveTo(p);
 		}
 	}

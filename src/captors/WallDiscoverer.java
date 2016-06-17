@@ -1,5 +1,7 @@
 package captors;
 
+import java.awt.Point;
+
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
@@ -17,6 +19,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private UltrasonicSensor front;
 	private UltrasonicSensor back;
 	private Position robotPosition;
+	private Point previous;
 	
 	private int[] previousDistances;
 	
@@ -29,13 +32,14 @@ public class WallDiscoverer extends Observable implements Runnable {
 		
 		this.robotPosition = robot;
 		this.previousDistances = new int[4];
+		this.previous = new Point(-1, -1);
 	}
 	
 	public void changeHeadPosition () {
 		if (this.isInFrontPosition)
 			Motor.C.rotateTo(0, false);
 		else
-			Motor.C.rotateTo(90, false);
+			Motor.C.rotateTo(92, false);
 		this.isInFrontPosition = !this.isInFrontPosition;
 	}
 	
@@ -50,14 +54,18 @@ public class WallDiscoverer extends Observable implements Runnable {
 		while (!this.stopped) {
 			double x = this.robotPosition.getX();
 			double y = this.robotPosition.getY();
+			Point pos = this.robotPosition.getPoint();
 			
-			double dx = x - Math.floor(x);
-			double dy = y - Math.floor(y);
-			
-			// Si le robot est au milieu de la case
-			if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
-				this.checkForWalls();
-				this.notifyObservers();
+			if (!this.previous.equals(pos)) {
+				double dx = x - Math.floor(x);
+				double dy = y - Math.floor(y);
+				
+				// Si le robot est au milieu de la case
+				if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
+					this.previous = pos;
+					this.checkForWalls();
+					this.notifyObservers();
+				}
 			}
 			
 			try {

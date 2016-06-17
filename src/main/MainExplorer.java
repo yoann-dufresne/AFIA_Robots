@@ -1,6 +1,7 @@
 package main;
 
 import ia.WallValuesExplorer;
+import lejos.nxt.Button;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -37,7 +38,8 @@ public class MainExplorer {
 		wd.addObserver(wo);/**/
 		
 		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
-		wve.explore();
+		wd.addObserver(wve);
+		wve.explore();/**/
 		
 		ld.stop();
 		wd.stop();
@@ -49,7 +51,9 @@ public class MainExplorer {
 		}
 		
 		if (wd.isInFrontPosition())
-			wd.changeHeadPosition();
+			wd.changeHeadPosition();/**/
+		
+		Button.waitForAnyPress();
 	}
 
 }

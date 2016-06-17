@@ -39,7 +39,7 @@ public class LineDetectors extends Observable implements Runnable {
 	}
 	
 	private boolean isLine (ColorSensor cs) {
-		if (Math.abs(cs.getLightValue() - this.refValue) > 20)
+		if (Math.abs(cs.getLightValue() - this.refValue) > 11)
 			return true;
 		return false;
 	}

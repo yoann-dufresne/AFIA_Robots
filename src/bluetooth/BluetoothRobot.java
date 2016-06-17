@@ -52,8 +52,8 @@ public class BluetoothRobot implements Runnable  {
 				String command = words.get(0);
 				System.out.println("received command : " + command);
 				try {
-					bw.write("nxt : " +command);
-					bw.flush();
+					this.bw.write("nxt : " +command);
+					this.bw.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 					this.ended = true;
@@ -71,7 +71,8 @@ public class BluetoothRobot implements Runnable  {
 			}
 			
 			try {
-				this.bw.write(this.btc.getAddress());
+				this.bw.write(this.btc.getAddress() + "\n");
+				this.bw.flush();
 				System.out.println(this.btc.getAddress());
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -95,6 +96,11 @@ public class BluetoothRobot implements Runnable  {
 
 	private void discover(List<String> words) {
 		System.out.println("DISCOVERED");
+	}
+	
+	
+	public void stop () {
+		this.ended = true;
 	}
 
 }
