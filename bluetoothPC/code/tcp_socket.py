@@ -16,36 +16,6 @@ def ctrl_c_handler(signal, frame):
         bt.join(1)
     print("After handler")
 
-class MyTCPHandler(SocketServer.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-
-    allow_reuse_address = True
-
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        print("new connection")
-        running = True
-        while running:
-            self.data = self.request.recv(1024).strip()
-            print("{} wrote:".format(self.client_address[0]))
-            print(self.data)
-            if self.data != "log":
-                 [bt.send(self.data) for bt in bts]
-            else:
-                print(qin)
-                self.request.sendall(str(qin)+"\n")
-            if self.data == "stop":
-                ctrl_c_handler(None, None)
-                running = False
-                break
-        print("end handle TCP")
-
 def connect_bt(addr, qin, bts):
     try:
         time.sleep(0.1)
@@ -57,13 +27,53 @@ def connect_bt(addr, qin, bts):
     except KeyboardInterrupt:
         ctrl_c_handler(None, None)
 
+
+class MyTCPHandler(SocketServer.BaseRequestHandler):
+    """
+    The request handler class for our server.
+
+    It is instantiated once per connection to the server, and must
+    override the handle() method to implement communication to the
+    client.
+    """
+
+    allow_reuse_address = True
+
+    def send_to_robots(self):
+        [bt.send(self.data) for bt in bts]
+
+    def answer_client(self):
+        self.request.sendall(str(qin)+"\n")
+
+    def stop(self):
+        ctrl_c_handler(None, None)
+        running = False
+
+
+    def handle(self):
+        # self.request is the TCP socket connected to the client
+        print("new connection")
+        running = True
+        while running:
+            self.data = self.request.recv(1024).strip()
+            if self.data != "log":
+                self.send_to_robots()
+            else:
+                self.answer_client()
+            if self.data == "stop":
+                self.stop()
+                break
+        print("end handle TCP")
+
+
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
     # Create the server, binding to localhost on port 9999
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
     qin = deque()
-    addrs = ["00:16:53:0C:C8:0A"]  #, "00:16:53:0F:F5:A9"]
+    addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9"]
+    addrs = ["00:16:53:0F:F5:A9"]
     bts = []
     for addr in addrs:
         bts = connect_bt(addr, qin, bts)
