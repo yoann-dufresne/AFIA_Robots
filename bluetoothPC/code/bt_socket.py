@@ -71,7 +71,6 @@ class BlueSock(Thread):
         l0 = len(data.encode('utf-8')) & 0xFF
         l1 = (len(data.encode('utf-8')) >> 8) & 0xFF
         d = chr(l0) + chr(l1) + data
-        print("sent : {}".format(d))
         try:
             self.sock.send(d)
         except bluetooth.BluetoothError:
@@ -90,18 +89,14 @@ class BlueSock(Thread):
             else:
                 data = {self.host: data.strip()}
                 self.fifo_in.append(data)
-        print("end running")
         self.close()
 
     def recv(self):
-        print("first receive length")
-
         data = self.sock.recv(2)
 
         l0 = ord(data[0])
         l1 = ord(data[1])
         plen = l0 + (l1 << 8)
-        print("receive message")
 
         data = self.sock.recv(plen)
 

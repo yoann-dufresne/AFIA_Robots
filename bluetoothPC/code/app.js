@@ -21,3 +21,11 @@ var getInfos = function(){
 }
 
 setInterval(getInfos, 1000)
+
+
+var quit = function(){
+  client.write("stop");
+  process.exit();
+}
+
+process.on('SIGINT', quit);

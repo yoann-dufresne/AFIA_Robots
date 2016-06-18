@@ -3,6 +3,9 @@ import SocketServer
 import signal
 import time
 
+import json
+import collections
+
 from bt_socket import BlueSock
 
 def ctrl_c_handler(signal, frame):
@@ -40,15 +43,24 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     allow_reuse_address = True
 
     def send_to_robots(self):
-        [bt.send(self.data) for bt in bts]
+        for bt in bts :
+            bt.send(self.data)
 
-    def answer_client(self):
-        self.request.sendall(str(qin)+"\n")
+    def answer_clients(self):
+        mess = collections.defaultdict(list)
+        while True:
+            try:
+                addr, val = qin.popleft().items()[0]
+                mess[addr].append(val)
+                print(addr, val, mess)
+            except IndexError:
+                break
+
+        self.request.sendall(json.dumps(mess) + '\n')
 
     def stop(self):
         ctrl_c_handler(None, None)
         running = False
-
 
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -59,7 +71,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             if self.data != "log":
                 self.send_to_robots()
             else:
-                self.answer_client()
+                self.answer_clients()
             if self.data == "stop":
                 self.stop()
                 break
@@ -77,7 +89,6 @@ if __name__ == "__main__":
     bts = []
     for addr in addrs:
         bts = connect_bt(addr, qin, bts)
-
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
