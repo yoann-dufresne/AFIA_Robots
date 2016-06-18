@@ -2,6 +2,7 @@ package captors;
 
 import lejos.nxt.ColorSensor;
 import lejos.nxt.SensorPort;
+import lejos.nxt.Sound;
 import lejos.robotics.Color;
 import api.Observable;
 import api.Observer;
@@ -39,7 +40,7 @@ public class LineDetectors extends Observable implements Runnable {
 	}
 	
 	private boolean isLine (ColorSensor cs) {
-		if (Math.abs(cs.getLightValue() - this.refValue) > 20)
+		if (Math.abs(cs.getLightValue() - this.refValue) > 10)
 			return true;
 		return false;
 	}
@@ -68,6 +69,12 @@ public class LineDetectors extends Observable implements Runnable {
 			if (this.lastDetectRight != 0 && !this.isLine(this.rightSensor)) {
 				this.lastDetectRight = 0;
 			}
+		}
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	
