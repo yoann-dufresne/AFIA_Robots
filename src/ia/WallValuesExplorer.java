@@ -9,13 +9,11 @@ import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
-import api.Observable;
-import api.Observer;
 import captors.Movement;
 
-public class WallValuesExplorer extends AbstractExplorer implements Observer {
+public class WallValuesExplorer extends AbstractExplorer {
 
-	public static final int MAX_DIST = 5;
+	public static final int MAX_DIST = 4;
 	
 	protected char tileValues[][];
 	private String filename;
@@ -75,23 +73,10 @@ public class WallValuesExplorer extends AbstractExplorer implements Observer {
 		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
 		
 		this.parkoor = this.chooseParkoor(parkoors);
-		this.movement.followPath(this.parkoor);/**/
-	}
-	
-	@Override
-	public void update(Observable o, Object arg) {
-		Point currentTile = this.position.getPoint();
-		Point nextTile = null;
-		
-		int currentIdx = this.parkoor.indexOf(currentTile);
-		if (this.parkoor.size() == currentIdx+1)
-			return;
-		nextTile = currentIdx == -1 ? this.parkoor.get(0) : this.parkoor.get(currentIdx+1);
-		
-		Direction dir = Direction.getDirectionBetween(currentTile, nextTile);
-		
-		if (this.grid.getTile(currentTile).getState(dir) == WallState.Wall)
-			this.movement.stopOnThisTile();
+		System.out.println(currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
+		System.out.println((int)distances[0][0] + " " + (int)distances[1][0] + " " + (int)distances[2][0]);
+		System.out.println(this.grid.getTile(0, 0).south.toString());
+		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
 
 

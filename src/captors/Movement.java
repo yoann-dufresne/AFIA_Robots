@@ -7,7 +7,10 @@ import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import main.Config;
 import model.Direction;
+import model.Grid;
 import model.Position;
+import model.Tile;
+import model.WallState;
 
 public class Movement {
 	
@@ -26,17 +29,34 @@ public class Movement {
 		this.position = position;
 	}
 	
-	public void followPath(List<Point> path) {
+	public void followPath(List<Point> path, Grid grid) {
 		this.pathStopped = false;
 		
 		for(Point p: path){
-			if (this.pathStopped) {
-				System.out.println("Stopped !");
+			if (this.pathStopped)
 				break;
+			
+			Point current = this.position.getPoint();
+			if(p.equals(current)){
+				continue;
 			}
 			
-			if(p.equals(this.position.getPoint())){
-				continue;
+			Direction dir = Direction.getDirectionBetween(current, p);
+			Tile t = grid.getTile(current);
+			
+			// Wait for wall values from detectors
+			while (t.getState(dir) == WallState.Undiscovered) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			// Stop if a wall was detected
+			if (t.getState(dir) == WallState.Wall) {
+				System.out.println("Stopped ! " + path.size());
+				break;
 			}
 			
 			this.moveTo(p);
@@ -66,7 +86,10 @@ public class Movement {
 				wantedDir = Direction.NORTH;
 		}
 		
-		this.turn(wantedDir);
+		synchronized (this) {
+			this.turn(wantedDir);
+		}
+		
 		this.forward(Math.abs(diff));
 	}
 

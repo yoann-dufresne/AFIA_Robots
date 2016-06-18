@@ -268,10 +268,13 @@ public class Grid {
 		
 		if (tile.getLine() > 0 && tile.north != WallState.Wall)
 			nei[Direction.NORTH.ordinal()] = this.getTile(tile.getLine()-1, tile.getCol());
+		
 		if (tile.getCol() > 0 && tile.west != WallState.Wall)
 			nei[Direction.WEST.ordinal()] = this.getTile(tile.getLine(), tile.getCol()-1);
+		
 		if (tile.getLine() < this.height-1 && tile.south != WallState.Wall)
 			nei[Direction.SOUTH.ordinal()] = this.getTile(tile.getLine()+1, tile.getCol());
+		
 		if (tile.getCol() < this.width-1 && tile.east != WallState.Wall)
 			nei[Direction.EAST.ordinal()] = this.getTile(tile.getLine(), tile.getCol()+1);
 		

@@ -36,6 +36,9 @@ public class WallDiscovererObserver implements Observer {
 			int y = tile.y;
 
 			int dist = dists[i];
+			if (dist == -1)
+				continue;
+			
 			while (dist > TILE_SIZE_CM) {
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;

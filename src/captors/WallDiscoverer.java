@@ -1,6 +1,7 @@
 package captors;
 
 import java.awt.Point;
+import java.util.Arrays;
 
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
@@ -20,10 +21,12 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private UltrasonicSensor back;
 	private Position robotPosition;
 	private Point previous;
+	private Movement synchro;
 	
+	private int[] tmpDists;
 	private int[] previousDistances;
 	
-	public WallDiscoverer (Position robot) {
+	public WallDiscoverer (Position robot, Movement move) {
 		this.front = new UltrasonicSensor(SensorPort.S2);
 		this.back = new UltrasonicSensor(SensorPort.S1);
 		this.front.continuous();
@@ -33,13 +36,16 @@ public class WallDiscoverer extends Observable implements Runnable {
 		this.robotPosition = robot;
 		this.previousDistances = new int[4];
 		this.previous = new Point(-1, -1);
+		
+		this.tmpDists = new int[3];
+		this.synchro = move;
 	}
 	
 	public void changeHeadPosition () {
 		if (this.isInFrontPosition)
 			Motor.C.rotateTo(0, false);
 		else
-			Motor.C.rotateTo(92, false);
+			Motor.C.rotateTo(95, false);
 		this.isInFrontPosition = !this.isInFrontPosition;
 	}
 	
@@ -63,13 +69,15 @@ public class WallDiscoverer extends Observable implements Runnable {
 				// Si le robot est au milieu de la case
 				if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
 					this.previous = pos;
-					this.checkForWalls();
+					synchronized (this.synchro) {
+						this.checkForWalls();
+					}
 					this.notifyObservers();
 				}
 			}
 			
 			try {
-				Thread.sleep(500);
+				Thread.sleep(300);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -79,15 +87,23 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private void checkForWalls() {
 		Direction dir = this.robotPosition.getDirection();
 		
-		this.previousDistances[dir.ordinal()] = this.front.getDistance();
-		this.previousDistances[(dir.ordinal() + 2) % 4] = this.back.getDistance();
+		this.previousDistances[dir.ordinal()] = this.middleDist(this.front);
+		this.previousDistances[(dir.ordinal() + 2) % 4] = -1;
 		
 		this.changeHeadPosition();
 		
-		this.previousDistances[(dir.ordinal() + 3) % 4] = this.front.getDistance();
-		this.previousDistances[(dir.ordinal() + 1) % 4] = this.back.getDistance();
+		this.previousDistances[(dir.ordinal() + 3) % 4] = this.middleDist(this.front);
+		this.previousDistances[(dir.ordinal() + 1) % 4] = this.middleDist(this.back);
 		
 		this.changeHeadPosition();
+	}
+	
+	private int middleDist (UltrasonicSensor sensor) {
+		for (int i=0 ;i<this.tmpDists.length ; i++)
+			this.tmpDists[i] = sensor.getDistance();
+		Arrays.sort(this.tmpDists);
+		
+		return this.tmpDists[1];
 	}
 	
 	@Override

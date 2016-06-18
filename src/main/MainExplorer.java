@@ -16,6 +16,7 @@ public class MainExplorer {
 	public static void main(String[] args) {
 		Position position = new Position(0.5, 0.5, Direction.EAST);
 		Grid g = new Grid(3, 4);
+		Movement move = new Movement(position);
 		
 		/*BluetoothRobot br = new BluetoothRobot();
 		Thread btThread = new Thread(br);
@@ -25,12 +26,11 @@ public class MainExplorer {
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
 		
-		WallDiscoverer wd = new WallDiscoverer(position);
+		WallDiscoverer wd = new WallDiscoverer(position, move);
 		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
 		
-		Movement move = new Movement(position);
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 
@@ -38,7 +38,7 @@ public class MainExplorer {
 		wd.addObserver(wo);/**/
 		
 		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
-		wd.addObserver(wve);
+		//wd.addObserver(wve);
 		wve.explore();/**/
 		
 		ld.stop();
