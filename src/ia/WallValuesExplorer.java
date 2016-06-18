@@ -13,7 +13,7 @@ import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer {
 
-	public static final int MAX_DIST = 4;
+	public static final int MAX_DIST = 20;
 	
 	protected char tileValues[][];
 	private String filename;
@@ -164,19 +164,19 @@ public class WallValuesExplorer extends AbstractExplorer {
 		return this.getManhattanDistances(current, null);
 	}
 	
-	public char[][] getManhattanDistances (Point current, Point destination) {
+	public char[][] getManhattanDistances (Point start, Point destination) {
 		char[][] dists = this.manhattanDistances;
 		for (int x=0; x<this.XMax; x++){
 			for (int y=0; y<this.YMax; y++)
 				dists[x][y]= 255;
 		}
-		dists[current.x][current.y] = 0;
+		dists[start.x][start.y] = 0;
 		
 		List<Point> nextPoints = new ArrayList<Point>();
-		nextPoints.add(current);
+		nextPoints.add(start);
 		
 		while (nextPoints.size() > 0) {
-			current = nextPoints.remove(0);
+			Point current = nextPoints.remove(0);
 			int val = dists[current.x][current.y];
 			
 			// Empeche les deplacements trop lointains quand pas de destination
@@ -190,7 +190,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 				
 				if (dists[nei.getLine()][nei.getCol()] > val+1) {
 					dists[nei.getLine()][nei.getCol()] = (char) (val+1);
-					nextPoints.add(current);
+					nextPoints.add(new Point(nei.getLine(), nei.getCol()));
 				}
 			}
 		}
