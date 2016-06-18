@@ -53,8 +53,6 @@ class BlueSock(Thread):
         self.start()
 
     def close(self):
-        import ipdb; ipdb.set_trace()
-
         if self.debug:
             print('Closing Bluetooth connection to {}...'.format(self.host))
         self.running = False
@@ -90,7 +88,7 @@ class BlueSock(Thread):
                 self.close()
 
             else:
-                data = {self.host: data}
+                data = {self.host: data.strip()}
                 self.fifo_in.append(data)
         print("end running")
         self.close()
@@ -124,7 +122,7 @@ def main():
     try:
         qin = deque()
 
-        bt = BlueSock("00:16:53:13:EF:A9", qin)
+        bt = BlueSock("00:16:53:0C:C8:0A", qin)
         bt.debug = True
         bt.connect()
         time.sleep(1)
