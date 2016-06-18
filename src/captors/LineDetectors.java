@@ -2,7 +2,6 @@ package captors;
 
 import lejos.nxt.ColorSensor;
 import lejos.nxt.SensorPort;
-import lejos.nxt.Sound;
 import lejos.robotics.Color;
 import api.Observable;
 import api.Observer;

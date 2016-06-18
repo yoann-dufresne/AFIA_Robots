@@ -1,5 +1,6 @@
 package main;
 
+import bluetooth.BluetoothRobot;
 import ia.WallValuesExplorer;
 import lejos.nxt.Button;
 import model.Direction;
@@ -15,34 +16,40 @@ public class MainExplorer {
 
 	public static void main(String[] args) {
 		Position position = new Position(0.5, 0.5, Direction.EAST);
-		Grid g = new Grid(3, 4);
+		Grid g = new Grid(5, 23);
 		Movement move = new Movement(position);
 		
-		/*BluetoothRobot br = new BluetoothRobot();
+		BluetoothRobot br = new BluetoothRobot(position, g);
 		Thread btThread = new Thread(br);
 		btThread.start();/**/
 		
-		LineDetectors ld = new LineDetectors ();
+		/*LineDetectors ld = new LineDetectors ();
 		Thread ldThread = new Thread (ld);
-		ldThread.start ();
+		ldThread.start ();/**/
 		
-		WallDiscoverer wd = new WallDiscoverer(position, move);
+		/*WallDiscoverer wd = new WallDiscoverer(position, move);
 		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
 		
-		LineObserver lo = new LineObserver(move, position);
+		/*LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 
 		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
 		wd.addObserver(wo);/**/
 		
-		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
+		//WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
 		//wd.addObserver(wve);
-		wve.explore();/**/
+		//wve.explore();/**/
 		
-		ld.stop();
-		wd.stop();
+		//ld.stop();
+		//wd.stop();
+		
+		try {
+			btThread.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		
 		try {
 			Thread.sleep(1000);
@@ -50,7 +57,7 @@ public class MainExplorer {
 			e.printStackTrace();
 		}
 		
-		if (wd.isInFrontPosition())
+		/*if (wd.isInFrontPosition())
 			wd.changeHeadPosition();/**/
 		
 		Button.waitForAnyPress();

@@ -13,6 +13,7 @@ import api.Observer;
 public class WallDiscovererObserver implements Observer {
 
 	private static final int TILE_SIZE_CM = new Double(100*Config.TILE_SIZE).intValue();
+	public static final int MAX_DIST_CM = new Double (4 * Config.TILE_SIZE * 100).intValue();
 
 
 	private Grid grid;
@@ -38,6 +39,8 @@ public class WallDiscovererObserver implements Observer {
 			int dist = dists[i];
 			if (dist == -1)
 				continue;
+			else if (dist > MAX_DIST_CM)
+				dist = MAX_DIST_CM;
 			
 			while (dist > TILE_SIZE_CM) {
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())

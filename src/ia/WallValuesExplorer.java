@@ -74,8 +74,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 		
 		this.parkoor = this.chooseParkoor(parkoors);
 		System.out.println(currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
-		System.out.println((int)distances[0][0] + " " + (int)distances[1][0] + " " + (int)distances[2][0]);
-		System.out.println(this.grid.getTile(0, 0).south.toString());
+		Direction dir = Direction.getDirectionBetween(currentPoint, destination);
+		System.out.println(this.grid.getTile(currentPoint).getState(dir).toString());
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
 
@@ -259,7 +259,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 						t.north == WallState.Undiscovered ||
 						t.south == WallState.Undiscovered) {
 					int score = this.tileScore(x, y);
-					this.tileValues[x][y] =  (char) Math.max(1,score/Math.max(1,distances[x][y]));
+					this.tileValues[x][y] =  (char) Math.max(1,score-distances[x][y]);
 				} else
 					this.tileValues[x][y] = 0;
 			}

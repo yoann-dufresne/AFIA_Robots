@@ -22,12 +22,10 @@ import captors.Movement;
 public class Main {
 
 	public static void main(String[] args) {
-//		RConsole.openUSB(0);
-//		System.setOut(new PrintStream(RConsole.getPrintStream()));
-		System.out.println("caca prout");
+		Position position = new Position(0.5, 0.5, Direction.EAST);
+		Grid g = GridExample.g;
 
-
-		BluetoothRobot br = new BluetoothRobot();
+		BluetoothRobot br = new BluetoothRobot(position, g);
 		Thread btThread = new Thread(br);
 		btThread.start();
 
@@ -35,21 +33,11 @@ public class Main {
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();
 
-		Position position = new Position(0.5, 0.5, Direction.EAST);
-
 		System.out.println("Go");
 
 		Movement move = new Movement(position);
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
-
-		// actions
-//		Grid g = GridGenerator.generate(23, 11, 0.2);
-		//Grid g = new Grid(3, 4);
-//		g.addWall(0, 1, Direction.SOUTH);
-//		g.addWall(1, 1, Direction.EAST);
-//		g.addWall(2, 3, Direction.NORTH);/**/
-		Grid g = GridExample.g;
 
 //		IA ia = new IA(position, g);
 //		Point dest = new Point(9, 22);

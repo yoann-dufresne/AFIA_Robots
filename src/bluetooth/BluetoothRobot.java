@@ -12,9 +12,15 @@ import java.util.List;
 
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import model.Grid;
+import model.Position;
+import model.Tile;
 import util.Spliter;
 
 public class BluetoothRobot implements Runnable  {
+	private Position position;
+	private Grid grid;
+	
 	private BTConnection btc;
 	private boolean ended;
 
@@ -23,9 +29,12 @@ public class BluetoothRobot implements Runnable  {
 
 	private List<String> inbox;
 
-	public BluetoothRobot() {
+	public BluetoothRobot(Position pos, Grid grid) {
 		this.ended = true;
 		this.inbox = new ArrayList<String>();
+		
+		this.position = pos;
+		this.grid = grid;
 	}
 
 	@Override
@@ -42,7 +51,7 @@ public class BluetoothRobot implements Runnable  {
 		this.bw = new BufferedWriter(new OutputStreamWriter(dos));
 
 		while(!this.ended){
-			if (this.btc.available() > 0) {
+			while (this.btc.available() > 0) {
 				String received = null;
 				try {
 					 received = this.br.readLine();
@@ -74,6 +83,17 @@ public class BluetoothRobot implements Runnable  {
 				}
 			}
 
+			// Envoie les infos de base
+			Tile current = this.grid.getTile(this.position.getPoint());
+			this.inbox.add("UPDATE;" +
+					current.getLine() + ";" + current.getCol() + ";" + this.position.getDirection() +
+					";" + current.north.toString() +
+					";" + current.east.toString() +
+					";" + current.south.toString() +
+					";" + current.west.toString()
+			);
+			
+			// Vide la inbox
 			while (this.inbox.size() > 0){
 				String msg = null;
 				synchronized (this.inbox) {
@@ -92,7 +112,7 @@ public class BluetoothRobot implements Runnable  {
 			}
 
 			try {
-				Thread.sleep(100);
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -100,6 +120,10 @@ public class BluetoothRobot implements Runnable  {
 		}
 		System.out.println("BT ended");
 		this.btc.close();
+	}
+	
+	public void stop () {
+		this.ended = true;
 	}
 
 	private void stop(List<String> words) {
