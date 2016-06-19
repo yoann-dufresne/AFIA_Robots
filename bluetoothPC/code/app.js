@@ -48,8 +48,6 @@ app.get('/update', function(req, res){
 
 
 
-
-
 // TCP
 var client = new net.Socket();
 client.connect(9999, '127.0.0.1', function() {
@@ -59,8 +57,13 @@ client.connect(9999, '127.0.0.1', function() {
 client.on('data', function(datas) {
   console.log('Received: ' + datas);
   datas = JSON.parse(datas);
+
+  if (datas === {})
+    return;
+
   for(var robot in datas)
     var message = datas[robot];
+
     processData(robot, message);
 });
 
@@ -86,8 +89,30 @@ var processData = function(robot, messages){
     var command = arr[0];
     arr.shift();
     var arguments = arr;
-    console.log(command, arguments);
+
+    if (command === "UPDATE"){
+      updateModel(robot, arguments)
+    }
   }
 }
 
 process.on('SIGINT', quit);
+
+
+// Model
+
+var updateModel = function(robotId, arguments){
+  robotState.x = arguments[0];
+  robotState.y = arguments[1];
+  robotState.dir = arguments[2];
+
+  north = arguments[3];
+  east = arguments[4];
+  south = arguments[5];
+  west = arguments[6];
+
+  table[robotState.x][robotState.y][0] = north;
+  table[robotState.x][robotState.y][1] = east;
+  table[robotState.x][robotState.y][2] = south;
+  table[robotState.x][robotState.y][3] = west;
+}
