@@ -28,52 +28,52 @@ var update = function (data) {
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
-				ctx.strokeStyle = '#ffffff';
+				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
 
 			// East
 			ctx.beginPath();
-			ctx.moveTo(x,y);
-			ctx.lineTo(x+tileSize,y);
+			ctx.moveTo(x+tileSize-1,y);
+			ctx.lineTo(x+tileSize-1,y+tileSize);
 			ctx.closePath();
 
-			if (data.laby[line][col][0] == "undiscovered")
+			if (data.laby[line][col][1] == "undiscovered")
 				ctx.strokeStyle = '#0000ff';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
-				ctx.strokeStyle = '#ffffff';
+				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
 
 			// South
 			ctx.beginPath();
-			ctx.moveTo(x,y+);
-			ctx.lineTo(x+tileSize,y);
+			ctx.moveTo(x,y+tileSize-1);
+			ctx.lineTo(x+tileSize,y+tileSize-1);
 			ctx.closePath();
 
-			if (data.laby[line][col][0] == "undiscovered")
+			if (data.laby[line][col][2] == "undiscovered")
 				ctx.strokeStyle = '#0000ff';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
-				ctx.strokeStyle = '#ffffff';
+				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
 
 			// West
 			ctx.beginPath();
 			ctx.moveTo(x,y);
-			ctx.lineTo(x+tileSize,y);
+			ctx.lineTo(x,y+tileSize);
 			ctx.closePath();
 
-			if (data.laby[line][col][0] == "undiscovered")
+			if (data.laby[line][col][3] == "undiscovered")
 				ctx.strokeStyle = '#0000ff';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
-				ctx.strokeStyle = '#ffffff';
+				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 		}
 	}

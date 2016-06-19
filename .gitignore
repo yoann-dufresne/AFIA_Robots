@@ -5,3 +5,4 @@
 **/*.swp
 /bin/
 *.pyc
+bluetoothPC/code/node_modules/
