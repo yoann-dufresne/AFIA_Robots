@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import bluetooth.BluetoothRobot;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -69,13 +70,13 @@ public class WallValuesExplorer extends AbstractExplorer {
 			return;
 		}
 		
+		BluetoothRobot.bt.send("DEBUG; " + currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
 		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
 		
 		this.parkoor = this.chooseParkoor(parkoors);
-		System.out.println(currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
-		Direction dir = Direction.getDirectionBetween(currentPoint, destination);
-		System.out.println(this.grid.getTile(currentPoint).getState(dir).toString());
+		
+		BluetoothRobot.bt.send("DEBUG;move " + this.parkoor.size());
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
 

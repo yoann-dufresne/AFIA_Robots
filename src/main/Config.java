@@ -13,7 +13,7 @@ public class Config {
 	
 	/* Robot config */
 	public static final double WHEEL_RADIUS = 0.021;
-	public static final double WHEELS_DISTANCE = 0.175 - 0.022;
+	public static final double WHEELS_DISTANCE = 0.14;
 	public static final double WHEEL_CIRCUMFERENCE = 2 * Math.PI * WHEEL_RADIUS;
 	public static final double INTER_WHEELS_CIRCUMFERENCE = WHEELS_DISTANCE * Math.PI;
 	

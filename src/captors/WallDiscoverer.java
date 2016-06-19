@@ -3,6 +3,7 @@ package captors;
 import java.awt.Point;
 import java.util.Arrays;
 
+import bluetooth.BluetoothRobot;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
@@ -21,7 +22,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private UltrasonicSensor back;
 	private Position robotPosition;
 	private Point previous;
-	private Movement synchro;
+	private Movement movement;
 	
 	private int[] tmpDists;
 	private int[] previousDistances;
@@ -37,8 +38,8 @@ public class WallDiscoverer extends Observable implements Runnable {
 		this.previousDistances = new int[4];
 		this.previous = new Point(-1, -1);
 		
-		this.tmpDists = new int[3];
-		this.synchro = move;
+		this.tmpDists = new int[5];
+		this.movement = move;
 	}
 	
 	public void changeHeadPosition () {
@@ -69,9 +70,15 @@ public class WallDiscoverer extends Observable implements Runnable {
 				// Si le robot est au milieu de la case
 				if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
 					this.previous = pos;
-					synchronized (this.synchro) {
-						this.checkForWalls();
-					}
+					while (this.movement.isRotating)
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					this.movement.needCalm = true;
+					this.checkForWalls();
+					this.movement.needCalm = false;
 					this.notifyObservers();
 				}
 			}
@@ -87,15 +94,15 @@ public class WallDiscoverer extends Observable implements Runnable {
 	private void checkForWalls() {
 		Direction dir = this.robotPosition.getDirection();
 		
-		this.previousDistances[dir.ordinal()] = this.middleDist(this.front);
-		this.previousDistances[(dir.ordinal() + 2) % 4] = -1;
-		
 		this.changeHeadPosition();
 		
 		this.previousDistances[(dir.ordinal() + 3) % 4] = this.middleDist(this.front);
 		this.previousDistances[(dir.ordinal() + 1) % 4] = this.middleDist(this.back);
 		
 		this.changeHeadPosition();
+		
+		this.previousDistances[dir.ordinal()] = this.middleDist(this.front);
+		this.previousDistances[(dir.ordinal() + 2) % 4] = this.middleDist(this.back);
 	}
 	
 	private int middleDist (UltrasonicSensor sensor) {
@@ -103,11 +110,16 @@ public class WallDiscoverer extends Observable implements Runnable {
 			this.tmpDists[i] = sensor.getDistance();
 		Arrays.sort(this.tmpDists);
 		
-		return this.tmpDists[1];
+		return this.tmpDists[3];
 	}
 	
 	@Override
 	public void notifyObservers () {
+		BluetoothRobot.bt.send("DEBUG;ultrasons " + this.previousDistances[0] +
+				" " + this.previousDistances[1] +
+				" " + this.previousDistances[2] +
+				" " + this.previousDistances[3]);
+		
 		for (Observer obs : this.observers)
 			obs.update(this, this.previousDistances);
 	}

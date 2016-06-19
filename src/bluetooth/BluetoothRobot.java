@@ -19,6 +19,8 @@ import model.Tile;
 import util.Spliter;
 
 public class BluetoothRobot implements Runnable  {
+	public static BluetoothRobot bt;
+	
 	private Position position;
 	private Grid grid;
 	
@@ -89,13 +91,13 @@ public class BluetoothRobot implements Runnable  {
 
 			// Envoie les infos de base
 			Tile current = this.grid.getTile(this.position.getPoint());
-			this.inbox.add("UPDATE;" +
-					current.getLine() + ";" + current.getCol() + ";" + this.position.getDirection() +
+			String up = "UPDATE;" +
+					current.getLine() + ";" + current.getCol() + ";" + this.position.getDirection().toString() +
 					";" + current.north.toString() +
 					";" + current.east.toString() +
 					";" + current.south.toString() +
-					";" + current.west.toString()
-			);
+					";" + current.west.toString();
+			this.inbox.add(up);
 			
 			// Vide la inbox
 			while (this.inbox.size() > 0){
@@ -107,7 +109,7 @@ public class BluetoothRobot implements Runnable  {
 				try {
 					this.bw.write(msg+'\n');
 					this.bw.flush();
-					Thread.sleep(20);
+					Thread.sleep(5);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
@@ -116,7 +118,7 @@ public class BluetoothRobot implements Runnable  {
 			}
 
 			try {
-				Thread.sleep(250);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

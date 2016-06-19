@@ -3,6 +3,7 @@ package captors;
 import java.awt.Point;
 import java.util.List;
 
+import bluetooth.BluetoothRobot;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import main.Config;
@@ -22,19 +23,27 @@ public class Movement {
 	private boolean interrupted;
 	public Position position;
 	private boolean pathStopped;
+	public boolean needCalm;
+	public boolean isRotating;
 
 	public Movement(Position position) {
 		this.right = Motor.A;
+		this.right.setSpeed(720);
 		this.left = Motor.B;
+		this.left.setSpeed(720);
 		this.position = position;
+		this.needCalm = false;
+		this.isRotating = false;
 	}
 	
 	public void followPath(List<Point> path, Grid grid) {
 		this.pathStopped = false;
 		
 		for(Point p: path){
-			if (this.pathStopped)
+			if (this.pathStopped) {
+				BluetoothRobot.bt.send("DEBUG;Path stopped");
 				break;
+			}
 			
 			Point current = this.position.getPoint();
 			if(p.equals(current)){
@@ -55,10 +64,13 @@ public class Movement {
 			
 			// Stop if a wall was detected
 			if (t.getState(dir) == WallState.Wall) {
-				System.out.println("Stopped ! " + path.size());
+				BluetoothRobot.bt.send("DEBUG;Path wall detected");
 				break;
 			}
 			
+			
+			BluetoothRobot.bt.send("DEBUG; " + current.x + "," + current.y + " " + this.position.getDirection().toString() + " " +
+					t.north + " " + t.east + " " + t.south + " " + t.west);
 			this.moveTo(p);
 		}
 	}
@@ -66,43 +78,47 @@ public class Movement {
 	// ----------- Basic movements -----------
 	
 	private void moveTo(Point p) {
-		Direction wantedDir = null;
+		Direction wantedDir = Direction.getDirectionBetween(this.position.getPoint(), p);;
 		int diff = 0;
-		
 		
 		if(p.x == this.position.getPoint().x){
 			diff = p.y - this.position.getPoint().y;
-			if (diff > 0)
-				wantedDir = Direction.EAST;
-			else 
-				wantedDir = Direction.WEST;
-		}
-		else {
-			// same Y
+		} else {
 			diff =  p.x - this.position.getPoint().x;
-			if (diff > 0)
-				wantedDir = Direction.SOUTH;
-			else
-				wantedDir = Direction.NORTH;
 		}
 		
-		synchronized (this) {
-			this.turn(wantedDir);
+		BluetoothRobot.bt.send("DEBUG;Synch");
+		while (this.needCalm) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		this.isRotating = true;
+		BluetoothRobot.bt.send("DEBUG;turn");
+		this.turn(wantedDir);
+		BluetoothRobot.bt.send("DEBUG;/turn");
+		this.isRotating = false;
+		BluetoothRobot.bt.send("DEBUG;/Synch");
 		
 		this.forward(Math.abs(diff));
 	}
 
 	public void turn(Direction wantedDir) {
-		if(wantedDir == this.position.getDirection())
+		if(wantedDir == this.position.getDirection()) {
+			BluetoothRobot.bt.send("DEBUG; good direction !");
 			return;
+		}
 
 		int turnValue = this.position.getDirection().turnTo(wantedDir);
+		BluetoothRobot.bt.send("DEBUG;turn value ");
 		
 		if(turnValue < 0) {
 			this.turnLeft(-turnValue);
 		} else 
 			this.turnRight(turnValue);
+		BluetoothRobot.bt.send("DEBUG;turn fin");
 	}
 
 	private void turnLeft(int repeat) {
@@ -262,11 +278,13 @@ public class Movement {
 	}
 	
 	public void turnRight () {
+		BluetoothRobot.bt.send("DEBUG;turn right");
 		this.rotate(90);
 		this.position.turnRight();
 	}
 	
 	public void turnLeft () {
+		BluetoothRobot.bt.send("DEBUG;turn left");
 		this.rotate(-90);
 		this.position.turnLeft();
 	}

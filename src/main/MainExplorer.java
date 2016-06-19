@@ -3,6 +3,7 @@ package main;
 import bluetooth.BluetoothRobot;
 import ia.WallValuesExplorer;
 import lejos.nxt.Button;
+import lejos.nxt.Motor;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -24,8 +25,9 @@ public class MainExplorer extends AbstractMain {
 		Movement move = new Movement(position);
 		
 		BluetoothRobot br = new BluetoothRobot(position, g, this);
+		BluetoothRobot.bt = br;
 		Thread btThread = new Thread(br);
-		btThread.start();/**/
+		btThread.start();
 		
 		while (!this.started) {
 			try {
@@ -33,7 +35,7 @@ public class MainExplorer extends AbstractMain {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+		}/**/
 		
 		LineDetectors ld = new LineDetectors ();
 		Thread ldThread = new Thread (ld);
@@ -48,6 +50,7 @@ public class MainExplorer extends AbstractMain {
 		ld.addObserver(lo);
 
 		WallDiscovererObserver wo = new WallDiscovererObserver(g, position, br);
+		//WallDiscovererObserver wo = new WallDiscovererObserver(g, position, null);
 		wd.addObserver(wo);/**/
 		
 		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");

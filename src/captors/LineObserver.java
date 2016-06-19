@@ -34,7 +34,7 @@ public class LineObserver implements Observer {
 		Sound.beep();
 		Sound.setVolume(0);
 		
-		if (Math.abs(angle) > 1.0)
+		if (Math.abs(angle) > 3.5)
 			this.move.correctAngle(angle);
 		
 		switch (this.pos.getDirection()) {

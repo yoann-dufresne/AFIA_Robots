@@ -33,7 +33,6 @@ public class WallDiscovererObserver implements Observer {
 	public void update(Observable o, Object arg) {
 		int[] dists = (int[])arg;
 		Point tile = this.position.getPoint();
-		String msg = "DISCOVERED";
 
 		for (int i=0 ; i<4 ; i++) {
 			Direction dir = Direction.values()[i];
@@ -55,58 +54,56 @@ public class WallDiscovererObserver implements Observer {
 
 				switch (dir) {
 				case NORTH:
-					msg += ';' + x + ';' + y + ";NORTH;EMPTY"; 
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty"); 
 					x--;
-					msg += ';' + x + ';' + y + ";SOUTH;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
 					break;
 				case EAST:
-					msg += ';' + x + ';' + y + ";EAST;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
 					y++;
-					msg += ';' + x + ';' + y + ";WEST;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
 					break;
 				case SOUTH:
-					msg += ';' + x + ';' + y + ";SOUTH;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
 					x++;
-					msg += ';' + x + ';' + y + ";NORTH;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
 					break;
 				case WEST:
-					msg += ';' + x + ';' + y + ";WEST;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
 					y--;
-					msg += ';' + x + ';' + y + ";EAST;EMPTY";
+					this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
 					break;
 				}
 			}
 
-			if (x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
+			if (this.bt != null && x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
 				if (dists[i] < MAX_DIST_CM) {
 					switch (dir) {
 					case NORTH:
-						msg += ';' + x + ';' + y + ";NORTH;WALL";
+						this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall");
 						if (x > 0)
-							msg += ';' + x-1 + ';' + y + ";SOUTH;WALL";
+							this.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall");
 						break;
 					case SOUTH:
-						msg += ';' + x + ';' + y + ";SOUTH;WALL";
+						this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall");
 						if (x < this.grid.getHeight()-1)
-							msg += ';' + x+1 + ';' + y + ";NORTH;WALL";
+							this.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall");
 						break;
 					case EAST:
-						msg += ';' + x + ';' + y + ";EAST;WALL";
+						this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall");
 						if (y < this.grid.getWidth()-1)
-							msg += ';' + x + ';' + y+1 + ";WEST;WALL";
+							this.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall");
 						break;
 					case WEST:
-						msg += ';' + x + ';' + y + ";WEST;WALL";
+						this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall");
 						if (y > 0)
-							msg += ';' + x + ';' + y-1 + ";EAST;WALL";
+							this.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall");
 						break;
 					}
 					
 					this.grid.addWall(x, y, dir);
 				}
 		}
-		
-		this.bt.send(msg);
 	}
 
 }
