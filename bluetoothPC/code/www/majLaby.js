@@ -83,6 +83,19 @@ var update = function (data) {
     ctx.closePath();
     ctx.fillStyle = "#82C46C";
     ctx.fill();
+
+	ctx.beginPath();
+	if (data.robot.dir=="NORTH")
+		ctx.rect((data.robot.x+0.45)*tileSize, (data.robot.y+0.25)*tileSize,4,4);
+	else if (data.robot.dir ="WEST")
+		ctx.rect((data.robot.x+0.65)*tileSize, (data.robot.y+0.45)*tileSize,4,4);
+	else if (data.robot.dir ="SOUTH")
+		ctx.rect((data.robot.x+0.45)*tileSize, (data.robot.y+0.65)*tileSize,4,4);
+	else
+		ctx.rect((data.robot.x+0.25)*tileSize, (data.robot.y+0.45)*tileSize,4,4);
+	ctx.closePath();
+	ctx.fillStyle ="#000000";
+	ctx.fill();
 };
 
 window.setInterval (
