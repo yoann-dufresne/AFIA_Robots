@@ -47,7 +47,7 @@ public class MainExplorer extends AbstractMain {
 		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 
-		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
+		WallDiscovererObserver wo = new WallDiscovererObserver(g, position, br);
 		wd.addObserver(wo);/**/
 		
 		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
