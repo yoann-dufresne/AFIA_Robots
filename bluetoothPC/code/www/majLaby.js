@@ -77,6 +77,12 @@ var update = function (data) {
 			ctx.stroke();
 		}
 	}
+
+	ctx.beginPath();
+    ctx.arc((data.robot.x+0.5) * tileSize, (data.robot.y+0.5) * tileSize, 15, 0, 2 * Math.PI, false);
+    ctx.closePath();
+    ctx.fillStyle = "#82C46C";
+    ctx.fill();
 };
 
 window.setInterval (
