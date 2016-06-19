@@ -11,14 +11,14 @@ import model.Grid;
 import model.Position;
 import bluetooth.BluetoothRobot;
 
-class MainBTLogging {
-
-	public static void main(String[] args) throws InterruptedException, IOException {
+public class MainBTLogging extends AbstractMain {
+	
+	public void start () throws InterruptedException, IOException {
 		ColorSensor colSensor = new ColorSensor(SensorPort.S4, Color.RED);
 		Position pos = new Position(0.5, 0.5, Direction.EAST);
 		Grid grid = new Grid(5, 11);
 
-		BluetoothRobot br = new BluetoothRobot(pos, grid);
+		BluetoothRobot br = new BluetoothRobot(pos, grid, this);
 		Thread btThread = new Thread(br);
 		btThread.start();/**/
 
@@ -27,6 +27,10 @@ class MainBTLogging {
 			br.send("" + colSensor.getLightValue());
 			Thread.sleep(1000);
 		}
+	}
 
+	public static void main(String[] args) throws InterruptedException, IOException {
+		MainBTLogging main = new MainBTLogging();
+		main.start();
 	}
 }

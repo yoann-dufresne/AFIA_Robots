@@ -12,55 +12,67 @@ import captors.Movement;
 import captors.WallDiscoverer;
 import captors.WallDiscovererObserver;
 
-public class MainExplorer {
-
-	public static void main(String[] args) {
+public class MainExplorer extends AbstractMain {
+	
+	public MainExplorer() {
+	}
+	
+	public void start () {
+		this.started = false;
 		Position position = new Position(0.5, 0.5, Direction.EAST);
 		Grid g = new Grid(5, 23);
 		Movement move = new Movement(position);
 		
-		BluetoothRobot br = new BluetoothRobot(position, g);
+		BluetoothRobot br = new BluetoothRobot(position, g, this);
 		Thread btThread = new Thread(br);
 		btThread.start();/**/
 		
-		/*LineDetectors ld = new LineDetectors ();
+		while (!this.started) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		LineDetectors ld = new LineDetectors ();
 		Thread ldThread = new Thread (ld);
 		ldThread.start ();/**/
 		
-		/*WallDiscoverer wd = new WallDiscoverer(position, move);
+		WallDiscoverer wd = new WallDiscoverer(position, move);
 		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
 		
-		/*LineObserver lo = new LineObserver(move, position);
+		LineObserver lo = new LineObserver(move, position);
 		ld.addObserver(lo);
 
 		WallDiscovererObserver wo = new WallDiscovererObserver(g, position);
 		wd.addObserver(wo);/**/
 		
-		//WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
-		//wd.addObserver(wve);
-		//wve.explore();/**/
+		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
+		wve.explore();/**/
 		
-		//ld.stop();
-		//wd.stop();
+		ld.stop();
+		wd.stop();
 		
 		try {
 			btThread.join();
+			ldThread.join();
+			wdThread.join();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		/*if (wd.isInFrontPosition())
+		if (wd.isInFrontPosition())
 			wd.changeHeadPosition();/**/
 		
 		Button.waitForAnyPress();
+	}
+
+	public static void main(String[] args) {
+		MainExplorer main = new MainExplorer();
+		main.start();
 	}
 
 }

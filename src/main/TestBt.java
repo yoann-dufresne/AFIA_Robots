@@ -5,13 +5,13 @@ import model.Grid;
 import model.Position;
 import bluetooth.BluetoothRobot;
 
-public class TestBt {
-
-	public static void main(String[] args) {
+public class TestBt extends AbstractMain {
+	
+	public void start() {
 		Position pos = new Position(0.5, 0.5, Direction.EAST);
 		Grid grid = new Grid(5, 11);
 		
-		BluetoothRobot br = new BluetoothRobot(pos, grid);
+		BluetoothRobot br = new BluetoothRobot(pos, grid, this);
 		Thread btThread = new Thread(br);
 		btThread.start();/**/
 		
@@ -22,7 +22,11 @@ public class TestBt {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+	}
+
+	public static void main(String[] args) {
+		TestBt main = new TestBt();
+		main.start();
 	}
 	
 }

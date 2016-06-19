@@ -12,6 +12,7 @@ import java.util.List;
 
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
+import main.AbstractMain;
 import model.Grid;
 import model.Position;
 import model.Tile;
@@ -28,13 +29,15 @@ public class BluetoothRobot implements Runnable  {
 	private BufferedWriter bw;
 
 	private List<String> inbox;
+	private AbstractMain main;
 
-	public BluetoothRobot(Position pos, Grid grid) {
+	public BluetoothRobot(Position pos, Grid grid, AbstractMain mainExplorer) {
 		this.ended = true;
 		this.inbox = new ArrayList<String>();
 		
 		this.position = pos;
 		this.grid = grid;
+		this.main = mainExplorer;
 	}
 
 	@Override
@@ -75,9 +78,10 @@ public class BluetoothRobot implements Runnable  {
 					this.discover(words);
 				} else if ("PARTIAL".equals(command)){
 					this.partial(words);
+				} else if ("START".equals(command)){
+					this.start(words);
 				} else if ("STOP".equals(command)){
 					this.stop(words);
-					System.out.println("endif ended");
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -121,11 +125,16 @@ public class BluetoothRobot implements Runnable  {
 		System.out.println("BT ended");
 		this.btc.close();
 	}
-	
+
 	public void stop () {
 		this.ended = true;
 	}
 
+	private void start(List<String> words) {
+		this.main.started = true;
+		System.out.println("Go !!!");
+	}
+	
 	private void stop(List<String> words) {
 		System.out.println("STOP");
 		this.ended = true;

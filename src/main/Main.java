@@ -19,13 +19,16 @@ import captors.Movement;
  * @author Lawrie Griffiths
  *
  */
-public class Main {
+public class Main extends AbstractMain {
 
-	public static void main(String[] args) {
+	public Main() {
+	}
+	
+	public void start () {
 		Position position = new Position(0.5, 0.5, Direction.EAST);
 		Grid g = GridExample.g;
 
-		BluetoothRobot br = new BluetoothRobot(position, g);
+		BluetoothRobot br = new BluetoothRobot(position, g, this);
 		Thread btThread = new Thread(br);
 		btThread.start();
 
@@ -68,6 +71,11 @@ public class Main {
 		}
 		
 		System.out.println("tout fini");
+	}
+	
+	public static void main(String[] args) {
+		Main main = new Main();
+		main.start();
 	}
 }
 
