@@ -79,10 +79,23 @@ var update = function (data) {
 	}
 
 	ctx.beginPath();
-    ctx.arc((data.robot.x+0.5) * tileSize, (data.robot.y+0.5) * tileSize, 15, 0, 2 * Math.PI, false);
+    ctx.arc((data.robot.x+0.5) * tileSize, (data.robot.y+0.5) * tileSize, 0.4*tileSize, 0, 2 * Math.PI, false);
     ctx.closePath();
     ctx.fillStyle = "#82C46C";
     ctx.fill();
+
+	ctx.beginPath();
+	if (data.robot.dir=="NORTH")
+		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.1)*tileSize,0.2*tileSize,0.2*tileSize);
+	else if (data.robot.dir ="WEST")
+		ctx.rect((data.robot.x+0.7)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
+	else if (data.robot.dir ="SOUTH")
+		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.7)*tileSize,0.2*tileSize,0.2*tileSize);
+	else
+		ctx.rect((data.robot.x+0.1)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
+	ctx.closePath();
+	ctx.fillStyle ="#000000";
+	ctx.fill();
 };
 
 window.setInterval (
