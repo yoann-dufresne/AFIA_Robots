@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # Create the server, binding to localhost on port 9999
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
-    qin = deque(maxlen=200)
+    qin = deque(maxlen=40)
     addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9"]
     addrs = ["00:16:53:0F:F5:A9"]
     bts = []

@@ -46,7 +46,10 @@ app.get('/update', function(req, res){
 	res.send(JSON.stringify(data));
 });
 
-
+app.get("/start", function(req, res){
+  startRobot();
+  res.send("started");
+});
 
 // TCP
 var client = new net.Socket();
@@ -58,7 +61,7 @@ client.on('data', function(datas) {
   console.log('Received: ' + datas);
   datas = JSON.parse(datas);
 
-  if (datas === {})
+  if (datas == {})
     return;
 
   for(var robot in datas)
@@ -78,7 +81,7 @@ var getInfos = function(){
 setInterval(getInfos, 1000)
 
 var quit = function(){
-  client.write("stop");
+  //client.write("stop");
   process.exit();
 }
 
@@ -115,4 +118,11 @@ var updateModel = function(robotId, arguments){
   table[robotState.x][robotState.y][1] = east;
   table[robotState.x][robotState.y][2] = south;
   table[robotState.x][robotState.y][3] = west;
+
+  console.log(robotState)
+}
+
+
+var startRobot = function(){
+  client.write("START");
 }
