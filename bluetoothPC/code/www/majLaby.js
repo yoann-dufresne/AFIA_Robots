@@ -4,7 +4,9 @@ var tileSize = 40;
 
 
 var update = function (data) {
-	data = JSON.parse (data);
+	data = JSON.parse(data);
+	data.robot.x = parseInt(data.robot.x);
+	data.robot.y = parseInt(data.robot.y);
 	console.log (data.robot);
 
 	canvas.width = data.width*tileSize;
@@ -24,7 +26,7 @@ var update = function (data) {
 			ctx.closePath();
 
 			if (data.laby[line][col][0] == "undiscovered")
-				ctx.strokeStyle = '#0000ff';
+				ctx.strokeStyle = '#D3D3D3';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
@@ -39,7 +41,7 @@ var update = function (data) {
 			ctx.closePath();
 
 			if (data.laby[line][col][1] == "undiscovered")
-				ctx.strokeStyle = '#0000ff';
+				ctx.strokeStyle = '#D3D3D3';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
@@ -54,7 +56,7 @@ var update = function (data) {
 			ctx.closePath();
 
 			if (data.laby[line][col][2] == "undiscovered")
-				ctx.strokeStyle = '#0000ff';
+				ctx.strokeStyle = '#D3D3D3';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
@@ -69,7 +71,7 @@ var update = function (data) {
 			ctx.closePath();
 
 			if (data.laby[line][col][3] == "undiscovered")
-				ctx.strokeStyle = '#0000ff';
+				ctx.strokeStyle = '#D3D3D3';
 			else if (data.laby[line][col][0] == "wall")
 				ctx.strokeStyle = '#ff0000';
 			else if (data.laby[line][col][0] == "empty")
@@ -85,14 +87,16 @@ var update = function (data) {
     ctx.fill();
 
 	ctx.beginPath();
-	if (data.robot.dir=="NORTH")
+	if (data.robot.dir == "NORTH")
 		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.1)*tileSize,0.2*tileSize,0.2*tileSize);
-	else if (data.robot.dir ="WEST")
+	else if (data.robot.dir == "EAST")
 		ctx.rect((data.robot.x+0.7)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
-	else if (data.robot.dir ="SOUTH")
+	else if (data.robot.dir == "SOUTH")
 		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.7)*tileSize,0.2*tileSize,0.2*tileSize);
-	else
+	else if (data.robot.dir == "WEST")
 		ctx.rect((data.robot.x+0.1)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
+	else
+		console.error("unknown direction : ", data.robot.dir)
 	ctx.closePath();
 	ctx.fillStyle ="#000000";
 	ctx.fill();
