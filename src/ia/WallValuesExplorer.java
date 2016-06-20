@@ -37,8 +37,40 @@ public class WallValuesExplorer extends AbstractExplorer {
 			this.nextMove();
 			this.computeScores(this.position.getPoint());
 		}/**/
+		this.endExploration();
 	}
 
+	
+	public void endExploration(){
+		Point currentPoint = this.position.getPoint();
+		Point corners[] = {new Point(0,0),new Point(0,YMax),new Point(XMax,0), new Point(XMax,YMax)};
+		List<Point> tmpParkoor = new ArrayList<Point>();
+		this.parkoor= null;
+		
+		for (Point destination : corners){
+			
+			// Si le robot est déja dans un coin
+			if (currentPoint.equals(destination)) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				return;
+			}
+			
+			char[][] distances = this.getManhattanDistances(currentPoint,destination);
+			List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
+			tmpParkoor = this.chooseParkoor(parkoors);
+			
+			if (this.parkoor==null || tmpParkoor.size()<this.parkoor.size())
+				this.parkoor = tmpParkoor;
+		}
+		BluetoothRobot.bt.send("DEBUG;move " + this.parkoor.size());
+		this.movement.followPath(this.parkoor, this.grid);/**/
+	
+	}
 	/** tells if the grid is all discovered or not
 	 * TODO : Améliorer pour pas de n^2 !!!!
 	 *
