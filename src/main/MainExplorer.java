@@ -58,6 +58,7 @@ public class MainExplorer extends AbstractMain {
 		
 		ld.stop();
 		wd.stop();
+		br.stop();
 		
 		try {
 			btThread.join();

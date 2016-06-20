@@ -28,9 +28,9 @@ public class Movement {
 
 	public Movement(Position position) {
 		this.right = Motor.A;
-		this.right.setSpeed(720);
+		this.right.setSpeed(550);
 		this.left = Motor.B;
-		this.left.setSpeed(720);
+		this.left.setSpeed(550);
 		this.position = position;
 		this.needCalm = false;
 		this.isRotating = false;

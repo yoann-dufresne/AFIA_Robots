@@ -6,7 +6,7 @@ public enum Direction {
 	NORTH, EAST, SOUTH, WEST;
 	
 	public Direction turnLeft () {
-		return Direction.values()[(this.ordinal()-1)%Direction.values().length];
+		return Direction.values()[(Direction.values().length + this.ordinal()-1)%Direction.values().length];
 	}
 	
 	public Direction turnRight () {
