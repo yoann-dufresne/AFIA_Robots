@@ -2,12 +2,17 @@ var canvas = document.getElementById("laby");
 var ctx = canvas.getContext('2d');
 var tileSize = 40;
 
+var globalData;
 
 var update = function (data) {
 	data = JSON.parse(data);
+	globalData = data;
 	data.robot.x = parseInt(data.robot.x);
 	data.robot.y = parseInt(data.robot.y);
-	console.log (data.robot);
+
+	var tmp_robot_x = data.robot.x;
+	data.robot.x = data.robot.y;
+	data.robot.y = tmp_robot_x;
 
 	canvas.width = data.width*tileSize;
 	ctx.canvas.width = data.width*tileSize;
@@ -25,11 +30,11 @@ var update = function (data) {
 			ctx.lineTo(x+tileSize,y);
 			ctx.closePath();
 
-			if (data.laby[line][col][0] == "undiscovered")
+			if (data.laby[line][col][0] == "Undiscovered")
 				ctx.strokeStyle = '#D3D3D3';
-			else if (data.laby[line][col][0] == "wall")
+			else if (data.laby[line][col][0] == "Wall")
 				ctx.strokeStyle = '#ff0000';
-			else if (data.laby[line][col][0] == "empty")
+			else if (data.laby[line][col][0] == "Empty")
 				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
@@ -40,11 +45,11 @@ var update = function (data) {
 			ctx.lineTo(x+tileSize-1,y+tileSize);
 			ctx.closePath();
 
-			if (data.laby[line][col][1] == "undiscovered")
+			if (data.laby[line][col][1] == "Undiscovered")
 				ctx.strokeStyle = '#D3D3D3';
-			else if (data.laby[line][col][0] == "wall")
+			else if (data.laby[line][col][1] == "Wall")
 				ctx.strokeStyle = '#ff0000';
-			else if (data.laby[line][col][0] == "empty")
+			else if (data.laby[line][col][1] == "Empty")
 				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
@@ -55,11 +60,11 @@ var update = function (data) {
 			ctx.lineTo(x+tileSize,y+tileSize-1);
 			ctx.closePath();
 
-			if (data.laby[line][col][2] == "undiscovered")
+			if (data.laby[line][col][2] == "Undiscovered")
 				ctx.strokeStyle = '#D3D3D3';
-			else if (data.laby[line][col][0] == "wall")
+			else if (data.laby[line][col][2] == "Wall")
 				ctx.strokeStyle = '#ff0000';
-			else if (data.laby[line][col][0] == "empty")
+			else if (data.laby[line][col][2] == "Empty")
 				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 
@@ -70,11 +75,11 @@ var update = function (data) {
 			ctx.lineTo(x,y+tileSize);
 			ctx.closePath();
 
-			if (data.laby[line][col][3] == "undiscovered")
+			if (data.laby[line][col][3] == "Undiscovered")
 				ctx.strokeStyle = '#D3D3D3';
-			else if (data.laby[line][col][0] == "wall")
+			else if (data.laby[line][col][3] == "Wall")
 				ctx.strokeStyle = '#ff0000';
-			else if (data.laby[line][col][0] == "empty")
+			else if (data.laby[line][col][3] == "Empty")
 				ctx.strokeStyle = '#000000';
 			ctx.stroke();
 		}
@@ -104,5 +109,5 @@ var update = function (data) {
 
 window.setInterval (
 	function () {$.get("/update", update)},
-	1000
+	300
 );

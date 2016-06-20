@@ -88,6 +88,8 @@ class BlueSock(Thread):
                 self.close()
             except KeyboardInterrupt:
                 self.close()
+            except IndexError:
+                pass
 
             else:
                 data = {self.host: data.strip()}

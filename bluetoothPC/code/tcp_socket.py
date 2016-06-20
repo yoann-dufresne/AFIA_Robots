@@ -67,16 +67,14 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print("new connection")
         print "Client connected with ", self.client_address
         running = True
-        while running:
-            self.data = self.request.recv(1024).strip()
-            if self.data != "log":
-                self.send_to_robots()
-            else:
-                self.answer_clients()
-            if self.data == "stop":
-                self.stop()
-                break
-        print("end handle TCP")
+        self.data = self.request.recv(1024).strip()
+        if self.data != "log":
+            self.send_to_robots()
+        else:
+            self.answer_clients()
+        if self.data == "stop":
+            self.stop()
+            break
 
 
 if __name__ == "__main__":
@@ -85,8 +83,8 @@ if __name__ == "__main__":
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
     qin = deque(maxlen=40)
-    addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9"]
-    addrs = ["00:16:53:13:EF:A9"]
+    addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9", "00:16:53:13:EF:A9"]
+    addrs = ["00:16:53:0F:F5:A9"]
     bts = []
     for addr in addrs:
         bts = connect_bt(addr, qin, bts)

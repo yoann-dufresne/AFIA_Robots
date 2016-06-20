@@ -1,11 +1,11 @@
 var net = require('net');
 var express = require('express');
-
+var count_move = 0;
 // Structures
 
 var table;
 var width = 23;
-var height = 11;
+var height = 5;
 
 var createTable = function (width, height) {
 	table = [];
@@ -13,7 +13,7 @@ var createTable = function (width, height) {
 		table[line] = [];
 
 		for (var col=0 ; col<width ; col++) {
-			table[line][col] = ["undiscovered", "undiscovered", "undiscovered", "undiscovered"];
+			table[line][col] = ["Undiscovered", "Undiscovered", "Undiscovered", "Undiscovered"];
 		}
 	}
 };
@@ -56,7 +56,7 @@ client.connect(9999, '127.0.0.1', function() {
 });
 
 client.on('data', function(datas) {
-  console.log('Received: ' + datas);
+  //console.log('Received: ' + datas);
   datas = JSON.parse(datas);
 
   if (datas == {})
@@ -95,11 +95,14 @@ var processData = function(robot, messages){
     arr.shift();
     var arguments = arr;
 
+    if (command === "DEBUG")
+      onDebug(robot, arguments)
+
     if (command === "UPDATE"){
       onUpdate(robot, arguments)
     }
 
-    if (command == "DISCOVERED")
+    if (command === "DISCOVERED")
       onDiscovered(robot, arguments)
   }
 }
@@ -114,20 +117,23 @@ var onUpdate = function(robotId, arguments){
   robotState.y = arguments[1];
   robotState.dir = arguments[2];
 
-  north = arguments[3];
-  east = arguments[4];
-  south = arguments[5];
-  west = arguments[6];
+  // north = arguments[3];
+  // east = arguments[4];
+  // south = arguments[5];
+  // west = arguments[6];
 
-  table[robotState.x][robotState.y][0] = north;
-  table[robotState.x][robotState.y][1] = east;
-  table[robotState.x][robotState.y][2] = south;
-  table[robotState.x][robotState.y][3] = west;
+  // table[robotState.x][robotState.y][0] = north;
+  // table[robotState.x][robotState.y][1] = east;
+  // table[robotState.x][robotState.y][2] = south;
+  // table[robotState.x][robotState.y][3] = west;
 
-  console.log("discovered : ", robotState.x, robotState.y);
+  //console.log("discovered : ", robotState.x, robotState.y);
 }
 
 var onDiscovered = function(robotId, arguments){
+  console.log("  -- onDiscovered", arguments)
+  count_move += 1;
+  console.log("mov n°", count_move)
   if (arguments == undefined)
     return
 
@@ -138,7 +144,6 @@ var onDiscovered = function(robotId, arguments){
 
     x = parseInt(tmp[0].toString());
     y = parseInt(tmp[1].toString());
-    console.log("discovered : ", x, y);
     if(x == -1 || y == -1)
       continue
 
@@ -146,8 +151,13 @@ var onDiscovered = function(robotId, arguments){
       continue
 
     direction = directions[tmp[2]];
-    table[x][y][direction] = tmp[3].toLowerCase;
+    table[x][y][direction] = tmp[3];
+    console.log(x, y, table[x][y]);
   }
+}
+
+var onDebug = function(robotId, arguments){
+  console.log("DEBUG : ", arguments);
 }
 
 var startRobot = function(){
