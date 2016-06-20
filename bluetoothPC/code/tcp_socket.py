@@ -67,14 +67,16 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print("new connection")
         print "Client connected with ", self.client_address
         running = True
-        self.data = self.request.recv(1024).strip()
-        if self.data != "log":
-            self.send_to_robots()
-        else:
-            self.answer_clients()
-        if self.data == "stop":
-            self.stop()
-            break
+        while running:
+            self.data = self.request.recv(1024).strip()
+            if self.data != "log":
+                self.send_to_robots()
+            else:
+                self.answer_clients()
+            if self.data == "stop":
+                self.stop()
+                break
+        print("end handle TCP")
 
 
 if __name__ == "__main__":
