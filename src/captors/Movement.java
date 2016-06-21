@@ -157,6 +157,10 @@ public class Movement {
 		}
 	}
 	
+	public void straightForward(){
+		//TODO go forward to next wall
+	}
+	
 	public void forward (double nbTiles){
 		double xInit = this.position.getX();
 		double yInit = this.position.getY();

@@ -28,7 +28,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 		this.filename = filename;
 		this.manhattanDistances = new char[this.XMax][this.YMax];
  	}
-
+ 
 
 	@Override
 	public void explore () {
