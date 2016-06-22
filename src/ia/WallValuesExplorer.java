@@ -4,12 +4,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import bluetooth.BluetoothRobot;
 import model.Direction;
 import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
+import bluetooth.BluetoothRobot;
 import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer {
@@ -17,15 +17,13 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public static final int MAX_DIST = 20;
 	
 	protected char tileValues[][];
-	private String filename;
 
 	private char[][] manhattanDistances;
 	private List<Point> parkoor;
 
-	public WallValuesExplorer(Position position, Movement movement, Grid grid, String filename) {
+	public WallValuesExplorer(Position position, Movement movement, Grid grid) {
  		super(position, movement, grid);
  		this.tileValues = new char[this.XMax][this.YMax];
-		this.filename = filename;
 		this.manhattanDistances = new char[this.XMax][this.YMax];
  	}
 
@@ -34,7 +32,9 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void explore () {
 		this.computeScores(this.position.getPoint());
 		while (!this.isAllDiscovered()){
+			BluetoothRobot.bt.send("DEBUG; next move");
 			this.nextMove();
+			BluetoothRobot.bt.send("DEBUG; compute score");
 			this.computeScores(this.position.getPoint());
 		}/**/
 		this.endExploration();
@@ -89,8 +89,12 @@ public class WallValuesExplorer extends AbstractExplorer {
 
 
 	public void nextMove(){
+		BluetoothRobot.bt.send("DEBUG; Next move start");
 		Point currentPoint = this.position.getPoint();
+		BluetoothRobot.bt.send("DEBUG; Get point");
 		Point destination = this.findHighestScore();
+		BluetoothRobot.bt.send("DEBUG; Destination: " + destination.x + " " + destination.y);
+		BluetoothRobot.bt.send("DEBUG; " + currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
 		
 		// Si pas de déplacements
 		if (currentPoint.equals(destination)) {
@@ -103,14 +107,22 @@ public class WallValuesExplorer extends AbstractExplorer {
 			return;
 		}
 		
-		BluetoothRobot.bt.send("DEBUG; " + currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
+		BluetoothRobot.bt.send("DEBUG; before distances");
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
+		BluetoothRobot.bt.send("DEBUG; distances ok");
+
 		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		
+		BluetoothRobot.bt.send("DEBUG; parkoor ok");
 		this.parkoor = this.chooseParkoor(parkoors);
 		
 		BluetoothRobot.bt.send("DEBUG;move " + this.parkoor.size());
 		this.movement.followPath(this.parkoor, this.grid);/**/
+		BluetoothRobot.bt.send("DEBUG;movement ended");
 	}
 
 
@@ -298,8 +310,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 					this.tileValues[x][y] = 0;
 			}
 		}
-		
-		Tile t = this.grid.getTile(0, 0);
 	}
 
 	public int scoreDistanceModulation(Point p1, Point p2, int score){
