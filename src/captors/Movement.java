@@ -15,14 +15,14 @@ import model.WallState;
 
 public class Movement {
 	
-	private NXTRegulatedMotor left;
-	private NXTRegulatedMotor right;
+	protected NXTRegulatedMotor left;
+	protected NXTRegulatedMotor right;
 	
-	private int prevAngle;
+	protected int prevAngle;
 	
-	private boolean interrupted;
+	protected boolean interrupted;
 	public Position position;
-	private boolean pathStopped;
+	protected boolean pathStopped;
 	public boolean needCalm;
 	public boolean isRotating;
 
@@ -157,9 +157,7 @@ public class Movement {
 		}
 	}
 	
-	public void straightForward(){
-		//TODO go forward to next wall
-	}
+	
 	
 	public void forward (double nbTiles){
 		double xInit = this.position.getX();
