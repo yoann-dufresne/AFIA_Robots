@@ -1,12 +1,11 @@
 package main;
 
-import bluetooth.BluetoothRobot;
 import ia.WallValuesExplorer;
 import lejos.nxt.Button;
-import lejos.nxt.Motor;
 import model.Direction;
 import model.Grid;
 import model.Position;
+import bluetooth.BluetoothRobot;
 import captors.LineDetectors;
 import captors.LineObserver;
 import captors.Movement;
@@ -21,7 +20,7 @@ public class MainExplorer extends AbstractMain {
 	public void start () {
 		this.started = false;
 		Position position = new Position(0.5, 0.5, Direction.EAST);
-		Grid g = new Grid(5, 23);
+		Grid g = new Grid(3, 4);
 		Movement move = new Movement(position);
 		
 		BluetoothRobot br = new BluetoothRobot(position, g, this);
@@ -53,7 +52,7 @@ public class MainExplorer extends AbstractMain {
 		//WallDiscovererObserver wo = new WallDiscovererObserver(g, position, null);
 		wd.addObserver(wo);/**/
 		
-		WallValuesExplorer wve = new WallValuesExplorer(position, move, g, "laby.txt");
+		WallValuesExplorer wve = new WallValuesExplorer(position, move, g);
 		wve.explore();/**/
 		
 		ld.stop();

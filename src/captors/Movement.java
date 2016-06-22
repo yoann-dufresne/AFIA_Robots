@@ -69,8 +69,8 @@ public class Movement {
 			}
 			
 			
-			BluetoothRobot.bt.send("DEBUG; " + current.x + "," + current.y + " " + this.position.getDirection().toString() + " " +
-					t.north + " " + t.east + " " + t.south + " " + t.west);
+			//BluetoothRobot.bt.send("DEBUG; " + current.x + "," + current.y + " " + this.position.getDirection().toString() + " " +
+				//	t.north + " " + t.east + " " + t.south + " " + t.west);
 			this.moveTo(p);
 		}
 	}
@@ -87,7 +87,6 @@ public class Movement {
 			diff =  p.x - this.position.getPoint().x;
 		}
 		
-		BluetoothRobot.bt.send("DEBUG;Synch");
 		while (this.needCalm) {
 			try {
 				Thread.sleep(10);
@@ -96,29 +95,23 @@ public class Movement {
 			}
 		}
 		this.isRotating = true;
-		BluetoothRobot.bt.send("DEBUG;turn");
 		this.turn(wantedDir);
-		BluetoothRobot.bt.send("DEBUG;/turn");
 		this.isRotating = false;
-		BluetoothRobot.bt.send("DEBUG;/Synch");
 		
 		this.forward(Math.abs(diff));
 	}
 
 	public void turn(Direction wantedDir) {
 		if(wantedDir == this.position.getDirection()) {
-			BluetoothRobot.bt.send("DEBUG; good direction !");
 			return;
 		}
 
 		int turnValue = this.position.getDirection().turnTo(wantedDir);
-		BluetoothRobot.bt.send("DEBUG;turn value ");
 		
 		if(turnValue < 0) {
 			this.turnLeft(-turnValue);
 		} else 
 			this.turnRight(turnValue);
-		BluetoothRobot.bt.send("DEBUG;turn fin");
 	}
 
 	private void turnLeft(int repeat) {
@@ -280,13 +273,11 @@ public class Movement {
 	}
 	
 	public void turnRight () {
-		BluetoothRobot.bt.send("DEBUG;turn right");
 		this.rotate(90);
 		this.position.turnRight();
 	}
 	
 	public void turnLeft () {
-		BluetoothRobot.bt.send("DEBUG;turn left");
 		this.rotate(-90);
 		this.position.turnLeft();
 	}
