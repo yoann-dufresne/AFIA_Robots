@@ -3,14 +3,13 @@ package captors;
 
 import java.awt.Point;
 
-import util.Debug;
-import bluetooth.BluetoothRobot;
 import main.Config;
 import model.Direction;
 import model.Grid;
 import model.Position;
 import api.Observable;
 import api.Observer;
+import bluetooth.BluetoothRobot;
 
 public class WallDiscovererObserver implements Observer {
 
@@ -41,7 +40,6 @@ public class WallDiscovererObserver implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		BluetoothRobot.bt.send("DEBUG; Update");
 		int[] dists = (int[])arg;
 		Point tile = this.position.getPoint();
 
@@ -56,8 +54,6 @@ public class WallDiscovererObserver implements Observer {
 			
 			int absDist = 0;
 			while (dist > TILE_SIZE_CM) {
-				this.bt.send("DEBUG;remaining dist " + dist);
-				this.bt.send("DEBUG;" + x + " " + y + " " + dir);
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;
 				absDist++;
@@ -75,10 +71,6 @@ public class WallDiscovererObserver implements Observer {
 					this.wallsProbas[probaIdx] = (char)absDist;
 					discovered = true;
 				}
-				
-				this.bt.send("DEBUG;discovered " + discovered);
-				this.bt.send("DEBUG;idx " + probaIdx);
-				this.bt.send("DEBUG;probas " + absDist + " <= " + proba);
 				
 				dist -= TILE_SIZE_CM;
 
@@ -155,7 +147,6 @@ public class WallDiscovererObserver implements Observer {
 					}
 				}
 		}
-		BluetoothRobot.bt.send("DEBUG;/Update");
 	}
 	
 	// --------------------------------------------------------------
@@ -174,7 +165,7 @@ public class WallDiscovererObserver implements Observer {
 			row = row-1;
 		} else if (dir == Direction.WEST) {
 			dir = Direction.EAST;
-			col = col+1;
+			col = col-1;
 		}
 		
 		return 2* (row * this.grid.getWidth() + col) + (dir == Direction.SOUTH ? 0 : 1);

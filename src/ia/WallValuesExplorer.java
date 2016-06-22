@@ -32,9 +32,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void explore () {
 		this.computeScores(this.position.getPoint());
 		while (!this.isAllDiscovered()){
-			BluetoothRobot.bt.send("DEBUG; next move");
 			this.nextMove();
-			BluetoothRobot.bt.send("DEBUG; compute score");
 			this.computeScores(this.position.getPoint());
 		}/**/
 		this.endExploration();
@@ -68,7 +66,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 			if (this.parkoor == null || tmpParkoor.size()<this.parkoor.size())
 				this.parkoor = tmpParkoor;
 		}
-		BluetoothRobot.bt.send("DEBUG;move " + this.parkoor.size());
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	
 	}
@@ -89,11 +86,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 
 
 	public void nextMove(){
-		BluetoothRobot.bt.send("DEBUG; Next move start");
 		Point currentPoint = this.position.getPoint();
-		BluetoothRobot.bt.send("DEBUG; Get point");
 		Point destination = this.findHighestScore();
-		BluetoothRobot.bt.send("DEBUG; Destination: " + destination.x + " " + destination.y);
 		BluetoothRobot.bt.send("DEBUG; " + currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
 		
 		// Si pas de déplacements
@@ -107,22 +101,12 @@ public class WallValuesExplorer extends AbstractExplorer {
 			return;
 		}
 		
-		BluetoothRobot.bt.send("DEBUG; before distances");
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
-		BluetoothRobot.bt.send("DEBUG; distances ok");
 
 		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		BluetoothRobot.bt.send("DEBUG; parkoor ok");
 		this.parkoor = this.chooseParkoor(parkoors);
 		
-		BluetoothRobot.bt.send("DEBUG;move " + this.parkoor.size());
 		this.movement.followPath(this.parkoor, this.grid);/**/
-		BluetoothRobot.bt.send("DEBUG;movement ended");
 	}
 
 
