@@ -97,23 +97,24 @@ public class BluetoothRobot implements Runnable  {
 					";" + current.east.toString() +
 					";" + current.south.toString() +
 					";" + current.west.toString();
-			this.inbox.add(up);
+				
+			synchronized (this.inbox) {
+				this.inbox.add(up);
 			
-			// Vide la inbox
-			while (this.inbox.size() > 0){
-				String msg = null;
-				synchronized (this.inbox) {
+				// Vide la inbox
+				while (this.inbox.size() > 0){
+					String msg = null;
 					msg = this.inbox.remove(0);
-				}
-
-				try {
-					this.bw.write(msg+'\n');
-					this.bw.flush();
-					Thread.sleep(5);
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+	
+					try {
+						this.bw.write(msg+'\n');
+						this.bw.flush();
+						Thread.sleep(5);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
