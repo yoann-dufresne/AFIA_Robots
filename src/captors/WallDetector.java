@@ -3,10 +3,8 @@ package captors;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
-import model.Position;
 import api.Observable;
 import api.Observer;
-import bluetooth.BluetoothRobot;
 
 public class WallDetector extends Observable implements Runnable {
 	
@@ -15,17 +13,14 @@ public class WallDetector extends Observable implements Runnable {
 	private boolean stopped;
 	private boolean isInFrontPosition;
 	private UltrasonicSensor front;
-	private Position robotPosition;
 	
 	private int distance;
 	
-	public WallDetector(Position robot, Movement move) {
+	public WallDetector() {
 		this.front = new UltrasonicSensor(SensorPort.S2);
 		this.front.continuous();
-		this.isInFrontPosition = false;
-		
-		this.robotPosition = robot;
-		
+		this.isInFrontPosition = true;
+		this.changeHeadPosition();
 		this.distance= 255;
 	}
 	
@@ -68,8 +63,6 @@ public class WallDetector extends Observable implements Runnable {
 	
 	@Override
 	public void notifyObservers () {
-		BluetoothRobot.bt.send("DEBUG;ultrasons " + this.robotPosition + "Wall detected");
-		
 		for (Observer obs : this.observers)
 			obs.update(this, this.distance);
 	}
