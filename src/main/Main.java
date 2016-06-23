@@ -9,8 +9,8 @@ public class Main extends AbstractMain {
 
 	public Main() {
 		super(
-				new Position(0.5, 0.5, Direction.EAST),
-				new Grid(11, 23)
+				new Grid(11, 23),
+				new Position(0.5, 0.5, Direction.EAST)
 		);
 	}
 	

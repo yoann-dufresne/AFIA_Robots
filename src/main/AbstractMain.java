@@ -10,7 +10,7 @@ public abstract class AbstractMain {
 	protected LineDetectors ld;
 	protected Thread ldThread;
 	
-	public AbstractMain(Position pos, Grid g) {
+	public AbstractMain(Grid g, Position pos) {
 		this.grid = g;
 		this.pos = pos;
 		

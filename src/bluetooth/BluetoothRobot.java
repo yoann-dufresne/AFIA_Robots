@@ -13,7 +13,7 @@ import java.util.List;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 import main.AbstractMain;
-import main.ExploitationMain;
+import main.MainExploitation;
 import main.MainExplorer;
 import model.Direction;
 import model.Grid;
@@ -45,7 +45,7 @@ public class BluetoothRobot implements Runnable  {
 		
 		this.position = pos;
 		this.grid = grid;
-		this.main = new ExploitationMain(pos, grid);
+		this.main = new MainExploitation(grid, pos);
 		
 		System.out.println("BT waiting");
         this.btc = Bluetooth.waitForConnection();
@@ -154,7 +154,7 @@ public class BluetoothRobot implements Runnable  {
 		
 		int id = new Integer(words.get(1));
 		System.out.println("ID " + id);
-		this.main = id == 0 ? new MainExplorer(this.grid, this.position) : new ExploitationMain(this.position, this.grid);
+		this.main = id == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
 	}
 
 	private void start(List<String> words) {

@@ -11,7 +11,7 @@ import captors.WallDiscovererObserver;
 public class MainExplorer extends AbstractMain {
 	
 	public MainExplorer(Grid g, Position pos) {
-		super(pos, g);
+		super(g, pos);
 	}
 	
 	public void start () {
