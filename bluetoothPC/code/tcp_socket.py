@@ -8,6 +8,9 @@ import collections
 
 from bt_socket import BlueSock
 
+
+ADRESSES = {"00:16:53:0F:F5:A9":1, "00:16:53:13:EF:A9":0}
+
 def ctrl_c_handler(signal, frame):
     time.sleep(1)
     print("In ctrl C handler...")
@@ -22,7 +25,7 @@ def ctrl_c_handler(signal, frame):
 def connect_bt(addr, qin, bts):
     try:
         time.sleep(0.1)
-        bt = BlueSock(addr, qin)
+        bt = BlueSock(addr, addr_simple, qin)
         bt.debug = True
         bt.connect()
         bts.append(bt)
@@ -98,10 +101,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         ctrl_c_handler(None, None)
 
-
-
-
-
-
-
-        

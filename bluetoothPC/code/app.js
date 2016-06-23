@@ -56,7 +56,10 @@ app.get("/init", function(req, res){
   res.send("initialized");
 });
 
-
+app.get("/sendLaby", function(req, res){
+  sendLaby();
+  res.send("initialized");
+});
 
 // TCP
 
@@ -173,4 +176,16 @@ var initRobot = function(command){
 
   client.write(command);
   console.log (command);
+}
+
+var sendLaby = function(){
+  for (var line=0 ; line<height ; line++) {
+    for (var col=0 ; col<width ; col++) {
+      walls = table[line][col];
+      client.write("DISCOVERED;"+line+";"+col+";NORTH;"+walls[0]+";1");
+      client.write("DISCOVERED;"+line+";"+col+";EAST;"+walls[1]+";1");
+      client.write("DISCOVERED;"+line+";"+col+";SOUTH;"+walls[2]+";1");
+      client.write("DISCOVERED;"+line+";"+col+";WEST;"+walls[3]+";1");
+    }
+  }
 }
