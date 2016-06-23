@@ -22,6 +22,7 @@ createTable (width, height);
 
 var robotState = {x:0, y:0, dir:"EAST"};
 var directions = {"NORTH": 0, "EAST": 1, "SOUTH": 2, "WEST": 3};
+var revertedDirections = ["NORTH", "EAST", "SOUTH", "WEST"];
 
 
 
@@ -50,7 +51,7 @@ app.get("/start", function(req, res){
 });
 
 app.get("/init", function(req, res){
-  initRobot(req.query.command);
+  initRobot(command);
   res.send("initialized");
 });
 
@@ -87,7 +88,6 @@ var getInfos = function(){
 setInterval(getInfos, 1000)
 
 var quit = function(){
-  //client.write("stop");
   client.destroy()
   process.exit();
 }
@@ -161,6 +161,16 @@ var startRobot = function(){
 }
 
 var initRobot = function(command){
+  var command = req.query.command;
+  var words = command.split(';');
+  width = parseInt(words[2]);
+  height = parseInt(words[3]);
+  createTable (width, height);
+
+  robotState.x = parseInt(words[4]);
+  robotState.y = parseInt(words[5]);
+  robotState.dir = revertedDirections[parseInt(words[6])];
+
   client.write(command);
   console.log (command);
 }
