@@ -49,7 +49,15 @@ app.get("/start", function(req, res){
   res.send("started");
 });
 
+app.get("/init", function(req, res){
+  initRobot(req.query.command);
+  res.send("initialized");
+});
+
+
+
 // TCP
+
 var client = new net.Socket();
 client.connect(9999, '127.0.0.1', function() {
   console.log('Connected');
@@ -116,18 +124,6 @@ var onUpdate = function(robotId, arguments){
   robotState.x = arguments[0];
   robotState.y = arguments[1];
   robotState.dir = arguments[2];
-
-  // north = arguments[3];
-  // east = arguments[4];
-  // south = arguments[5];
-  // west = arguments[6];
-
-  // table[robotState.x][robotState.y][0] = north;
-  // table[robotState.x][robotState.y][1] = east;
-  // table[robotState.x][robotState.y][2] = south;
-  // table[robotState.x][robotState.y][3] = west;
-
-  //console.log("discovered : ", robotState.x, robotState.y);
 }
 
 var onDiscovered = function(robotId, arguments){
@@ -162,4 +158,9 @@ var onDebug = function(robotId, arguments){
 
 var startRobot = function(){
   client.write("START");
+}
+
+var initRobot = function(command){
+  client.write(command);
+  console.log (command);
 }

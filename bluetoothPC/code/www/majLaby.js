@@ -107,7 +107,7 @@ var update = function (data) {
 	ctx.fill();
 };
 
-window.setInterval (
+/*window.setInterval (
 	function () {$.get("/update", update)},
 	300
-);
+);/**/
