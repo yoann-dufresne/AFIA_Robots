@@ -2,7 +2,6 @@ package bluetooth;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.TimerTask;
 
 public class PeriodicBt implements Runnable {
 	private BufferedWriter bw;

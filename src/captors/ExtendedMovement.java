@@ -1,9 +1,10 @@
 package captors;
 
-import main.Config;
+import model.Position;
 import api.Observable;
+import api.Observer;
 
-public class ExtendedMovement extends Movement implements Observer{
+public class ExtendedMovement extends Movement implements Observer {
 	
 	
 	public ExtendedMovement(Position position){

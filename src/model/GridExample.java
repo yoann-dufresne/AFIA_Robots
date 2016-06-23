@@ -3,6 +3,7 @@ package model;
 
 public class GridExample {
 	public static final Grid g = new Grid(11, 23, WallState.Empty);
+	@SuppressWarnings("unused")
 	private static final GridExample ex = new GridExample();
 	
 	private GridExample(){

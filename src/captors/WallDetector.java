@@ -1,16 +1,12 @@
 package captors;
 
-import java.awt.Point;
-import java.util.Arrays;
-
-import bluetooth.BluetoothRobot;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
-import model.Direction;
 import model.Position;
 import api.Observable;
 import api.Observer;
+import bluetooth.BluetoothRobot;
 
 public class WallDetector extends Observable implements Runnable {
 	
@@ -20,9 +16,7 @@ public class WallDetector extends Observable implements Runnable {
 	private boolean isInFrontPosition;
 	private UltrasonicSensor front;
 	private Position robotPosition;
-	private Movement movement;
-		
-//	private int[] tmpDists;
+	
 	private int distance;
 	
 	public WallDetector(Position robot, Movement move) {
@@ -31,8 +25,6 @@ public class WallDetector extends Observable implements Runnable {
 		this.isInFrontPosition = false;
 		
 		this.robotPosition = robot;
-//		this.tmpDists = new int[5];
-		this.movement = move;
 		
 		this.distance= 255;
 	}
@@ -69,18 +61,10 @@ public class WallDetector extends Observable implements Runnable {
 		if (!this.isInFrontPosition())
 			this.changeHeadPosition();
 		this.distance= this.front.getDistance();
-//		this.distance =this.middleDist(this.front);
-		if (this.distance< this.MIN_DIST){
+		if (this.distance< WallDetector.MIN_DIST){
 			this.notifyObservers();
 		}
-	
-//	private int middleDist (UltrasonicSensor sensor) {
-//		for (int i=0 ;i<this.tmpDists.length ; i++)
-//			this.tmpDists[i] = sensor.getDistance();
-//		Arrays.sort(this.tmpDists);
-//		
-//		return this.tmpDists[3];
-//	}
+	}
 	
 	@Override
 	public void notifyObservers () {
