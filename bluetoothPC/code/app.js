@@ -51,6 +51,7 @@ app.get("/start", function(req, res){
 });
 
 app.get("/init", function(req, res){
+  var command = req.query.command;
   initRobot(command);
   res.send("initialized");
 });
@@ -161,7 +162,6 @@ var startRobot = function(){
 }
 
 var initRobot = function(command){
-  var command = req.query.command;
   var words = command.split(';');
   width = parseInt(words[2]);
   height = parseInt(words[3]);
