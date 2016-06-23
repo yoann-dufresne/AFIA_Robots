@@ -30,7 +30,7 @@ class BlueSock(Thread):
     bsize = 118 # Bluetooth socket block size
     PORT = 1    # Standard NXT rfcomm port
 
-    def __init__(self, host, fifo_in):
+    def __init__(self, host, fifo_in, fifo_connexion):
         Thread.__init__(self)
 
         self.host = host
@@ -38,6 +38,7 @@ class BlueSock(Thread):
         self.debug = False
         self.running = True
         self.fifo_in = fifo_in
+        self.fifo_connexion = fifo_connexion
 
     def __str__(self):
         return 'Bluetooth (%s)' % self.host
@@ -45,18 +46,33 @@ class BlueSock(Thread):
     def connect(self):
         if self.debug:
             print('Connecting via Bluetooth to {}...'.format(self.host))
-        sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        sock.connect((self.host, BlueSock.PORT))
-        self.sock = sock
+
+        connected = self._connect()
+        if not connected:
+            return False
+
         if self.debug:
             print('Connected.')
         self.start()
+        return True
+
+    def _connect(self):
+        sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        try:
+            sock.connect((self.host, BlueSock.PORT))
+        except bluetooth.btcommon.BluetoothError:
+            self.fifo_connexion.append(self.host)
+            return False
+        self.sock = sock
+        return True
+
 
     def close(self):
         if self.debug:
             print('Closing Bluetooth connection to {}...'.format(self.host))
         self.running = False
         self.sock.close()
+        self.fifo_connexion.append(self.host)
         if self.debug:
             print('Bluetooth connection closed to {}...'.format(self.host))
 
