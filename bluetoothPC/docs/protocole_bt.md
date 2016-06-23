@@ -6,6 +6,7 @@ Id : 0-1-2-3 (0 au nord west, 1 au nord est, 2 au sud est, 3 au sud ouest (on to
 ### Commands :
  * Envoyer un update du robot fréquemment    => UPDATE;X;Y;DIR;WALL_NORTH;_EAST;_SOUTH;_WEST
  * Envoyer une liste de murs découverts     => DISCOVERED;X;Y
+ * Conflit entre la carte et le terrain lors de l'exploitation => CONFLICT
 
 
 

@@ -120,7 +120,7 @@ public class WallDiscovererObserver implements Observer {
 					
 					if (absDist < proba) {
 						this.wallsProbas[probaIdx] = (char)absDist;
-						this.grid.addWall(x, y, dir);
+						this.grid.setWall(x, y, dir);
 						
 						switch (dir) {
 						case NORTH:

@@ -48,7 +48,7 @@ public class Grid {
 	}
 	
 
-	public void addWall(int x, int y, Direction direction) {
+	public void setWall(int x, int y, Direction direction) {
 		this.setTile(x, y, direction, WallState.Wall);
 	}
 	
@@ -59,13 +59,13 @@ public class Grid {
 	
 	public void makeBorders(){
 		for(int row=0; row < this.height; row++){
-			this.addWall(row, 0, Direction.WEST);
-			this.addWall(row,  this.width-1, Direction.EAST);
+			this.setWall(row, 0, Direction.WEST);
+			this.setWall(row,  this.width-1, Direction.EAST);
 		}
 		
 		for(int col=0; col < this.width; col++){
-			this.addWall(0, col, Direction.NORTH);
-			this.addWall(this.height-1, col , Direction.SOUTH);
+			this.setWall(0, col, Direction.NORTH);
+			this.setWall(this.height-1, col , Direction.SOUTH);
 		}
 	}
 	

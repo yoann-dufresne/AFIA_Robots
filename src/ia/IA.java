@@ -59,7 +59,7 @@ public class IA {
 				emptyWalls.add(Direction.SOUTH);
 
 			for (Direction dir : emptyWalls)
-				this.grid.addWall(sol.coopTile.x, sol.coopTile.y, dir);
+				this.grid.setWall(sol.coopTile.x, sol.coopTile.y, dir);
 			sol.myCoopPath = this.traceback(sol.coopParkoor, destination);
 			for (Direction dir : emptyWalls)
 				this.grid.removeWall(sol.coopTile.x, sol.coopTile.y, dir);
@@ -179,7 +179,7 @@ public class IA {
 					emptyWalls.add(Direction.SOUTH);
 	
 				for (Direction dir : emptyWalls)
-					this.grid.addWall(i, j, dir);
+					this.grid.setWall(i, j, dir);
 				
 				char[][] tmp = this.parkoor(start, destination, limit);
 				char score = (char)Math.max(

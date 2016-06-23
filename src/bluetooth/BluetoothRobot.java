@@ -1,5 +1,6 @@
 package bluetooth;
 
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -10,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import api.Observable;
+import api.Observer;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 import main.AbstractMain;
@@ -21,12 +24,14 @@ import model.Position;
 import model.Tile;
 import util.Spliter;
 
-public class BluetoothRobot implements Runnable  {
+public class BluetoothRobot extends Observable implements Runnable  {
 	public static BluetoothRobot bt;
 	private boolean started;
 	
 	private Position position;
 	private Grid grid;
+	public Point destination;
+	public boolean conflict;
 	
 	private BTConnection btc;
 	private boolean ended;
@@ -34,6 +39,7 @@ public class BluetoothRobot implements Runnable  {
 	private BufferedReader br;
 	private BufferedWriter bw;
 
+	private String command;
 	private List<String> inbox;
 	public AbstractMain main;
 
@@ -48,9 +54,12 @@ public class BluetoothRobot implements Runnable  {
 		this.position = pos;
 		this.grid = grid;
 		this.main = new MainExploitation(grid, pos);
-				
+
+		this.destination = new Point(-1, -1);
+		this.conflict = false;
+		
 		System.out.println("BT waiting");
-        this.btc = Bluetooth.waitForConnection();
+		this.btc = Bluetooth.waitForConnection();
 		System.out.println("BT connected");
 
         DataInputStream dis = btc.openDataInputStream();
@@ -97,6 +106,8 @@ public class BluetoothRobot implements Runnable  {
 					System.out.println(command);
 				} else if ("SETID".equals(command)){
 					this.setID(words);
+				} else if ("CONFLICT".equals(command)){
+					this.conflict(words);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -156,9 +167,9 @@ public class BluetoothRobot implements Runnable  {
 		Direction dir = Direction.values()[new Integer(words.get(6))];
 		this.position = new Position(line + 0.5, col + 0.5, dir);
 		
-		int id = new Integer(words.get(1));
-		System.out.println("ID " + id);
-		this.main = id == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
+		int idMain = new Integer(words.get(1));
+		System.out.println("Main " + idMain);
+		this.main = idMain == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
 	}
 
 	private void start(List<String> words) {
@@ -172,11 +183,23 @@ public class BluetoothRobot implements Runnable  {
 	}
 
 	private void partial(List<String> words) {
+		String word = words.get(0);
+		if (word.startsWith("?"))
+		this.destination = new Point(new Integer(words.get(1)), new Integer(words.get(2)));
+		this.command = "PARTIAL";
+		this.notifyObservers();
+		
 		System.out.println("PARTIAL");
 	}
 
 	private void discover(List<String> words) {
 		System.out.println("DISCOVERED");
+	}
+	
+	private void conflict(List<String> words) {
+		this.conflict = true;
+		this.notifyObservers();
+		System.out.println("CONFLICT");
 	}
 
 	private void setID(List<String> words){
@@ -192,6 +215,12 @@ public class BluetoothRobot implements Runnable  {
 
 	public boolean started() {
 		return this.started;
+	}
+
+	@Override
+	public void notifyObservers() {
+		for (Observer obs : this.observers)
+			obs.update(this, this.command);
 	}
 
 }
