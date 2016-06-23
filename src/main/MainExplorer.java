@@ -1,12 +1,8 @@
 package main;
 
 import ia.WallValuesExplorer;
-import lejos.nxt.Button;
-import model.Direction;
 import model.Grid;
 import model.Position;
-import bluetooth.BluetoothRobot;
-import captors.LineDetectors;
 import captors.LineObserver;
 import captors.Movement;
 import captors.WallDiscoverer;
@@ -14,54 +10,33 @@ import captors.WallDiscovererObserver;
 
 public class MainExplorer extends AbstractMain {
 	
-	public MainExplorer() {
+	public MainExplorer(Grid g, Position pos) {
+		super(pos, g);
 	}
 	
 	public void start () {
-		this.started = false;
-		Position position = new Position(0.5, 0.5, Direction.EAST);
-		Grid g = new Grid(3, 4);
-		Movement move = new Movement(position);
+		Movement move = new Movement(this.pos);
 		
-		BluetoothRobot br = new BluetoothRobot(position, g, this);
-		BluetoothRobot.bt = br;
-		Thread btThread = new Thread(br);
-		btThread.start();
-		
-		while (!this.started) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}/**/
-		
-		LineDetectors ld = new LineDetectors ();
-		Thread ldThread = new Thread (ld);
-		ldThread.start ();/**/
-		
-		WallDiscoverer wd = new WallDiscoverer(position, move);
+		WallDiscoverer wd = new WallDiscoverer(this.pos, move);
 		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
 		
-		LineObserver lo = new LineObserver(move, position);
-		ld.addObserver(lo);
+		LineObserver lo = new LineObserver(move, this.pos);
+		this.ld.addObserver(lo);
+		this.ldThread.start();
 
-		WallDiscovererObserver wo = new WallDiscovererObserver(g, position, br);
-		//WallDiscovererObserver wo = new WallDiscovererObserver(g, position, null);
+		WallDiscovererObserver wo = new WallDiscovererObserver(this.grid, this.pos);
 		wd.addObserver(wo);/**/
 		
-		WallValuesExplorer wve = new WallValuesExplorer(position, move, g);
+		WallValuesExplorer wve = new WallValuesExplorer(this.pos, move, this.grid);
 		wve.explore();/**/
 		
-		ld.stop();
+		this.ld.stop();
 		wd.stop();
-		br.stop();
 		
 		try {
-			btThread.join();
-			ldThread.join();
+			this.ldThread.join();
 			wdThread.join();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -69,13 +44,6 @@ public class MainExplorer extends AbstractMain {
 		
 		if (wd.isInFrontPosition())
 			wd.changeHeadPosition();/**/
-		
-		Button.waitForAnyPress();
-	}
-
-	public static void main(String[] args) {
-		MainExplorer main = new MainExplorer();
-		main.start();
 	}
 
 }

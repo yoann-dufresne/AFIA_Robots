@@ -13,6 +13,9 @@ import java.util.List;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
 import main.AbstractMain;
+import main.ExploitationMain;
+import main.MainExplorer;
+import model.Direction;
 import model.Grid;
 import model.Position;
 import model.Tile;
@@ -20,6 +23,7 @@ import util.Spliter;
 
 public class BluetoothRobot implements Runnable  {
 	public static BluetoothRobot bt;
+	private boolean started;
 	
 	private Position position;
 	private Grid grid;
@@ -31,21 +35,18 @@ public class BluetoothRobot implements Runnable  {
 	private BufferedWriter bw;
 
 	private List<String> inbox;
-	private AbstractMain main;
+	public AbstractMain main;
 
-	public BluetoothRobot(Position pos, Grid grid, AbstractMain mainExplorer) {
+	public BluetoothRobot(Position pos, Grid grid) {
+		BluetoothRobot.bt = this;
+		this.started = false;
 		this.ended = true;
 		this.inbox = new ArrayList<String>();
 		
 		this.position = pos;
 		this.grid = grid;
-		this.main = mainExplorer;
-	}
-
-	@Override
-	public void run() {
-		this.ended = false;
-
+		this.main = new ExploitationMain(pos, grid);
+		
 		System.out.println("BT waiting");
         this.btc = Bluetooth.waitForConnection();
 		System.out.println("BT connected");
@@ -54,6 +55,11 @@ public class BluetoothRobot implements Runnable  {
 		DataOutputStream dos = btc.openDataOutputStream();
 		this.br = new BufferedReader(new InputStreamReader(dis));
 		this.bw = new BufferedWriter(new OutputStreamWriter(dos));
+	}
+
+	@Override
+	public void run() {
+		this.ended = false;
 
 		while(!this.ended){
 			while (this.btc.available() > 0) {
@@ -84,6 +90,9 @@ public class BluetoothRobot implements Runnable  {
 					this.start(words);
 				} else if ("STOP".equals(command)){
 					this.stop(words);
+				} else if ("INIT".equals(command)){
+					this.init(words);
+					System.out.println(command);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -119,7 +128,7 @@ public class BluetoothRobot implements Runnable  {
 			}
 
 			try {
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -132,9 +141,24 @@ public class BluetoothRobot implements Runnable  {
 	public void stop () {
 		this.ended = true;
 	}
+	
+	private void init(List<String> words) {
+		int width = new Integer(words.get(2));
+		int height = new Integer(words.get(3));
+		this.grid = new Grid(height, width);
+		
+		int line = new Integer(words.get(4));
+		int col = new Integer(words.get(5));
+		Direction dir = Direction.values()[new Integer(words.get(6))];
+		this.position = new Position(line + 0.5, col + 0.5, dir);
+		
+		int id = new Integer(words.get(1));
+		System.out.println("ID " + id);
+		this.main = id == 0 ? new MainExplorer(this.grid, this.position) : new ExploitationMain(this.position, this.grid);
+	}
 
 	private void start(List<String> words) {
-		this.main.started = true;
+		this.started = true;
 		System.out.println("Go !!!");
 	}
 	
@@ -155,6 +179,10 @@ public class BluetoothRobot implements Runnable  {
 		synchronized (this.inbox) {
 			this.inbox.add(msg);
 		}
+	}
+
+	public boolean started() {
+		return this.started;
 	}
 
 }

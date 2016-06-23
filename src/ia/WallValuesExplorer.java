@@ -32,8 +32,11 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void explore () {
 		this.computeScores(this.position.getPoint());
 		while (!this.isAllDiscovered()){
+			BluetoothRobot.bt.send("DEBUG;Next Move");
 			this.nextMove();
+			BluetoothRobot.bt.send("DEBUG;Compute score");
 			this.computeScores(this.position.getPoint());
+			BluetoothRobot.bt.send("DEBUG;fin boucle explore");
 		}/**/
 		this.endExploration();
 	}

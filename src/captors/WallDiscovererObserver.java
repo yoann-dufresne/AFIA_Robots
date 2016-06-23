@@ -3,13 +3,13 @@ package captors;
 
 import java.awt.Point;
 
+import bluetooth.BluetoothRobot;
 import main.Config;
 import model.Direction;
 import model.Grid;
 import model.Position;
 import api.Observable;
 import api.Observer;
-import bluetooth.BluetoothRobot;
 
 public class WallDiscovererObserver implements Observer {
 
@@ -20,13 +20,11 @@ public class WallDiscovererObserver implements Observer {
 
 	private Grid grid;
 	private Position position;
-	private BluetoothRobot bt;
 
 
-	public WallDiscovererObserver(Grid grid, Position pos, BluetoothRobot bt){
+	public WallDiscovererObserver(Grid grid, Position pos){
 		this.grid = grid;
 		this.position = pos;
-		this.bt = bt;
 		
 		this.wallsProbas = new char[grid.getWidth()*grid.getHeight()*2];
 		for (int i=0 ; i<this.wallsProbas.length ; i++) {
@@ -43,6 +41,7 @@ public class WallDiscovererObserver implements Observer {
 		int[] dists = (int[])arg;
 		Point tile = this.position.getPoint();
 
+		BluetoothRobot.bt.send("DEBUG;Updates");
 		for (int i=0 ; i<4 ; i++) {
 			Direction dir = Direction.values()[i];
 			int x = tile.x;
@@ -54,6 +53,7 @@ public class WallDiscovererObserver implements Observer {
 			
 			int absDist = 0;
 			while (dist > TILE_SIZE_CM) {
+				BluetoothRobot.bt.send("DEBUG;" + x + " " + y + " " + dir + " " + dist);
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;
 				absDist++;
@@ -66,7 +66,7 @@ public class WallDiscovererObserver implements Observer {
 				} catch (IllegalArgumentException e) {}
 				
 				boolean discovered = false;
-				if (absDist <= proba) {
+				if (probaIdx != -1 && absDist <= proba) {
 					this.grid.setDiscovered(x, y, dir);
 					this.wallsProbas[probaIdx] = (char)absDist;
 					discovered = true;
@@ -78,36 +78,36 @@ public class WallDiscovererObserver implements Observer {
 				switch (dir) {
 				case NORTH:
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
 					x--;
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
 					break;
 				case EAST:
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
 					y++;
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
 					break;
 				case SOUTH:
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
 					x++;
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
 					break;
 				case WEST:
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
 					y--;
 					if (discovered)
-						this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
 					break;
 				}
 			}
 
-			if (this.bt != null && x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
+			if (x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
 				if (dists[i] < MAX_DIST_CM) {
 					char proba = 100;
 					int probaIdx = -1;
@@ -124,24 +124,24 @@ public class WallDiscovererObserver implements Observer {
 						
 						switch (dir) {
 						case NORTH:
-							this.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall");
 							if (x > 0)
-								this.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall");
 							break;
 						case SOUTH:
-							this.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall");
 							if (x < this.grid.getHeight()-1)
-								this.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall");
 							break;
 						case EAST:
-							this.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall");
 							if (y < this.grid.getWidth()-1)
-								this.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall");
 							break;
 						case WEST:
-							this.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall");
 							if (y > 0)
-								this.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall");
 							break;
 						}
 					}
@@ -154,12 +154,6 @@ public class WallDiscovererObserver implements Observer {
 	// --------------------------------------------------------------
 	
 	public int getProbaIdx (int row, int col, Direction dir) throws IllegalArgumentException {
-		if ((row == 0 && dir == Direction.NORTH) ||
-				(row == this.grid.getHeight()-1 && dir == Direction.SOUTH) ||
-				(col == 0 && dir == Direction.WEST) ||
-				(col == this.grid.getWidth()-1 && dir == Direction.EAST))
-			throw new IllegalArgumentException("Impossible to change the probability of external walls");
-		
 		if (dir == Direction.NORTH) {
 			dir = Direction.SOUTH;
 			row = row-1;
@@ -167,6 +161,11 @@ public class WallDiscovererObserver implements Observer {
 			dir = Direction.EAST;
 			col = col-1;
 		}
+
+		if (row < 0 || col < 0 ||
+				(row == this.grid.getHeight()-1 && dir == Direction.SOUTH) ||
+				(col == this.grid.getWidth()-1 && dir == Direction.EAST))
+			throw new IllegalArgumentException("Impossible to change the probability of external walls");
 		
 		return 2* (row * this.grid.getWidth() + col) + (dir == Direction.SOUTH ? 0 : 1);
 	}

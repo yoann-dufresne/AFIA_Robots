@@ -79,6 +79,12 @@ public class WallDiscoverer extends Observable implements Runnable {
 					this.movement.needCalm = true;
 					this.checkForWalls();
 					this.movement.needCalm = false;
+					
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					this.notifyObservers();
 				}
 			}
