@@ -37,6 +37,8 @@ public class BluetoothRobot implements Runnable  {
 	private List<String> inbox;
 	public AbstractMain main;
 
+	public int id;
+	
 	public BluetoothRobot(Position pos, Grid grid) {
 		BluetoothRobot.bt = this;
 		this.started = false;
@@ -46,7 +48,7 @@ public class BluetoothRobot implements Runnable  {
 		this.position = pos;
 		this.grid = grid;
 		this.main = new MainExploitation(grid, pos);
-		
+				
 		System.out.println("BT waiting");
         this.btc = Bluetooth.waitForConnection();
 		System.out.println("BT connected");
@@ -93,6 +95,8 @@ public class BluetoothRobot implements Runnable  {
 				} else if ("INIT".equals(command)){
 					this.init(words);
 					System.out.println(command);
+				} else if ("SETID".equals(command)){
+					this.setID(words);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -175,11 +179,16 @@ public class BluetoothRobot implements Runnable  {
 		System.out.println("DISCOVERED");
 	}
 
+	private void setID(List<String> words){
+		this.id= new Integer(words.get(1));
+	}
+	
 	public void send(String msg){
 		synchronized (this.inbox) {
 			this.inbox.add(msg);
 		}
 	}
+	
 
 	public boolean started() {
 		return this.started;
