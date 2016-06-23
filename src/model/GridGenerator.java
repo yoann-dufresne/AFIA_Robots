@@ -13,10 +13,10 @@ public class GridGenerator {
 			for (int col=0 ; col<width ; col++) {
 				double coin = rand.nextDouble();
 				if (coin <= proba)
-					grid.addWall(line, col, Direction.EAST);
+					grid.setWall(line, col, Direction.EAST);
 				coin = rand.nextDouble();
 				if (coin <= proba)
-					grid.addWall(line, col, Direction.SOUTH);
+					grid.setWall(line, col, Direction.SOUTH);
 			}
 		
 		return grid;
