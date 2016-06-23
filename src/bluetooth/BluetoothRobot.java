@@ -161,9 +161,9 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		Direction dir = Direction.values()[new Integer(words.get(6))];
 		this.position = new Position(line + 0.5, col + 0.5, dir);
 		
-		int id = new Integer(words.get(1));
-		System.out.println("ID " + id);
-		this.main = id == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
+		int idMain = new Integer(words.get(1));
+		System.out.println("Main " + idMain);
+		this.main = idMain == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
 	}
 
 	private void start(List<String> words) {
