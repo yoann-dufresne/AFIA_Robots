@@ -34,6 +34,9 @@ app.listen(8080);
 
 app.use(express.static(__dirname+"/www"));
 
+app.get("/", function(req, res){
+  res.sendFile('visu.html', { root: __dirname+"/www"});
+});
 
 app.get('/update', function(req, res){
 	var data = {};
