@@ -187,6 +187,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	}
 
 	private void discover(List<String> words) {
+		// TODO : faire le discovered
 		System.out.println("DISCOVERED");
 	}
 	
