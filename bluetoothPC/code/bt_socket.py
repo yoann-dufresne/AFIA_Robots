@@ -51,7 +51,7 @@ class BlueSock(Thread):
         self.sock = sock
         if self.debug:
             print('Connected.')
-        self.send("SETID;"+self.simple_id)
+        self.send("SETID;{}".format(self.simple_id))
         self.start()
 
     def close(self):
