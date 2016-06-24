@@ -30,10 +30,11 @@ class BlueSock(Thread):
     bsize = 118 # Bluetooth socket block size
     PORT = 1    # Standard NXT rfcomm port
 
-    def __init__(self, host, fifo_in):
+    def __init__(self, host, simple_id, fifo_in):
         Thread.__init__(self)
 
         self.host = host
+        self.simple_id = simple_id
         self.sock = None
         self.debug = False
         self.running = True
@@ -50,6 +51,7 @@ class BlueSock(Thread):
         self.sock = sock
         if self.debug:
             print('Connected.')
+        self.send("SETID;{}".format(self.simple_id))
         self.start()
 
     def close(self):

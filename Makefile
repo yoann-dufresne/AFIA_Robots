@@ -3,26 +3,8 @@ all: clean Main.nxj class/main/Main.class
 Main.nxj: class/main/Main.class
 	nxjlink -o $@ -classpath class/ main.Main
 
-MainExploration.nxj: class/main/MainExploration.class
-	nxjlink -o $@ -classpath class/ main.MainExploration
-
-MainBTLogging.nxj: class/main/MainBTLogging.class
-	nxjlink -o $@ -classpath class/ main.MainBTLogging
-
 class/main/Main.class: src/main/Main.java
 	nxjc $< -d class -sourcepath src -classpath class
-
-class/main/MainExploration.class: src/main/MainExploration.java
-	nxjc $< -d class -sourcepath src -classpath class
-
-class/main/MainBTLogging.class: src/main/MainBTLogging.java
-	nxjc $< -d class -sourcepath src -classpath class
-
-class/main/MainPC.class: src/main/MainPC.java
-	nxjpcc -d class $<
-
-runPC: class/main/MainPC.class
-	nxjpc -cp ./class  main.MainPC
 
 clean:
 	rm -rf class/
@@ -49,7 +31,3 @@ send-bt3: all
 	@echo "--------------------\n"
 
 send-bt: send-bt0 send-bt1 send-bt2
-
-remote-debug: MainBTLogging.nxj
-	-nxjupload -b -r -d 00:16:53:0C:C8:0A MainBTLogging.nxj
-	@echo "--------------------\n"

@@ -112,6 +112,7 @@ public class Movement {
 		this.turn(wantedDir);
 		this.isRotating = false;
 		
+		BluetoothRobot.bt.send("NEXT_POS;" + p.x + " " + p.y);
 		this.forward(Math.abs(diff));
 	}
 
