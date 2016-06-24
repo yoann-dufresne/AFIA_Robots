@@ -9,21 +9,21 @@
   <body>
     <h1>l'ABL IA</h1>
     <canvas id="laby"></canvas><br>
-    
+
     <button onclick="$.get('/start')">Start robots</button>
-    
+
     <h2>Setups</h2>
     <form>
       <h3>Choix du main</h3>
       <input type="radio" name="main" value=0 checked>Exploration
       <input type="radio" name="main" value=1>Exploitation<br>
-      
+
       <h3>Propriétés du labyrinthe</h3>
       Largeur
       <input type="text" id="width" value="23">
       Hauteur
       <input type="text" id="height" value="11">
-      
+
       <h3>Position de départ</h3>
       Ligne
       <input type="text" id="line" value="0">
@@ -36,6 +36,8 @@
       <input type="radio" name="dir" value=3>W<br>
     </form>
     <button id="submit">Envoyer les infos</button>
+
+    <button onclick="$.get('/sendLaby')">Send laby to robots</button>
 
   </body>
 

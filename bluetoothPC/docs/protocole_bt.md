@@ -10,7 +10,6 @@ Id : 0-1-2-3 (0 au nord west, 1 au nord est, 2 au sud est, 3 au sud ouest (on to
  * Envoie du prochain point d'arrivée    => NEXT_POS;LINE;COL
 
 
-
 ## pc = > robot
  * COMMAND;DATA0;DATA;...;DATAN\n
 
