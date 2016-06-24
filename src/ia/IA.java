@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import bluetooth.BluetoothRobot;
 import main.Config;
 import model.Direction;
 import model.Grid;
@@ -13,11 +14,13 @@ import model.WallState;
 
 public class IA {
 
-	private Position position;
+	private Position[] positions;
 	private Grid grid;
 	
-	public IA(Position position, Grid grid) {
-		this.position = position;
+	public IA(Position rob0, Position rob1, Grid grid) {
+		this.positions = new Position[2];
+		this.positions[0] = rob0;
+		this.positions[1] = rob1;
 		this.grid = grid;
 	}
 	
@@ -32,38 +35,47 @@ public class IA {
 		Solution sol = new Solution();
 		Point destination = new Point(row, col);
 		
-		sol.aloneParkoor = this.allPossibleDestinations(position.getPoint());
-		//sol.alonePath = this.traceback(sol.aloneParkoor, destination);
+		sol.aloneParkoor0 = this.allPossibleDestinations(this.positions[0].getPoint());
+		if (this.positions[0].equals(this.positions[1]))
+			sol.aloneParkoor1 = sol.aloneParkoor0;
+		else
+			sol.aloneParkoor1 = this.allPossibleDestinations(this.positions[1].getPoint());
 		
-		int aloneCost = sol.aloneParkoor[destination.x][destination.y];
-		this.parkoor(this.position.getPoint(), destination, sol, aloneCost);
+		int aloneCost0 = sol.aloneParkoor0[destination.x][destination.y];
+		int aloneCost1 = sol.aloneParkoor1[destination.x][destination.y];
 		
-		int coopCost = sol.coopParkoor == null ? 255 : Math.max(
-				sol.coopParkoor[destination.x][destination.y],
-				sol.aloneParkoor[sol.coopTile.x][sol.coopTile.y]
+		int aloneCost = aloneCost0 < aloneCost1 ? aloneCost0 : aloneCost1;
+		char[][] aloneParkoor = aloneCost0 < aloneCost1 ? sol.aloneParkoor0 : sol.aloneParkoor1;
+		
+		Point[] points = new Point[2];
+		points[0] = this.positions[0].getPoint();
+		points[1] = this.positions[1].getPoint();
+		this.parkoor(points, destination, sol, aloneCost);
+		
+		int coopCost = sol.myCoopParkoor == null ? 255 : Math.max(
+				sol.myCoopParkoor[destination.x][destination.y],
+				aloneParkoor[sol.coopTile.x][sol.coopTile.y]
 		);
 		
 		if (aloneCost <= coopCost) {
-			sol.alonePath = this.traceback(sol.aloneParkoor, destination);
+			if (aloneCost0 < aloneCost1)
+				sol.alonePath = this.traceback(sol.aloneParkoor0, destination);
+			else
+				sol.alonePath = this.traceback(sol.aloneParkoor1, destination);
 		} else {
 			Tile t = this.grid.getTile(sol.coopTile.x, sol.coopTile.y);
 			
 			List<Direction> emptyWalls = new ArrayList<Direction>(4);
-			if (t.east == WallState.Empty)
-				emptyWalls.add(Direction.EAST);
-			if (t.west == WallState.Empty)
-				emptyWalls.add(Direction.WEST);
-			if (t.north == WallState.Empty)
-				emptyWalls.add(Direction.NORTH);
-			if (t.south == WallState.Empty)
-				emptyWalls.add(Direction.SOUTH);
-
+			for (Direction dir : Direction.values())
+				if (t.getState(dir) == WallState.Empty)
+					emptyWalls.add(dir);
 			for (Direction dir : emptyWalls)
 				this.grid.setWall(sol.coopTile.x, sol.coopTile.y, dir);
-			sol.myCoopPath = this.traceback(sol.coopParkoor, destination);
+			sol.myCoopPath = this.traceback(sol.myCoopParkoor, destination);
+			
 			for (Direction dir : emptyWalls)
 				this.grid.setEmpty(sol.coopTile.x, sol.coopTile.y, dir);
-			sol.otherCoopPath = this.traceback(sol.aloneParkoor, sol.coopTile);
+			sol.otherCoopPath = this.traceback(sol.otherCoopParkoor, sol.coopTile);
 		}
 		
 		return sol;
@@ -155,50 +167,59 @@ public class IA {
 		return values;
 	}
 	
-	public void parkoor (Point start, Point destination, Solution sol, int limit) {
-		char[][] robotPositions = sol.aloneParkoor;
+	public void parkoor (Point[] points, Point destination, Solution sol, int limit) {
+		char[][][] robotParkoors = new char[2][][];
+		robotParkoors[0] = sol.aloneParkoor0;
+		robotParkoors[1] = sol.aloneParkoor1;
+		
 		char[][] best = null;
 		Point bestTile = null;
 		char minVal = 255;
+		int bestCoop = 0;
 		
-		for (int i=0 ; i<robotPositions.length ; i++)
-			for (int j=0 ; j<robotPositions[i].length ; j++) {
-				if (robotPositions[i][j] == 255)
-					continue;
-
-				Tile t = this.grid.getTile(i, j);
-				
-				List<Direction> emptyWalls = new ArrayList<Direction>(4);
-				if (t.east == WallState.Empty)
-					emptyWalls.add(Direction.EAST);
-				if (t.west == WallState.Empty)
-					emptyWalls.add(Direction.WEST);
-				if (t.north == WallState.Empty)
-					emptyWalls.add(Direction.NORTH);
-				if (t.south == WallState.Empty)
-					emptyWalls.add(Direction.SOUTH);
+		for (int coop=0 ; coop<2 ; coop++) {
+			for (int i=0 ; i<robotParkoors.length ; i++)
+				for (int j=0 ; j<robotParkoors[i].length ; j++) {
+					if (robotParkoors[coop][i][j] == 255)
+						continue;
 	
-				for (Direction dir : emptyWalls)
-					this.grid.setWall(i, j, dir);
-				
-				char[][] tmp = this.parkoor(start, destination, limit);
-				char score = (char)Math.max(
-						tmp[destination.x][destination.y],
-						robotPositions[i][j]
-				);
-				// TODO : Modifier le score en fonction du temps d'arrivée de l'autre robot
-				if (score < minVal) {
-					best = tmp;
-					minVal = score;
-					bestTile = new Point(i, j);
-				}
-				
-				for (Direction dir : emptyWalls)
-					this.grid.setEmpty(i, j, dir);
-			}
+					Tile t = this.grid.getTile(i, j);
+					
+					List<Direction> emptyWalls = new ArrayList<Direction>(4);
+					for (Direction dir : Direction.values())
+						if (t.getState(dir) == WallState.Empty)
+							emptyWalls.add(dir);
 		
-		sol.coopParkoor = best;
+					for (Direction dir : emptyWalls)
+						this.grid.setWall(i, j, dir);
+					
+					Point p = points[(coop+1) % 2];
+					char[][] tmp = this.parkoor(p, destination, limit);
+					char score = (char)Math.max(
+							tmp[destination.x][destination.y],
+							robotParkoors[coop][i][j]
+					);
+					// TODO : Modifier le score en fonction du temps d'arrivée de l'autre robot
+					if (score < minVal) {
+						best = tmp;
+						minVal = score;
+						bestTile = new Point(i, j);
+						bestCoop = coop;
+					}
+					
+					for (Direction dir : emptyWalls)
+						this.grid.setEmpty(i, j, dir);
+				}
+		}
+		
 		sol.coopTile = bestTile;
+		
+		sol.mainRobot = (bestCoop + 1) % 2;
+		sol.secondRobot = bestCoop;
+		
+		// Ask for Yoann because it's shit !
+		sol.myCoopParkoor = bestCoop == BluetoothRobot.bt.id ? robotParkoors[bestCoop] : best;
+		sol.otherCoopParkoor = bestCoop == BluetoothRobot.bt.id ? best : robotParkoors[(bestCoop+1)%2];
 	}
 
 	private void insertInList(Point p, List<Point> positions, char[][] possibleDestinations) {

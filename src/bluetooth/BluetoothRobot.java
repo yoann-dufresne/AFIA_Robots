@@ -45,6 +45,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	public AbstractMain main;
 
 	public int id;
+	public Position otherPosition;
 	
 	public BluetoothRobot(Position pos, Grid grid) {
 		BluetoothRobot.bt = this;
@@ -53,6 +54,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.inbox = new ArrayList<String>();
 		
 		this.position = pos;
+		this.otherPosition = new Position(0, 0, Direction.NORTH);
 		this.grid = grid;
 		this.main = new MainExploitation(grid, pos);
 
@@ -109,6 +111,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					this.setID(words);
 				} else if ("CONFLICT".equals(command)){
 					this.conflict(words);
+				} else if ("NEXT_POS".equals(command)){
+					this.majPosition(words);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -216,6 +220,11 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.conflict = true;
 		this.notifyObservers();
 		System.out.println("CONFLICT");
+	}
+
+	private void majPosition(List<String> words) {
+		this.otherPosition.setX(new Integer(words.get(1)));
+		this.otherPosition.setY(new Integer(words.get(2)));
 	}
 
 	private void setID(List<String> words){
