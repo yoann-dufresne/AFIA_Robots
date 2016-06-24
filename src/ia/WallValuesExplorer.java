@@ -9,7 +9,6 @@ import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
-import bluetooth.BluetoothRobot;
 import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer {
@@ -32,11 +31,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void explore () {
 		this.computeScores(this.position.getPoint());
 		while (!this.isAllDiscovered()){
-			BluetoothRobot.bt.send("DEBUG;Next Move");
 			this.nextMove();
-			BluetoothRobot.bt.send("DEBUG;Compute score");
 			this.computeScores(this.position.getPoint());
-			BluetoothRobot.bt.send("DEBUG;fin boucle explore");
 		}/**/
 		this.endExploration();
 	}
@@ -91,7 +87,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public void nextMove(){
 		Point currentPoint = this.position.getPoint();
 		Point destination = this.findHighestScore();
-		BluetoothRobot.bt.send("DEBUG; " + currentPoint.x+","+currentPoint.y+"->"+destination.x+","+destination.y);
 		
 		// Si pas de déplacements
 		if (currentPoint.equals(destination)) {

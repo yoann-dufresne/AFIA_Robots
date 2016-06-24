@@ -93,7 +93,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 				List<String> words = Spliter.split(received, ';');
 				String command = words.get(0);
-				System.out.println("received command : " + command);
 				try {
 					this.bw.write("nxt : " +command);
 					this.bw.flush();
@@ -114,8 +113,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					System.out.println(command);
 				} else if ("SETID".equals(command)){
 					this.setID(words);
-				} else if ("LOCK".equals(command)){
-					this.lock(words);
 				} else if ("CONFLICT".equals(command)){
 					this.conflict(words);
 				} else if ("NEXT_POS".equals(command)){
@@ -190,6 +187,11 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 	private void start(List<String> words) {
 		this.started = true;
+		if (words.size() > 2) {
+			if (this.id == (new Integer(words.get(2))).intValue())
+				this.lock = false;
+		} else
+			this.lock = false;
 		System.out.println("Go !!!");
 	}
 	
@@ -204,8 +206,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.destination = new Point(new Integer(words.get(1)), new Integer(words.get(2)));
 		this.command = "PARTIAL";
 		this.notifyObservers();
-		
-		System.out.println("PARTIAL");
 	}
 
 	private void discover(List<String> words) {
@@ -230,7 +230,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	private void conflict(List<String> words) {
 		this.conflict = true;
 		this.notifyObservers();
-		System.out.println("CONFLICT");
 	}
 
 	private void majPosition(List<String> words) {
@@ -242,12 +241,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.id= new Integer(words.get(1));
 		this.computeInProgress = this.id != 0;
 		System.out.println("IDDDDDDDDD: "+this.id);
-	}
-	
-	private void lock(List<String> words){
-		if (this.id == new Integer(words.get(1))){
-			this.lock = new Boolean(words.get(2).toLowerCase());
-		}
 	}
 
 	private void computedPath(List<String> words) {

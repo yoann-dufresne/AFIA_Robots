@@ -52,7 +52,6 @@ public class Movement {
 		
 		for(Point p: path){
 			if (this.pathStopped) {
-				BluetoothRobot.bt.send("DEBUG;Path stopped");
 				break;
 			}
 			
