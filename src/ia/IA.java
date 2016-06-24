@@ -289,22 +289,27 @@ public class IA {
 		char[][] values = this.allPossibleDestinations(this.positions[robotID].getPoint());
 		Point dest= BluetoothRobot.bt.beginningCorner;
 		List<Point> path = new ArrayList<Point>();
-		if (dest!=this.positions[robotID].getPoint && !values[dest.x][dest.y]==255)
+		if (dest!=this.positions[robotID].getPoint() && values[dest.x][dest.y]!=255)
 			 path = this.getPathTo(dest, values);
 		return path;
 	}
 	
 	
-	private List<Point> goBackToAnyCorner(){
-		char[][] values = this.allPossibleDestinations(this.positions[robotID].getPoint());
-		Point corners[] = {new Point(0,0),new Point(0,YMax-1),new Point(XMax-1,0), new Point(XMax-1,YMax-1)};
+	public List<Point> goBackToAnyCorner(){
+		char[][] values = this.allPossibleDestinations(this.positions[BluetoothRobot.bt.id].getPoint());
+		Point corners[] = {
+				new Point(0,0),
+				new Point(0,this.grid.getWidth()-1),
+				new Point(this.grid.getHeight()-1,0),
+				new Point(this.grid.getHeight()-1,this.grid.getWidth()-1)
+		};
 		List<Point> path = new ArrayList<Point>();
 		Point dest = corners[0];
 		for (int i=1;i<4;i++){
 			if (values[dest.x][dest.y] > values[corners[i].x][corners[i].y])
 				dest=corners[i];
 		}
-		if (dest!=this.positions[robotID].getPoint && !values[dest.x][dest.y]==255)
+		if (dest!=this.positions[BluetoothRobot.bt.id].getPoint() && values[dest.x][dest.y]!=255)
 			 path = this.getPathTo(dest, values);
 		return path;
 	}
