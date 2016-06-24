@@ -22,6 +22,7 @@ import model.Direction;
 import model.Grid;
 import model.Position;
 import model.Tile;
+import model.WallState;
 import util.Spliter;
 
 public class BluetoothRobot extends Observable implements Runnable  {
@@ -193,8 +194,22 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	}
 
 	private void discover(List<String> words) {
-		// TODO : faire le discovered
-		System.out.println("DISCOVERED");
+		int x = new Integer(words.get(1));
+		int y = new Integer(words.get(2));
+		Direction dir = Direction.values()[new Integer(words.get(3))];
+		WallState state = WallState.values()[new Integer(words.get(4))];
+		int quality = new Integer(words.get(5));
+		
+		try {
+			int proba = this.grid.getProba(x, y, dir);
+			if (quality > proba)
+				return;
+			
+			if (quality == proba && state == WallState.Wall)
+				return;
+			
+			this.grid.setState(x, y, dir, state);
+		} catch (IllegalArgumentException e) {};
 	}
 	
 	private void conflict(List<String> words) {

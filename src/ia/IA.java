@@ -62,7 +62,7 @@ public class IA {
 				this.grid.setWall(sol.coopTile.x, sol.coopTile.y, dir);
 			sol.myCoopPath = this.traceback(sol.coopParkoor, destination);
 			for (Direction dir : emptyWalls)
-				this.grid.removeWall(sol.coopTile.x, sol.coopTile.y, dir);
+				this.grid.setEmpty(sol.coopTile.x, sol.coopTile.y, dir);
 			sol.otherCoopPath = this.traceback(sol.aloneParkoor, sol.coopTile);
 		}
 		
@@ -194,7 +194,7 @@ public class IA {
 				}
 				
 				for (Direction dir : emptyWalls)
-					this.grid.removeWall(i, j, dir);
+					this.grid.setEmpty(i, j, dir);
 			}
 		
 		sol.coopParkoor = best;

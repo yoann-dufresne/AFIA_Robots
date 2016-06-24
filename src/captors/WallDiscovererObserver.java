@@ -16,8 +16,6 @@ public class WallDiscovererObserver implements Observer {
 	private static final int TILE_SIZE_CM = new Double(100*Config.TILE_SIZE).intValue();
 	public static final int MAX_DIST_CM = 4 * TILE_SIZE_CM;
 
-	private char[] wallsProbas;
-
 	private Grid grid;
 	private Position position;
 
@@ -25,14 +23,6 @@ public class WallDiscovererObserver implements Observer {
 	public WallDiscovererObserver(Grid grid, Position pos){
 		this.grid = grid;
 		this.position = pos;
-		
-		this.wallsProbas = new char[grid.getWidth()*grid.getHeight()*2];
-		for (int i=0 ; i<this.wallsProbas.length ; i++) {
-			if (i % 2 == 0 && i > 2 * grid.getWidth() * (grid.getHeight() - 1))
-				this.wallsProbas[i] = 0;
-			else
-				this.wallsProbas[i] = 100;
-		}
 	}
 
 
@@ -61,14 +51,13 @@ public class WallDiscovererObserver implements Observer {
 				int proba = 100;
 				int probaIdx = -1;
 				try {
-					probaIdx = this.getProbaIdx(x, y, dir);
-					proba = (int)this.wallsProbas[probaIdx];
+					proba = this.grid.getProba(x, y, dir);
 				} catch (IllegalArgumentException e) {}
 				
 				boolean discovered = false;
 				if (probaIdx != -1 && absDist <= proba) {
-					this.grid.setDiscovered(x, y, dir);
-					this.wallsProbas[probaIdx] = (char)absDist;
+					this.grid.setEmpty(x, y, dir);
+					this.grid.setProba(x, y, dir, absDist);
 					discovered = true;
 				}
 				
@@ -78,96 +67,73 @@ public class WallDiscovererObserver implements Observer {
 				switch (dir) {
 				case NORTH:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty" + absDist);
 					x--;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty" + absDist);
 					break;
 				case EAST:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty" + absDist);
 					y++;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty" + absDist);
 					break;
 				case SOUTH:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty" + absDist);
 					x++;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty" + absDist);
 					break;
 				case WEST:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty" + absDist);
 					y--;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty");
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty" + absDist);
 					break;
 				}
 			}
 
 			if (x >= 0 && x < this.grid.getHeight() && y >= 0 && y < this.grid.getWidth())
 				if (dists[i] < MAX_DIST_CM) {
-					char proba = 100;
-					int probaIdx = -1;
+					int proba = 100;
 					try {
-						probaIdx = this.getProbaIdx(x, y, dir);
-						proba = this.wallsProbas[probaIdx];
+						proba = this.grid.getProba(x, y, dir);
 					} catch (IllegalArgumentException e) {
 						continue;
 					}
 					
 					if (absDist < proba) {
-						this.wallsProbas[probaIdx] = (char)absDist;
+						this.grid.setProba(x, y, dir, absDist);
 						this.grid.setWall(x, y, dir);
 						
 						switch (dir) {
 						case NORTH:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall" + absDist);
 							if (x > 0)
-								BluetoothRobot.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall" + absDist);
 							break;
 						case SOUTH:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall" + absDist);
 							if (x < this.grid.getHeight()-1)
-								BluetoothRobot.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall" + absDist);
 							break;
 						case EAST:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall" + absDist);
 							if (y < this.grid.getWidth()-1)
-								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall" + absDist);
 							break;
 						case WEST:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall");
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall" + absDist);
 							if (y > 0)
-								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall");
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall" + absDist);
 							break;
 						}
 					}
 				}
 		}
-	}
-	
-	// --------------------------------------------------------------
-	// ----------------------- Proba idxs ---------------------------
-	// --------------------------------------------------------------
-	
-	public int getProbaIdx (int row, int col, Direction dir) throws IllegalArgumentException {
-		if (dir == Direction.NORTH) {
-			dir = Direction.SOUTH;
-			row = row-1;
-		} else if (dir == Direction.WEST) {
-			dir = Direction.EAST;
-			col = col-1;
-		}
-
-		if (row < 0 || col < 0 ||
-				(row == this.grid.getHeight()-1 && dir == Direction.SOUTH) ||
-				(col == this.grid.getWidth()-1 && dir == Direction.EAST))
-			throw new IllegalArgumentException("Impossible to change the probability of external walls");
-		
-		return 2* (row * this.grid.getWidth() + col) + (dir == Direction.SOUTH ? 0 : 1);
 	}
 
 }

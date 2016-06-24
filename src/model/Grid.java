@@ -10,6 +10,7 @@ public class Grid {
 	private Tile[][] tiles;
 	private int height;
 	private int width;
+	private char[] probas;
 	
 	public Grid(int height, int width, WallState state) { // height = Xmax, width = Ymax
 		this.tiles = new Tile[height][width];
@@ -21,6 +22,14 @@ public class Grid {
 				this.tiles[line][col] = new Tile(line, col, state);
 	
 		makeBorders();
+		
+		this.probas = new char[width*height*2];
+		for (int i=0 ; i<this.probas.length ; i++) {
+			if (i % 2 == 0 && i > 2 * width * (height - 1))
+				this.probas[i] = 0;
+			else
+				this.probas[i] = 100;
+		}
 	}
 	
 	public Grid(int height, int width){
@@ -47,13 +56,39 @@ public class Grid {
 			return null;
 	}
 	
-
-	public void setWall(int x, int y, Direction direction) {
-		this.setTile(x, y, direction, WallState.Wall);
+	public void setState(int x, int y, Direction direction, WallState state) {	
+		switch (direction) {
+		case NORTH:
+			this.getTile(x, y).north = state;
+			if(x-1 >= 0)
+				this.getTile(x-1, y).south = state;
+			break;
+		case SOUTH:
+			this.getTile(x, y).south = state;
+			if(x+1 < this.height)
+				this.getTile(x+1, y).north = state;
+			break;
+		case EAST:
+			this.getTile(x, y).east = state;
+			if(y+1 < this.width)
+				this.getTile(x, y+1).west = state;
+			break;
+		case WEST:
+			this.getTile(x, y).west = state;
+			if(y-1 >= 0)
+				this.getTile(x, y-1).east = state;
+			break;
+		}
 	}
 	
-	public void removeWall(int x, int y, Direction direction) {
-		this.setTile(x, y, direction, WallState.Empty);
+	public void setEmpty (int x, int y, Direction direction) {
+		if(x >= 0 && y >= 0 && 
+		   x < this.height && y < this.width)
+			this.setState(x, y, direction, WallState.Empty);
+	}
+
+	public void setWall(int x, int y, Direction direction) {
+		this.setState(x, y, direction, WallState.Wall);
 	}
 
 	
@@ -206,37 +241,6 @@ public class Grid {
 		return tiles;
 	}
 	
-	public void setTile(int x, int y, Direction direction, WallState state) {	
-		switch (direction) {
-		case NORTH:
-			this.getTile(x, y).north = state;
-			if(x-1 >= 0)
-				this.getTile(x-1, y).south = state;
-			break;
-		case SOUTH:
-			this.getTile(x, y).south = state;
-			if(x+1 < this.height)
-				this.getTile(x+1, y).north = state;
-			break;
-		case EAST:
-			this.getTile(x, y).east = state;
-			if(y+1 < this.width)
-				this.getTile(x, y+1).west = state;
-			break;
-		case WEST:
-			this.getTile(x, y).west = state;
-			if(y-1 >= 0)
-				this.getTile(x, y-1).east = state;
-			break;
-		}
-	}
-	
-	public void setDiscovered(int x, int y, Direction direction) {
-		if(x >= 0 && y >= 0 && 
-		   x < this.height && y < this.width)
-			setTile(x, y, direction, WallState.Empty);
-	}
-	
 	//replace the point coordinate by the next one on the given direction
 	public void translatePoint(Point p, Direction d){
 		switch(d){
@@ -280,5 +284,33 @@ public class Grid {
 		
 		return nei;
 	}
+	
+	public int getProba (int row, int col, Direction dir) throws IllegalArgumentException {
+		int idx = this.getProbaIdx(row, col, dir);
+		return this.probas[idx];
+	}
+	
+	public void setProba (int row, int col, Direction dir, int value) {
+		try {
+			int idx = this.getProbaIdx(row, col, dir);
+			this.probas[idx] = (char)value;
+		} catch (IllegalArgumentException e) {}
+	}
 
+	public int getProbaIdx (int row, int col, Direction dir) throws IllegalArgumentException {
+		if (dir == Direction.NORTH) {
+			dir = Direction.SOUTH;
+			row = row-1;
+		} else if (dir == Direction.WEST) {
+			dir = Direction.EAST;
+			col = col-1;
+		}
+
+		if (row < 0 || col < 0 ||
+				(row == this.getHeight()-1 && dir == Direction.SOUTH) ||
+				(col == this.getWidth()-1 && dir == Direction.EAST))
+			throw new IllegalArgumentException("Impossible to change the probability of external walls");
+		
+		return 2* (row * this.getWidth() + col) + (dir == Direction.SOUTH ? 0 : 1);
+	}
 }
