@@ -36,7 +36,10 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	
 	private BTConnection btc;
 	private boolean ended;
-	private boolean lock; 
+	public boolean lock; 
+	
+	public boolean computeInProgress;
+	public List<Point> distantPath;
 	
 	private BufferedReader br;
 	private BufferedWriter bw;
@@ -121,6 +124,10 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					this.conflict(words);
 				} else if ("NEXT_POS".equals(command)){
 					this.majPosition(words);
+				} else if ("COMPUTE_PATH".equals(command)){
+					this.computeInProgress = true;
+				} else if ("COMPUTED_PATH".equals(command)){
+					this.computedPath(words);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -239,12 +246,27 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 	private void setID(List<String> words){
 		this.id= new Integer(words.get(1));
+		this.computeInProgress = this.id != 0;
 		System.out.println("IDDDDDDDDD: "+this.id);
 	}
 	
 	private void lock(List<String> words){
-		if (this.id = new Integer(words.get(1))){
+		if (this.id == new Integer(words.get(1))){
 			this.lock = new Boolean(words.get(2).toLowerCase());
+		}
+	}
+
+	private void computedPath(List<String> words) {
+		words.remove(0);
+		
+		this.distantPath = new ArrayList<Point>(words.size()/2);
+		synchronized (this.distantPath) {
+			while (words.size() > 0) {
+				int x = new Integer(words.remove(0));
+				int y = new Integer(words.remove(0));
+				Point p = new Point(x, y);
+				this.distantPath.add(p);
+			}
 		}
 	}
 	

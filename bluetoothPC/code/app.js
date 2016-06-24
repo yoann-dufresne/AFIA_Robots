@@ -1,7 +1,12 @@
 var net = require('net');
 var express = require('express');
+var fs = require('fs');
+var readline = require('readline');
+
 var count_move = 0;
 // Structures
+
+var FNAME_LABY=__dirname+"/laby.txt"
 
 var table;
 var width = 23;
@@ -55,7 +60,10 @@ app.get("/start", function(req, res){
 
 app.get("/init", function(req, res){
   var command = req.query.command;
+  var main = req.query.main;
+  console.log("init main: ", main)
   initRobot(command);
+  initLaby(main);
   res.send("initialized");
 });
 
@@ -92,7 +100,7 @@ client.on('close', function() {
 var getInfos = function(){
   client.write("log");
 }
-setInterval(getInfos, 1000)
+setInterval(getInfos, 50)
 
 var quit = function(){
   client.destroy()
@@ -127,6 +135,38 @@ process.on('SIGINT', quit);
 
 // Model
 
+var logLaby = function(x, y, dir, state){
+  line = "DISCOVERED;"+x+";"+y+";"+dir+";"+state+"\n"
+  fs.appendFileSync(FNAME_LABY, line, function(err){
+    if(err){console.log("erro : ", err, "impossible to write line to file:", line)}
+  })
+}
+
+var initLaby = function(main){
+  if(main==0){
+    // exploration
+    console.log("init laby with exploration");
+    fs.rename(FNAME_LABY, FNAME_LABY+".bak", function(err){
+      if(err){console.log("impossible to rename file", err)}
+      else{"renamed file"}
+    });
+    fs.unlinkSync(FNAME_LABY);
+    fs.writeFileSync(FNAME_LABY);
+  } else if (main==1){
+    //exploitation
+    console.log("init laby with exploitation")
+    var lineReader = readline.createInterface({
+      input: fs.createReadStream('FNAME_LABY')
+    });
+
+    lineReader.on('line', function (line) {
+      client.write(line);
+    });
+  } else {
+    console.log("unknown initialisation method...")
+  }
+}
+
 var onUpdate = function(robotId, arguments){
   robotState.x = arguments[0];
   robotState.y = arguments[1];
@@ -156,6 +196,7 @@ var onDiscovered = function(robotId, arguments){
     direction = directions[tmp[2]];
     table[x][y][direction] = tmp[3];
     console.log(x, y, table[x][y]);
+    logLaby(x, y, direction, table[x][y])
   }
 }
 
@@ -181,14 +222,14 @@ var initRobot = function(command){
   console.log (command);
 }
 
-var sendLaby = function(){
-  for (var line=0 ; line<height ; line++) {
-    for (var col=0 ; col<width ; col++) {
-      walls = table[line][col];
-      client.write("DISCOVERED;"+line+";"+col+";NORTH;"+walls[0]+";1");
-      client.write("DISCOVERED;"+line+";"+col+";EAST;"+walls[1]+";1");
-      client.write("DISCOVERED;"+line+";"+col+";SOUTH;"+walls[2]+";1");
-      client.write("DISCOVERED;"+line+";"+col+";WEST;"+walls[3]+";1");
-    }
-  }
-}
+// var sendLaby = function(){
+//   for (var line=0 ; line<height ; line++) {
+//     for (var col=0 ; col<width ; col++) {
+//       walls = table[line][col];
+//       client.write("DISCOVERED;"+line+";"+col+";NORTH;"+walls[0]+";1");
+//       client.write("DISCOVERED;"+line+";"+col+";EAST;"+walls[1]+";1");
+//       client.write("DISCOVERED;"+line+";"+col+";SOUTH;"+walls[2]+";1");
+//       client.write("DISCOVERED;"+line+";"+col+";WEST;"+walls[3]+";1");
+//     }
+//   }
+// }

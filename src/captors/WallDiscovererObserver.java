@@ -49,13 +49,15 @@ public class WallDiscovererObserver implements Observer {
 				absDist++;
 
 				int proba = 100;
-				int probaIdx = -1;
 				try {
 					proba = this.grid.getProba(x, y, dir);
-				} catch (IllegalArgumentException e) {}
+					BluetoothRobot.bt.send("DEBUG;Proba " + proba + " " + absDist);
+				} catch (IllegalArgumentException e) {
+					BluetoothRobot.bt.send("DEBUG;CATCH ! " + x + " " + y + " " + dir + " " + dist);
+				}
 				
 				boolean discovered = false;
-				if (probaIdx != -1 && absDist <= proba) {
+				if (absDist <= proba) {
 					this.grid.setEmpty(x, y, dir);
 					this.grid.setProba(x, y, dir, absDist);
 					discovered = true;
@@ -67,31 +69,31 @@ public class WallDiscovererObserver implements Observer {
 				switch (dir) {
 				case NORTH:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty;" + absDist);
 					x--;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty;" + absDist);
 					break;
 				case EAST:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty;" + absDist);
 					y++;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty;" + absDist);
 					break;
 				case SOUTH:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Empty;" + absDist);
 					x++;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Empty;" + absDist);
 					break;
 				case WEST:
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Empty;" + absDist);
 					y--;
 					if (discovered)
-						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty" + absDist);
+						BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Empty;" + absDist);
 					break;
 				}
 			}
@@ -111,24 +113,24 @@ public class WallDiscovererObserver implements Observer {
 						
 						switch (dir) {
 						case NORTH:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall" + absDist);
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";NORTH;Wall;" + absDist);
 							if (x > 0)
-								BluetoothRobot.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall" + absDist);
+								BluetoothRobot.bt.send("DISCOVERED;" + (x-1) + ";" + y + ";SOUTH;Wall;" + absDist);
 							break;
 						case SOUTH:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall" + absDist);
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";SOUTH;Wall;" + absDist);
 							if (x < this.grid.getHeight()-1)
-								BluetoothRobot.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall" + absDist);
+								BluetoothRobot.bt.send("DISCOVERED;" + (x+1) + ";" + y + ";NORTH;Wall;" + absDist);
 							break;
 						case EAST:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall" + absDist);
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";EAST;Wall;" + absDist);
 							if (y < this.grid.getWidth()-1)
-								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall" + absDist);
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y+1) + ";WEST;Wall;" + absDist);
 							break;
 						case WEST:
-							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall" + absDist);
+							BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + y + ";WEST;Wall;" + absDist);
 							if (y > 0)
-								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall" + absDist);
+								BluetoothRobot.bt.send("DISCOVERED;" + x + ";" + (y-1) + ";EAST;Wall;" + absDist);
 							break;
 						}
 					}

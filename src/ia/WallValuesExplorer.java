@@ -39,7 +39,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 			this.computeScores(this.position.getPoint());
 			BluetoothRobot.bt.send("DEBUG;fin boucle explore");
 		}/**/
+		//Phase 1
 		this.endExploration();
+		//Phase 2 ou 3
+//		this.endExplorationToBigginingCorner();
 	}
 
 	
