@@ -211,8 +211,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	private void discover(List<String> words) {
 		int x = new Integer(words.get(1));
 		int y = new Integer(words.get(2));
-		Direction dir = Direction.values()[new Integer(words.get(3))];
-		WallState state = WallState.values()[new Integer(words.get(4))];
+		Direction dir = Direction.directionFromString(words.get(3));
+		WallState state = WallState.stateFromString(words.get(4));
 		int quality = new Integer(words.get(5));
 		
 		try {
