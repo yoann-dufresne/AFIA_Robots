@@ -17,6 +17,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 	public static final int MAX_DIST = 20;
 	
 	protected char tileValues[][];
+	private Point beginCorner;
 
 	private char[][] manhattanDistances;
 	private List<Point> parkoor;
@@ -72,6 +73,32 @@ public class WallValuesExplorer extends AbstractExplorer {
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	
 	}
+	
+	//Fin de l'exploration dans un coin donné
+	public void endExplorationToBigginingCorner(){
+		Point currentPoint = this.position.getPoint();
+		this.parkoor= null;
+			
+			// Si le robot est déja arrivé à destination
+			if (currentPoint.equals(BluetoothRobot.bt.beginningCorner)) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
+				return;
+			}
+			
+		char[][] distances = this.getManhattanDistances(currentPoint,BluetoothRobot.bt.beginningCorner);
+		List<List<Point>> parkoors = this.tracebackDijktsra(distances, BluetoothRobot.bt.beginningCorner, currentPoint);
+	
+		this.parkoor = this.chooseParkoor(parkoors);
+			
+		this.movement.followPath(this.parkoor, this.grid);
+	
+	}
+	
+	
 	/** tells if the grid is all discovered or not
 	 * TODO : Améliorer pour pas de n^2 !!!!
 	 *
