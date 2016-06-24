@@ -6,15 +6,17 @@ var line = document.getElementById("line");
 var col = document.getElementById("col");
 
 submit.onclick = function () {
-	var command = "INIT;";
+  var command = "INIT;";
+  var main = $("input[name=main]:checked").val();
 
-	command += $("input[name=main]:checked").val() + ";"
+  command += main + ";";
 
-	command += widthTxt.value + ";";
-	command += heightTxt.value + ";";
+  command += widthTxt.value + ";";
+  command += heightTxt.value + ";";
 
-	command += line.value + ";";
-	command += col.value + ";";
-	command += $("input[name=dir]:checked").val()
-	$.get('/init?command=' + command)
+  command += line.value + ";";
+  command += col.value + ";";
+  command += $("input[name=dir]:checked").val();
+  var url = '/init?command='+command + "&main="+main;
+	$.get(url);
 }

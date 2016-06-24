@@ -50,11 +50,27 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         for bt in bts :
             bt.send(self.data)
 
+    def send_to_other_robots(addr, val):
+        """Send a command to the other robots if needed
+        """
+        to_send = ("DISCOVERED", "CONFLICT",
+                   "NEXT_POS", "PARTIAL",
+                   "COMPUTE_PATH", "COMPUTED_PATH")
+
+        command = val.split(";")[0]
+        print("sending to others : ", command)
+        if command in to_send:
+            for bt in set(bts) - set([addr]):
+                print("sent {} to {}".format(command, bt))
+                bt.send(val)
+
+
     def answer_clients(self):
         mess = collections.defaultdict(list)
         while True:
             try:
                 addr, val = qin.popleft().items()[0]
+                send_to_other_robots(self, addr, val)
                 mess[addr].append(val)
                 print(addr, val, mess)
             except IndexError:
