@@ -45,6 +45,7 @@ public class IA {
 		int aloneCost1 = sol.aloneParkoor1[destination.x][destination.y];
 		
 		int aloneCost = aloneCost0 < aloneCost1 ? aloneCost0 : aloneCost1;
+		sol.aloneRobotID = aloneCost0 < aloneCost1 ? 0 : 1 ;
 		char[][] aloneParkoor = aloneCost0 < aloneCost1 ? sol.aloneParkoor0 : sol.aloneParkoor1;
 		
 		Point[] points = new Point[2];
@@ -56,10 +57,12 @@ public class IA {
 				sol.myCoopParkoor[destination.x][destination.y],
 				aloneParkoor[sol.coopTile.x][sol.coopTile.y]
 		);
-		
-		if (aloneCost <= coopCost) {
+		if (aloneCost == 255 && coopCost == 255){
+			return sol;
+		}
+		else if (aloneCost <= coopCost) {
 			if (aloneCost0 < aloneCost1)
-				sol.alonePath = this.traceback(sol.aloneParkoor0, destination);
+				sol.alonePath = this.traceback(sol.aloneParkoor0, destination); //Pourquoi????
 			else
 				sol.alonePath = this.traceback(sol.aloneParkoor1, destination);
 		} else {
@@ -282,4 +285,30 @@ public class IA {
 		return prov;
 	}
 	
+	private List<Point> goBackHome(int robotID){
+		char[][] values = this.allPossibleDestinations(this.positions[robotID].getPoint());
+		Point dest= BluetoothRobot.bt.beginningCorner;
+		List<Point> path = new ArrayList<Point>();
+		if (dest!=this.positions[robotID].getPoint && !values[dest.x][dest.y]==255)
+			 path = this.getPathTo(dest, values);
+		return path;
+	}
+	
+	
+	private List<Point> goBackToAnyCorner(){
+		char[][] values = this.allPossibleDestinations(this.positions[robotID].getPoint());
+		Point corners[] = {new Point(0,0),new Point(0,YMax-1),new Point(XMax-1,0), new Point(XMax-1,YMax-1)};
+		List<Point> path = new ArrayList<Point>();
+		Point dest = corners[0];
+		for (int i=1;i<4;i++){
+			if (values[dest.x][dest.y] > values[corners[i].x][corners[i].y])
+				dest=corners[i];
+		}
+		if (dest!=this.positions[robotID].getPoint && !values[dest.x][dest.y]==255)
+			 path = this.getPathTo(dest, values);
+		return path;
+	}
+
+
 }
+

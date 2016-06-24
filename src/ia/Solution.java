@@ -8,6 +8,7 @@ public class Solution {
 	public char[][] aloneParkoor0;
 	public char[][] aloneParkoor1;
 	public List<Point> alonePath;
+	public int aloneRobotID;
 	
 	public char[][] myCoopParkoor;
 	public List<Point> myCoopPath;

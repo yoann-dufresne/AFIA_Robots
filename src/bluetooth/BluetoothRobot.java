@@ -51,6 +51,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	public int id;
 	public Position otherPosition;
 	
+	public Point beginningCorner;
+	
 	public BluetoothRobot(Position pos, Grid grid) {
 		BluetoothRobot.bt = this;
 		this.started = false;
@@ -61,8 +63,10 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.otherPosition = new Position(0, 0, Direction.NORTH);
 		this.grid = grid;
 		this.main = new MainExploitation(grid, pos);
-
+		
+		this.beginningCorner = new Point(0,0);
 		this.destination = new Point(-1, -1);
+		
 		this.conflict = false;
 		this.lock= true;
 		
@@ -178,8 +182,10 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		int line = new Integer(words.get(4));
 		int col = new Integer(words.get(5));
 		Direction dir = Direction.values()[new Integer(words.get(6))];
-		this.position = new Position(line + 0.5, col + 0.5, dir);
 		
+		this.position = new Position(line + 0.5, col + 0.5, dir);
+		this.beginningCorner = new Point(line,col); 
+				
 		int idMain = new Integer(words.get(1));
 		System.out.println("Main " + idMain);
 		this.main = idMain == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
