@@ -6,3 +6,6 @@
 /bin/
 *.pyc
 bluetoothPC/code/node_modules/
+**/*~
+.classpath
+.metadata/
