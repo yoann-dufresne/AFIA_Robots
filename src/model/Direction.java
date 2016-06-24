@@ -43,6 +43,14 @@ public enum Direction {
 		}
 	}
 	
+	public static Direction directionFromString (String name) {
+		for (Direction dir : Direction.values()) {
+			if (dir.toString().toLowerCase().equals(name.toLowerCase()))
+				return dir;
+		}
+		return null;
+	}
+	
 	public static Direction getDirectionBetween (Point from, Point to) {
 		if (from.x < to.x)
 			return SOUTH;
