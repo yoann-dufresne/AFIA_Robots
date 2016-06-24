@@ -25,6 +25,7 @@ def ctrl_c_handler(signal, frame):
 def connect_bt(addr, qin, bts):
     try:
         time.sleep(0.1)
+        addr_simple = ADRESSES[addr]
         bt = BlueSock(addr, addr_simple, qin)
         bt.debug = True
         bt.connect()

@@ -220,6 +220,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 	private void setID(List<String> words){
 		this.id= new Integer(words.get(1));
+		System.out.println("IDDDDDDDDD: "+this.id);
 	}
 	
 	public void send(String msg){
