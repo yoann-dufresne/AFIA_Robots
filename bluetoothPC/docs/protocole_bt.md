@@ -8,6 +8,8 @@ Id : 0-1-2-3 (0 au nord west, 1 au nord est, 2 au sud est, 3 au sud ouest (on to
  * Envoyer une liste de murs découverts     => DISCOVERED;LINE;COL;DIRECTION;STATE;QUALITY
  * Conflit entre la carte et le terrain lors de l'exploitation => CONFLICT
  * Envoie du prochain point d'arrivée    => NEXT_POS;LINE;COL
+ * Envoie du message de synchronisation du calcul du path => COMPUTE_PATH
+ * Envoie du path computé    => COMPUTED_PATH;X0;Y0;X1;Y1;X2;X3...
 
 
 ## pc = > robot
