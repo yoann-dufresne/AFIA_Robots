@@ -57,10 +57,12 @@ public class IA {
 				sol.myCoopParkoor[destination.x][destination.y],
 				aloneParkoor[sol.coopTile.x][sol.coopTile.y]
 		);
-		
-		if (aloneCost <= coopCost) {
+		if (aloneCost == 255 && coopCost == 255){
+			return sol;
+		}
+		else if (aloneCost <= coopCost) {
 			if (aloneCost0 < aloneCost1)
-				sol.alonePath = this.traceback(sol.aloneParkoor0, destination);
+				sol.alonePath = this.traceback(sol.aloneParkoor0, destination); //Pourquoi????
 			else
 				sol.alonePath = this.traceback(sol.aloneParkoor1, destination);
 		} else {
