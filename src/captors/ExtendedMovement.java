@@ -12,7 +12,7 @@ public class ExtendedMovement extends Movement implements Observer {
 	}
 	
 	public void straightForward(){
-		//TODO go forward to next wall
+		this.waitForUnlock();
 		this.forward(1.5,false); //vérifier l'utilisation du booleen
 	}
 	

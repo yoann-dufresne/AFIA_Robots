@@ -36,7 +36,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	
 	private BTConnection btc;
 	private boolean ended;
-
+	private boolean lock; 
+	
 	private BufferedReader br;
 	private BufferedWriter bw;
 
@@ -58,6 +59,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 		this.destination = new Point(-1, -1);
 		this.conflict = false;
+		this.lock= true;
 		
 		System.out.println("BT waiting");
 		this.btc = Bluetooth.waitForConnection();
@@ -107,6 +109,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					System.out.println(command);
 				} else if ("SETID".equals(command)){
 					this.setID(words);
+				} else if ("LOCK".equals(command)){
+					this.lock(words);
 				} else if ("CONFLICT".equals(command)){
 					this.conflict(words);
 				} else {
@@ -221,6 +225,13 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	private void setID(List<String> words){
 		this.id= new Integer(words.get(1));
 	}
+	
+	private void lock(List<String> words){
+		if (this.id = new Integer(words.get(1))){
+			this.lock = new Boolean(words.get(2).toLowerCase());
+		}
+	}
+	
 	
 	public void send(String msg){
 		synchronized (this.inbox) {

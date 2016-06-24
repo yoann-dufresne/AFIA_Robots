@@ -36,6 +36,17 @@ public class Movement {
 		this.isRotating = false;
 	}
 	
+	public void waitForUnlock(){
+		while (BluetoothRobot.bt.lock){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			continue;
+		}
+	}
+	
 	public void followPath(List<Point> path, Grid grid) {
 		this.pathStopped = false;
 		
@@ -78,6 +89,9 @@ public class Movement {
 	// ----------- Basic movements -----------
 	
 	private void moveTo(Point p) {
+		
+		this.waitForUnlock();
+		
 		Direction wantedDir = Direction.getDirectionBetween(this.position.getPoint(), p);;
 		int diff = 0;
 		
@@ -125,6 +139,7 @@ public class Movement {
 	}
 	
 	public void forward (double distance, boolean stop) {
+				
 		this.interrupted = false;
 		
 		// Circonf / 360 == Distance / xxx 
@@ -153,6 +168,7 @@ public class Movement {
 	
 	
 	public void forward (double nbTiles){
+		
 		double xInit = this.position.getX();
 		double yInit = this.position.getY();
 		
@@ -206,7 +222,7 @@ public class Movement {
 		}
 	}
 	
-	public void stopOnThisTile() {
+	public void stopOnThisTile() {	
 		double x = this.position.getX();
 		double y = this.position.getY();
 		double dx, dy;
@@ -266,7 +282,7 @@ public class Movement {
 		this.prevAngle = newAngle;
 	}
 
-	public void rotate (double degree) {
+	public void rotate (double degree) {	
 		double wheel = Config.WHEELS_DISTANCE * degree / (2 * Config.WHEEL_RADIUS);
 		this.right.rotateTo(new Double(this.right.getPosition() - wheel).intValue(), true);
 		this.left.rotateTo(new Double(this.left.getPosition() + wheel).intValue());
@@ -291,7 +307,7 @@ public class Movement {
 	
 	// ------------ Angle corrections ------------
 	
-	public void correctAngle (double angle) {
+	public void correctAngle (double angle) {	
 		int leftAngle = this.left.getLimitAngle() - this.left.getPosition();
 		int rightAngle = this.right.getLimitAngle() - this.right.getPosition();
 		
