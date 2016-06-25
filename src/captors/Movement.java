@@ -36,17 +36,6 @@ public class Movement {
 		this.isRotating = false;
 	}
 	
-	public void waitForUnlock(){
-		while (BluetoothRobot.bt.lock){
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			continue;
-		}
-	}
-	
 	public void followPath(List<Point> path, Grid grid) {
 		this.pathStopped = false;
 		
@@ -89,7 +78,7 @@ public class Movement {
 	
 	private void moveTo(Point p) {
 		
-		this.waitForUnlock();
+		//this.waitForUnlock();
 		
 		Direction wantedDir = Direction.getDirectionBetween(this.position.getPoint(), p);;
 		int diff = 0;

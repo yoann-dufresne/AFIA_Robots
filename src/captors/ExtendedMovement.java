@@ -12,8 +12,8 @@ public class ExtendedMovement extends Movement implements Observer {
 	}
 	
 	public void straightForward(){
-		this.waitForUnlock();
-		this.forward(1.5,false); //vérifier l'utilisation du booleen
+		//this.waitForUnlock();
+		this.forward(10,true);
 	}
 	
 	public void update(Observable o, Object arg){

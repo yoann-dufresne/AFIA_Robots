@@ -36,7 +36,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	
 	private BTConnection btc;
 	private boolean ended;
-	public boolean lock; 
+	//public boolean lock;
 	
 	public boolean computeInProgress;
 	public List<Point> distantPath;
@@ -62,13 +62,13 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.position = pos;
 		this.otherPosition = new Position(0, 0, Direction.NORTH);
 		this.grid = grid;
-		this.main = new MainExploitation(grid, pos);
+		this.main = new MainExplorer(grid, pos);
 		
 		this.beginningCorner = new Point(0,0);
 		this.destination = new Point(-1, -1);
 		
 		this.conflict = false;
-		this.lock= true;
+		//this.lock= true;
 		
 		System.out.println("BT waiting");
 		this.btc = Bluetooth.waitForConnection();
@@ -113,7 +113,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					this.stop(words);
 				} else if ("INIT".equals(command)){
 					this.init(words);
-					System.out.println(command);
 				} else if ("SETID".equals(command)){
 					this.setID(words);
 				} else if ("CONFLICT".equals(command)){
@@ -125,7 +124,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 				} else if ("COMPUTED_PATH".equals(command)){
 					this.computedPath(words);
 				} else {
-					System.out.println("Unknown command");
+					System.out.println("Unknown: " + received);
 				}
 			}
 
@@ -193,11 +192,11 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	private void start(List<String> words) {
 		if (words.size() > 1) {
 			if (this.id == (new Integer(words.get(1))).intValue()) {
-				this.lock = false;
+				//this.lock = false;
 				this.started = true;
 			}
 		} else {
-			this.lock = false;
+			//this.lock = false;
 			this.started = true;
 		}
 	}

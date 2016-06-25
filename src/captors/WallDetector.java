@@ -22,6 +22,7 @@ public class WallDetector extends Observable implements Runnable {
 		this.isInFrontPosition = true;
 		this.changeHeadPosition();
 		this.distance= 255;
+		this.stopped = false;
 	}
 	
 	public void changeHeadPosition () {
@@ -43,20 +44,13 @@ public class WallDetector extends Observable implements Runnable {
 		while (!this.stopped) {
 			this.checkForWall();
 		}
-			
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
 	private void checkForWall() {
 		if (!this.isInFrontPosition())
 			this.changeHeadPosition();
 		this.distance= this.front.getDistance();
-		if (this.distance< WallDetector.MIN_DIST){
+		if (this.distance < WallDetector.MIN_DIST){
 			this.notifyObservers();
 		}
 	}
