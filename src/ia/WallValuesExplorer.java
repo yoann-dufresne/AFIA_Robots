@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bluetooth.BluetoothRobot;
+import lejos.nxt.comm.Bluetooth;
 import model.Direction;
 import model.Grid;
 import model.Position;
@@ -163,8 +164,19 @@ public class WallValuesExplorer extends AbstractExplorer {
 					
 					pointsReached.add(new Point(nei.getLine(), nei.getCol()));
 				}
-
-				int idx=0;
+				BluetoothRobot.bt.send("DEBUG;traceback dijks, length: "+pointsReached.size());
+				try {
+					System.gc();
+					list.add(pointsReached.iterator().next());
+				} catch (IndexOutOfBoundsException e) {
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					e.printStackTrace();
+				}
+				/*int idx=0;
 				for (Point reached : pointsReached) {
 					List<Point> current = list;
 					
@@ -174,7 +186,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 					}
 					
 					current.add(reached);
-				}
+				}/**/
 			}
 			
 			possibleParkoors.addAll(toAdd);

@@ -91,7 +91,7 @@ app.get("/sendLaby", function(req, res){
 // TCP
 
 var client = new net.Socket();
-client.connect(9999, '127.0.0.1', function() {
+client.connect(10000, '127.0.0.1', function() {
   console.log('Connected');
 });
 

@@ -108,14 +108,14 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 9999
+    HOST, PORT = "localhost", 10000
     # Create the server, binding to localhost on port 9999
     SocketServer.TCPServer.allow_reuse_address = True
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
     server.server_activate()
     qin = deque(maxlen=40)
 
-    addrs = [ADRESSES_INV[0]]
+    addrs = [ADRESSES_INV[1]]
 
     bts = []
     for addr in addrs:
