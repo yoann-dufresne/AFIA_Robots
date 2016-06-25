@@ -25,7 +25,9 @@ var createTable = function (width, height) {
 createTable (width, height);
 
 
-var robotState = {x:0, y:0, dir:"EAST"};
+var robots = [];
+robots[0] = {x:0, y:0, dir:"EAST"};
+robots[1] = {x:0, y:0, dir:"EAST"};
 var directions = {"NORTH": 0, "EAST": 1, "SOUTH": 2, "WEST": 3};
 var revertedDirections = ["NORTH", "EAST", "SOUTH", "WEST"];
 
@@ -47,7 +49,7 @@ app.get('/update', function(req, res){
 	var data = {};
 	data.width = width;
 	data.height = height;
-	data.robot = robotState;
+	data.robots = robots;
 	data.laby = table;
 
 	res.send(JSON.stringify(data));
@@ -172,10 +174,13 @@ var initLaby = function(main){
   }
 }
 
-var onUpdate = function(robotId, arguments){
+var onUpdate = function(robotId, arguments) {
+  var robotState = robots[arguments[3]];
+
   robotState.x = arguments[0];
   robotState.y = arguments[1];
   robotState.dir = arguments[2];
+
 }
 
 var onDiscovered = function(robotId, arguments){
@@ -219,9 +224,12 @@ var initRobot = function(command){
   height = parseInt(words[3]);
   createTable (width, height);
 
-  robotState.x = parseInt(words[4]);
-  robotState.y = parseInt(words[5]);
-  robotState.dir = revertedDirections[parseInt(words[6])];
+  for (var idx=0 ; idx<robots.length ; idx++) {
+    var robotState = robots[idx];
+    robotState.x = parseInt(words[4]);
+    robotState.y = parseInt(words[5]);
+    robotState.dir = revertedDirections[parseInt(words[6])];
+  }
 
   client.write(command);
   console.log (command);

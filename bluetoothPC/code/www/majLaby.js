@@ -7,12 +7,16 @@ var globalData;
 var update = function (data) {
 	data = JSON.parse(data);
 	globalData = data;
-	data.robot.x = parseInt(data.robot.x);
-	data.robot.y = parseInt(data.robot.y);
+	for (var idx=0 ; idx<data.robots.length ; idx++) {
+		var robot = data.robots[idx];
 
-	var tmp_robot_x = data.robot.x;
-	data.robot.x = data.robot.y;
-	data.robot.y = tmp_robot_x;
+		robot.x = parseInt(robot.x);
+		robot.y = parseInt(robot.y);
+
+		var tmp_robot_x = robot.x;
+		robot.x = robot.y;
+		robot.y = tmp_robot_x;
+	}
 
 	canvas.width = data.width*tileSize;
 	ctx.canvas.width = data.width*tileSize;
@@ -85,26 +89,30 @@ var update = function (data) {
 		}
 	}
 
-	ctx.beginPath();
-    ctx.arc((data.robot.x+0.5) * tileSize, (data.robot.y+0.5) * tileSize, 0.4*tileSize, 0, 2 * Math.PI, false);
-    ctx.closePath();
-    ctx.fillStyle = "#82C46C";
-    ctx.fill();
+	for (var idx=0 ; idx<data.robots.length ; idx++) {
+		var robot = data.robots[idx];
+		
+		ctx.beginPath();
+	    ctx.arc((robot.x+0.5) * tileSize, (robot.y+0.5) * tileSize, 0.4*tileSize, 0, 2 * Math.PI, false);
+	    ctx.closePath();
+	    ctx.fillStyle = "#82C46C";
+	    ctx.fill();
 
-	ctx.beginPath();
-	if (data.robot.dir == "NORTH")
-		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.1)*tileSize,0.2*tileSize,0.2*tileSize);
-	else if (data.robot.dir == "EAST")
-		ctx.rect((data.robot.x+0.7)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
-	else if (data.robot.dir == "SOUTH")
-		ctx.rect((data.robot.x+0.4)*tileSize, (data.robot.y+0.7)*tileSize,0.2*tileSize,0.2*tileSize);
-	else if (data.robot.dir == "WEST")
-		ctx.rect((data.robot.x+0.1)*tileSize, (data.robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
-	else
-		console.error("unknown direction : ", data.robot.dir)
-	ctx.closePath();
-	ctx.fillStyle ="#000000";
-	ctx.fill();
+		ctx.beginPath();
+		if (robot.dir == "NORTH")
+			ctx.rect((robot.x+0.4)*tileSize, (robot.y+0.1)*tileSize,0.2*tileSize,0.2*tileSize);
+		else if (robot.dir == "EAST")
+			ctx.rect((robot.x+0.7)*tileSize, (robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
+		else if (robot.dir == "SOUTH")
+			ctx.rect((robot.x+0.4)*tileSize, (robot.y+0.7)*tileSize,0.2*tileSize,0.2*tileSize);
+		else if (robot.dir == "WEST")
+			ctx.rect((robot.x+0.1)*tileSize, (robot.y+0.4)*tileSize,0.2*tileSize,0.2*tileSize);
+		else
+			console.error("unknown direction : ", robot.dir)
+		ctx.closePath();
+		ctx.fillStyle ="#000000";
+		ctx.fill();
+	}
 };
 
 window.setInterval (
