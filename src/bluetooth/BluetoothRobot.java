@@ -89,7 +89,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 				String received = null;
 				try {
 					 received = this.br.readLine();
-					 System.out.println(received);
 				} catch (IOException e) {
 					e.printStackTrace();
 					this.ended = true;
@@ -192,13 +191,15 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	}
 
 	private void start(List<String> words) {
-		this.started = true;
 		if (words.size() > 1) {
-			if (this.id == (new Integer(words.get(1))).intValue())
+			if (this.id == (new Integer(words.get(1))).intValue()) {
 				this.lock = false;
-		} else
+				this.started = true;
+			}
+		} else {
 			this.lock = false;
-		System.out.println("Go !!!");
+			this.started = true;
+		}
 	}
 	
 	private void stop(List<String> words) {
