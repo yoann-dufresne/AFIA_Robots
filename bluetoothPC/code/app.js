@@ -54,7 +54,15 @@ app.get('/update', function(req, res){
 });
 
 app.get("/start", function(req, res){
-  startRobot();
+  var id_ = req.query.address;
+  if(id_==undefined){
+    startRobot(0);
+    startRobot(1);
+  }
+  else{
+    startRobot(id_);
+  }
+
   res.send("started");
 });
 
@@ -137,9 +145,7 @@ process.on('SIGINT', quit);
 
 var logLaby = function(x, y, dir, state){
   line = "DISCOVERED;"+x+";"+y+";"+dir+";"+state+"\n"
-  fs.appendFileSync(FNAME_LABY, line, function(err){
-    if(err){console.log("erro : ", err, "impossible to write line to file:", line)}
-  })
+  fs.appendFileSync(FNAME_LABY, line)
 }
 
 var initLaby = function(main){
@@ -201,11 +207,11 @@ var onDiscovered = function(robotId, arguments){
 }
 
 var onDebug = function(robotId, arguments){
-  console.log("DEBUG : ", arguments);
+  console.log("DEBUG : ", robotId, " -- ", arguments);
 }
 
-var startRobot = function(){
-  client.write("START");
+var startRobot = function(id_){
+  client.write("START;"+id_);
 }
 
 var initRobot = function(command){

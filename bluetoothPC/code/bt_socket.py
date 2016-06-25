@@ -107,9 +107,9 @@ class BlueSock(Thread):
 
         data = self.sock.recv(plen)
 
-        if self.debug:
-            print('Recv:', end=" ")
-            print(':'.join('%02x' % ord(c) for c in data))
+        # if self.debug:
+        #     print('Recv:', end=" ")
+        #     print(':'.join('%02x' % ord(c) for c in data))
         return data
 
 def _check_brick(arg, value):

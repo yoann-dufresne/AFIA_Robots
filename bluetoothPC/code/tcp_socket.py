@@ -50,7 +50,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         for bt in bts :
             bt.send(self.data)
 
-    def send_to_other_robots(addr, val):
+    def send_to_other_robots(self, addr, val):
         """Send a command to the other robots if needed
         """
         to_send = ("DISCOVERED", "CONFLICT",
@@ -58,7 +58,6 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                    "COMPUTE_PATH", "COMPUTED_PATH")
 
         command = val.split(";")[0]
-        print("sending to others : ", command)
         if command in to_send:
             for bt in set(bts) - set([addr]):
                 print("sent {} to {}".format(command, bt))
@@ -70,9 +69,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         while True:
             try:
                 addr, val = qin.popleft().items()[0]
-                send_to_other_robots(self, addr, val)
+                self.send_to_other_robots(addr, val)
                 mess[addr].append(val)
-                print(addr, val, mess)
             except IndexError:
                 break
 
@@ -105,7 +103,8 @@ if __name__ == "__main__":
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
     qin = deque(maxlen=40)
-    addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9", "00:16:53:13:EF:A9"]
+    # addrs = ["00:16:53:0C:C8:0A", "00:16:53:0F:F5:A9", "00:16:53:13:EF:A9"]
+    addrs = ["00:16:53:13:EF:A9", "00:16:53:0F:F5:A9"]
     addrs = ["00:16:53:13:EF:A9"]
     bts = []
     for addr in addrs:
