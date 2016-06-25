@@ -1,7 +1,6 @@
 var net = require('net');
 var express = require('express');
 var fs = require('fs');
-var readline = require('readline');
 
 var count_move = 0;
 // Structures
@@ -30,7 +29,7 @@ robots[0] = {x:0, y:0, dir:"EAST"};
 robots[1] = {x:0, y:0, dir:"EAST"};
 var directions = {"NORTH": 0, "EAST": 1, "SOUTH": 2, "WEST": 3};
 var revertedDirections = ["NORTH", "EAST", "SOUTH", "WEST"];
-
+var ADDRESSES = {"00:16:53:0F:F5:A9":1, "00:16:53:13:EF:A9":0};
 
 
 // Serveur web
@@ -60,11 +59,12 @@ app.get("/start", function(req, res){
   if(id_==undefined){
     startRobot(0);
     startRobot(1);
+    console.log("started both");
   }
   else{
     startRobot(id_);
+    console.log("started", id_);
   }
-
   res.send("started");
 });
 
@@ -134,15 +134,18 @@ var processData = function(robot, messages){
     arr.shift();
     var arguments = arr;
 
-    if (command === "DEBUG")
+    if (command === "DEBUG"){
       onDebug(robot, arguments)
+    }
 
     if (command === "UPDATE"){
       onUpdate(robot, arguments)
     }
 
-    if (command === "DISCOVERED")
-      onDiscovered(robot, arguments)
+    if (command === "DISCOVERED"){
+      logLaby(message);
+      onDiscovered(robot, arguments);
+    }
   }
 }
 
@@ -167,20 +170,14 @@ var initLaby = function(main){
   } else if (main==1){
     //exploitation
     console.log("init laby with exploitation")
-    var lineReader = readline.createInterface({
-      input: fs.createReadStream('FNAME_LABY')
-    });
-
-    lineReader.on('line', function (line) {
-      client.write(line);
-    });
   } else {
     console.log("unknown initialisation method...")
   }
 }
 
 var onUpdate = function(robotId, arguments) {
-  var robotState = robots[arguments[3]];
+  var robotState = robots[ADDRESSES[robotId]];
+
 
   robotState.x = arguments[0];
   robotState.y = arguments[1];
@@ -189,10 +186,9 @@ var onUpdate = function(robotId, arguments) {
 }
 
 var onDiscovered = function(robotId, arguments){
-  console.log("  -- onDiscovered", arguments)
+  console.log(" - onDiscovered", arguments)
   count_move += 1;
-  console.log("mov n°", count_move)
-  logLaby(arguments)
+  // console.log("mov n°", count_move)
 
   if (arguments == undefined)
     return
@@ -212,7 +208,6 @@ var onDiscovered = function(robotId, arguments){
 
     direction = directions[tmp[2]];
     table[x][y][direction] = tmp[3];
-    console.log(x, y, table[x][y]);
   }
 }
 
@@ -241,14 +236,15 @@ var initRobot = function(command){
   console.log (command);
 }
 
-// var sendLaby = function(){
-//   for (var line=0 ; line<height ; line++) {
-//     for (var col=0 ; col<width ; col++) {
-//       walls = table[line][col];
-//       client.write("DISCOVERED;"+line+";"+col+";NORTH;"+walls[0]+";1");
-//       client.write("DISCOVERED;"+line+";"+col+";EAST;"+walls[1]+";1");
-//       client.write("DISCOVERED;"+line+";"+col+";SOUTH;"+walls[2]+";1");
-//       client.write("DISCOVERED;"+line+";"+col+";WEST;"+walls[3]+";1");
-//     }
-//   }
-// }
+var sendLaby = function(){
+    console.log("init laby with exploitation")
+    rl = readline(FNAME_LABY);
+    rl.on('line', function(line, lineCount, byteCount) {
+      console.log(" -- line : ", line)
+      client.write(line+"\n");
+    })
+    .on('error', function(e) {
+        // something went wrong
+        console.log(e);
+     });
+}
