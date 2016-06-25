@@ -96,8 +96,18 @@ client.connect(9999, '127.0.0.1', function() {
 });
 
 client.on('data', function(datas) {
-  //console.log('Received: ' + datas);
-  datas = JSON.parse(datas);
+  if(datas==""){
+    return;
+  }
+
+  try{
+    datas = JSON.parse(datas);
+  }
+  catch (err){
+    console.log("error with datas:", datas.toString("utf8"));
+    console.log(err);
+    return ;
+  }
 
   if (datas == {})
     return;
@@ -114,7 +124,7 @@ client.on('close', function() {
 
 
 var getInfos = function(){
-  client.write("log");
+  client.write("log\n");
 }
 setInterval(getInfos, 50)
 
@@ -178,11 +188,9 @@ var initLaby = function(main){
 var onUpdate = function(robotId, arguments) {
   var robotState = robots[ADDRESSES[robotId]];
 
-
   robotState.x = arguments[0];
   robotState.y = arguments[1];
   robotState.dir = arguments[2];
-
 }
 
 var onDiscovered = function(robotId, arguments){
@@ -238,13 +246,8 @@ var initRobot = function(command){
 
 var sendLaby = function(){
     console.log("init laby with exploitation")
-    rl = readline(FNAME_LABY);
-    rl.on('line', function(line, lineCount, byteCount) {
-      console.log(" -- line : ", line)
-      client.write(line+"\n");
-    })
-    .on('error', function(e) {
-        // something went wrong
-        console.log(e);
-     });
+    var lines = fs.readFileSync(FNAME_LABY, "utf8").split("\n");
+    for(lineNb in lines){
+      client.write(lines[lineNb]+"\n");
+    }
 }
