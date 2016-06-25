@@ -31,3 +31,7 @@ send-bt3: all
 	@echo "--------------------\n"
 
 send-bt: send-bt0 send-bt1 send-bt2
+
+debug:
+	nxjlink -o Main.nxj -od Main.nxd main.Main -classpath class
+	nxjdebugtool -di Main.nxd -c -m $(CLASS) $(METHOD) $(LINE)
