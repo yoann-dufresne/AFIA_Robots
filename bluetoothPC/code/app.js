@@ -96,11 +96,15 @@ client.connect(9999, '127.0.0.1', function() {
 });
 
 client.on('data', function(datas) {
-  //console.log('Received: ' + datas);
+  if(datas==""){
+    return;
+  }
+
   try{
     datas = JSON.parse(datas);
   }
   catch (err){
+    console.log("error with datas:", datas.toString("utf8"));
     console.log(err);
     return ;
   }

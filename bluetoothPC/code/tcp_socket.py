@@ -60,7 +60,13 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
         command = val.split(";")[0]
         if command in to_send:
-            for bt in set(bts) - set([addr]):
+            connections = {bt.host:bt for bt in bts}
+
+            addresses_to_send = set(connections.keys()) - set([addr])
+            print("to send: {}".format(addresses_to_send))
+            print("shortIDs: {}".format([ADRESSES[i] for i in addresses_to_send]))
+            for addr in addresses_to_send:
+                bt = connections[addr]
                 print("sent {} to {}".format(command, bt))
                 bt.send(val)
 
@@ -88,7 +94,6 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         running = True
         while running:
             datas = self.request.recv(4096).strip().split("\n")
-            print("received : ", datas)
             for data in datas:
                 if data is None:
                     continue
