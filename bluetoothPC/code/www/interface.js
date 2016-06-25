@@ -44,6 +44,26 @@ startButton.onclick = function(){
     $.get(url);
     return;
   }
-
-
 }
+
+
+
+var dest_line = document.getElementById("dest_line");
+var dest_col = document.getElementById("dest_col");
+var dest_button = document.getElementById("dest_button");
+
+dest_button.onclick = function () {
+  command = "PARTIAL;";
+  command += dest_line.value + ";";
+  command += dest_col.value;
+
+  var url = '/partial?command='+command;
+  $.get(url);
+}
+
+
+
+
+
+
+

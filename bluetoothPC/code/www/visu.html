@@ -42,7 +42,16 @@
     </form>
     <button id="submit">Envoyer les infos</button>
 
-    <button onclick="$.get('/sendLaby')">Send laby to robots</button>
+    <button onclick="$.get('/sendLaby')">Send laby to robots</button><br><br>
+
+    <form>
+      <p>Destination</p>
+      Ligne
+      <input type="text" id="dest_line" value="?">
+      Colonne
+      <input type="text" id="dest_col" value="."><br>
+    </form>
+    <button id="dest_button">Envoie</button>
 
   </body>
 

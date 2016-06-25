@@ -77,6 +77,12 @@ app.get("/init", function(req, res){
   res.send("initialized");
 });
 
+app.get("/partial", function(req, res){
+  var command = req.query.command;
+  res.send(command);
+  client.write(command);
+});
+
 app.get("/sendLaby", function(req, res){
   sendLaby();
   res.send("initialized");
