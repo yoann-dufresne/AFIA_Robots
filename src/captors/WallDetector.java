@@ -1,8 +1,12 @@
 package captors;
 
+import java.awt.Point;
+
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
+import model.Direction;
+import model.Position;
 import api.Observable;
 import api.Observer;
 
@@ -15,8 +19,11 @@ public class WallDetector extends Observable implements Runnable {
 	private UltrasonicSensor front;
 	
 	private int distance;
+
+	private Position pos;
 	
-	public WallDetector() {
+	public WallDetector(Position pos) {
+		this.pos = pos;
 		this.front = new UltrasonicSensor(SensorPort.S2);
 		this.front.continuous();
 		this.isInFrontPosition = true;
@@ -51,7 +58,17 @@ public class WallDetector extends Observable implements Runnable {
 			this.changeHeadPosition();
 		this.distance= this.front.getDistance();
 		if (this.distance < WallDetector.MIN_DIST){
+			Point current = this.pos.getPoint();
+			Direction dir = this.pos.getDirection();
 			this.notifyObservers();
+			
+			while (this.pos.getPoint().equals(current) && this.pos.getDirection().equals(dir)) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
