@@ -84,6 +84,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	@Override
 	public void run() {
 		this.ended = false;
+		this.send("DEBUG; BT TA MERE");
 
 		while(!this.ended){
 			while (this.btc.available() > 0) {

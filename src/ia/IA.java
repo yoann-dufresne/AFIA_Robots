@@ -35,6 +35,7 @@ public class IA {
 		Solution sol = new Solution();
 		Point destination = new Point(row, col);
 		
+		// calcul les distances pour 1 robot. 255 si pas possible
 		sol.aloneParkoor0 = this.allPossibleDestinations(this.positions[0].getPoint());
 		if (this.positions[0].equals(this.positions[1]))
 			sol.aloneParkoor1 = sol.aloneParkoor0;
@@ -44,58 +45,32 @@ public class IA {
 		int aloneCost0 = sol.aloneParkoor0[destination.x][destination.y];
 		int aloneCost1 = sol.aloneParkoor1[destination.x][destination.y];
 		
-		int aloneCost = aloneCost0 < aloneCost1 ? aloneCost0 : aloneCost1;
-		sol.aloneRobotID = aloneCost0 < aloneCost1 ? 0 : 1 ;
-		char[][] aloneParkoor = aloneCost0 < aloneCost1 ? sol.aloneParkoor0 : sol.aloneParkoor1;
+		int aloneScore = aloneCost0 < aloneCost1 ? aloneCost0 : aloneCost1;
+		sol.aloneRobotID = aloneCost0 <= aloneCost1 ? 0 : 1 ;
+		sol.aloneScore = aloneScore;
 		
 		Point[] points = new Point[2];
 		points[0] = this.positions[0].getPoint();
 		points[1] = this.positions[1].getPoint();
-		this.parkoor(points, destination, sol, aloneCost);
+		this.parkoor(points, destination, sol, aloneScore);
 		
-		BluetoothRobot.bt.send("DEBUG;parkoor ended");
-		BluetoothRobot.bt.send("DEBUG;destination " + destination.x + " " + destination.y);
-		BluetoothRobot.bt.send("DEBUG;coop tile " + (sol.coopTile == null));
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
+		int coopScore = sol.coopScore;
 		
-		int coopCost = sol.myCoopParkoor == null ? 255 : Math.max(
-				sol.myCoopParkoor[destination.x][destination.y],
-				aloneParkoor[sol.coopTile.x][sol.coopTile.y]
-		);
+		BluetoothRobot.bt.send("DEBUG;alone score " + aloneScore);
+		BluetoothRobot.bt.send("DEBUG;coop score " + coopScore);
 		
-		BluetoothRobot.bt.send("DEBUG;coop cost " + coopCost);
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		
-		if (aloneCost == 255 && coopCost == 255){
+		if (aloneScore == 255 && coopScore == 255){
 			return sol;
 		}
-		else if (aloneCost <= coopCost) {
-			BluetoothRobot.bt.send("DEBUG;if");
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+		else if (aloneScore <= coopScore) {
+			BluetoothRobot.bt.send("DEBUG;Alone");
 			
 			if (aloneCost0 < aloneCost1)
 				sol.alonePath = this.traceback(sol.aloneParkoor0, destination); //Pourquoi????
 			else
 				sol.alonePath = this.traceback(sol.aloneParkoor1, destination);
 		} else {
-			BluetoothRobot.bt.send("DEBUG;else");
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+			BluetoothRobot.bt.send("DEBUG;Coop");
 			Tile t = this.grid.getTile(sol.coopTile.x, sol.coopTile.y);
 			
 			List<Direction> emptyWalls = new ArrayList<Direction>(4);
@@ -109,13 +84,6 @@ public class IA {
 			for (Direction dir : emptyWalls)
 				this.grid.setEmpty(sol.coopTile.x, sol.coopTile.y, dir);
 			sol.otherCoopPath = this.traceback(sol.otherCoopParkoor, sol.coopTile);
-		}
-		
-		BluetoothRobot.bt.send("DEBUG;return");
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
 		}
 		
 		return sol;
@@ -251,6 +219,9 @@ public class IA {
 						this.grid.setEmpty(i, j, dir);
 				}
 		}
+		sol.coopScore = 255;
+		if (sol.coopTile == null)
+			return;
 		
 		sol.coopTile = bestTile;
 		
