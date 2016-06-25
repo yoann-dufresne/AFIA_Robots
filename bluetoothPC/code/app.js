@@ -156,7 +156,6 @@ var initLaby = function(main){
       if(err){console.log("impossible to rename file", err)}
       else{"renamed file"}
     });
-    fs.unlinkSync(FNAME_LABY);
     fs.writeFileSync(FNAME_LABY);
   } else if (main==1){
     //exploitation
