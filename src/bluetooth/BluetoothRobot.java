@@ -65,7 +65,8 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		this.main = new MainExplorer(grid, pos);
 		
 		this.beginningCorner = new Point(0,0);
-		this.destination = new Point(-1, -1);
+		//this.destination = new Point(-1, -1);
+		this.destination = new Point(0, 3);
 		
 		this.conflict = false;
 		//this.lock= true;
