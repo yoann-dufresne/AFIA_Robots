@@ -9,3 +9,7 @@ bluetoothPC/code/node_modules/
 **/*~
 .classpath
 .metadata/
+
+###
+**/laby.txt
+**/laby.txt.bak

@@ -62,24 +62,28 @@ class BlueSock(Thread):
         if self.debug:
             print('Bluetooth connection closed to {}...'.format(self.host))
 
-    def send(self, data):
-        if not data:
-            return
+    def send(self, datas):
+        print("sending datas: ", datas.encode('unicode_escape'))
+        for data in datas.split('\n'):
+            if not data:
+                return
 
-        print("sending ", data)
-        if data[-1] != "\n":
-            data = data + "\n"
+            print("sending ", data)
 
-        if self.debug:
-            print('Send:', end=' ')
-            print(':'.join('%02x' % ord(c) for c in data))
-        l0 = len(data.encode('utf-8')) & 0xFF
-        l1 = (len(data.encode('utf-8')) >> 8) & 0xFF
-        d = chr(l0) + chr(l1) + data
-        try:
-            self.sock.send(d)
-        except bluetooth.BluetoothError:
-            print("exception while sending")
+            if data[-1] != "\n":
+                data = data + "\n"
+
+            if self.debug:
+                print('Send:', end=' ')
+                print(':'.join('%02x' % ord(c) for c in data))
+            l0 = len(data.encode('utf-8')) & 0xFF
+            l1 = (len(data.encode('utf-8')) >> 8) & 0xFF
+            d = chr(l0) + chr(l1) + data
+            try:
+                self.sock.send(d)
+            except bluetooth.BluetoothError:
+                print("exception while sending")
+            time.sleep(0.02)
 
     def run(self):
         while self.running:
