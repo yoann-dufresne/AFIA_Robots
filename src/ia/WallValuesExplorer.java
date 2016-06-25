@@ -133,8 +133,18 @@ public class WallValuesExplorer extends AbstractExplorer {
 		
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
 
-		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		this.parkoor = this.chooseParkoor(parkoors);
+//		Version originale :
+//		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
+//		this.parkoor = this.chooseParkoor(parkoors);
+		
+//		Version de Camille :
+		this.parkoor =this.tracebackDijktsra(distances,currentPoint, destination);
+		List<Point> reverted = new ArrayList<Point>(this.parkoor.size());
+		for (Point p : parkoor)
+			reverted.add(0, p);
+		this.parkoor = reverted;
+		
+		
 		
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
@@ -143,8 +153,34 @@ public class WallValuesExplorer extends AbstractExplorer {
 	// --------------------------------------------------------------
 	// ----------------------- Path selection -----------------------
 	// --------------------------------------------------------------
+
+//	Version modifiée par Camille
+	public List<Point> tracebackDijktsra(char[][] dists, Point begin, Point dest){
+		List<Point> possibleParkoors = new ArrayList<Point>();
+		
+		possibleParkoors.add(begin);
+		
+		for (int dist=dists[begin.x][begin.y]; dist>0; dist--){
+			<List<Point> toAdd = new ArrayList<Point>();
+			
+		
+			Point p = parkoor.get(list.size()-1);
+			
+			for (Tile nei : this.grid.getNeighbors(p)) {
+				if (nei == null || dists[nei.getLine()][nei.getCol()] != dist-1)
+					continue;
+				
+				possibleParkoors.add(new Point(nei.getLine(), nei.getCol()));
+				break;
+			}
+			
+		}
+		return possibleParkoors;
+	}
 	
-	public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
+	
+//	Version originale
+	/*public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
 		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
 		List<Point> tmp = new ArrayList<Point>();
 		
@@ -176,7 +212,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 					}
 					e.printStackTrace();
 				}
-				/*int idx=0;
+				int idx=0;
 				for (Point reached : pointsReached) {
 					List<Point> current = list;
 					
@@ -186,16 +222,16 @@ public class WallValuesExplorer extends AbstractExplorer {
 					}
 					
 					current.add(reached);
-				}/**/
+				}
 			}
 			
 			possibleParkoors.addAll(toAdd);
 		}
 		
 		return possibleParkoors;
-	}
+	}*/
 	
-	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
+	/*public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
 		List<Point> parkoor = new ArrayList<Point>();
 		int value;
 		int maxValue =-20000;
@@ -224,7 +260,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			reverted.add(0, p);
 		
 		return reverted;
-	}
+	}*/
 	
 	
 	// --------------------------------------------------------------
