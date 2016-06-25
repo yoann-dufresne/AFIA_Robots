@@ -57,7 +57,7 @@ public class WallDiscovererObserver implements Observer {
 				}
 				
 				boolean discovered = false;
-				if (absDist <= proba) {
+				if (absDist < proba) {
 					this.grid.setEmpty(x, y, dir);
 					this.grid.setProba(x, y, dir, absDist);
 					discovered = true;
@@ -107,7 +107,7 @@ public class WallDiscovererObserver implements Observer {
 						continue;
 					}
 					
-					if (absDist < proba) {
+					if (absDist <= proba) {
 						this.grid.setProba(x, y, dir, absDist);
 						this.grid.setWall(x, y, dir);
 						
