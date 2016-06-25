@@ -47,9 +47,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
     allow_reuse_address = True
 
-    def send_to_robots(self):
+    def send_to_robots(self, data):
         for bt in bts :
-            bt.send(self.data)
+            bt.send(data)
 
     def send_to_other_robots(self, addr, val):
         """Send a command to the other robots if needed
@@ -87,22 +87,27 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print "Client connected with ", self.client_address
         running = True
         while running:
-            self.data = self.request.recv(1024).strip()
-            if self.data != "log":
-                self.send_to_robots()
-            else:
-                self.answer_clients()
-            if self.data == "stop":
-                self.stop()
-                break
+            datas = self.request.recv(4096).strip().split("\n")
+            print("received : ", datas)
+            for data in datas:
+                if data is None:
+                    continue
+                if data == "log":
+                    self.answer_clients()
+                else:
+                    self.send_to_robots(data)
+                if data == "stop":
+                    self.stop()
+                    break
         print("end handle TCP")
 
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
     # Create the server, binding to localhost on port 9999
+    SocketServer.TCPServer.allow_reuse_address = True
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
-
+    server.server_activate()
     qin = deque(maxlen=40)
 
     addrs = [ADRESSES_INV[0]]
