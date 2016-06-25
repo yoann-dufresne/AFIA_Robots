@@ -151,8 +151,8 @@ process.on('SIGINT', quit);
 
 // Model
 
-var logLaby = function(x, y, dir, state){
-  line = "DISCOVERED;"+x+";"+y+";"+dir+";"+state+"\n"
+var logLaby = function(message){
+  line = message+"\n"
   fs.appendFileSync(FNAME_LABY, line)
 }
 
@@ -164,7 +164,6 @@ var initLaby = function(main){
       if(err){console.log("impossible to rename file", err)}
       else{"renamed file"}
     });
-    fs.writeFileSync(FNAME_LABY);
   } else if (main==1){
     //exploitation
     console.log("init laby with exploitation")
@@ -193,6 +192,8 @@ var onDiscovered = function(robotId, arguments){
   console.log("  -- onDiscovered", arguments)
   count_move += 1;
   console.log("mov n°", count_move)
+  logLaby(arguments)
+
   if (arguments == undefined)
     return
 
@@ -212,7 +213,6 @@ var onDiscovered = function(robotId, arguments){
     direction = directions[tmp[2]];
     table[x][y][direction] = tmp[3];
     console.log(x, y, table[x][y]);
-    logLaby(x, y, direction, table[x][y])
   }
 }
 
