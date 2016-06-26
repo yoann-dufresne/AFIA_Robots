@@ -62,7 +62,7 @@ public class WallDetector extends Observable implements Runnable {
 			Direction dir = this.pos.getDirection();
 			this.notifyObservers();
 			
-			while (this.pos.getPoint().equals(current) && this.pos.getDirection().equals(dir)) {
+			while (!this.stopped && this.pos.getPoint().equals(current) && this.pos.getDirection().equals(dir)) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
