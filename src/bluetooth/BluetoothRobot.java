@@ -209,11 +209,11 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	}
 
 	private void partial(List<String> words) {
-		String word = words.get(1);
+		String word = words.get(0);
 		int line = -1;
 		if (!word.startsWith("?"))
 			line = new Integer(word);
-		word = words.get(2);
+		word = words.get(1);
 		int col = -1;
 		if (!word.startsWith("?"))
 			line = new Integer(word);
