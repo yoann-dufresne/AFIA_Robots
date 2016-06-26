@@ -216,8 +216,9 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		word = words.get(2);
 		int col = -1;
 		if (!word.startsWith("?"))
-			line = new Integer(word);
+			col = new Integer(word);
 		this.destination = new Point(line, col);
+		System.out.println("dest rcv partial: "+this.destination.x+","+this.destination.y);
 	}
 
 	private void discover(List<String> words) {
