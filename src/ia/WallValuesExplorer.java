@@ -4,21 +4,19 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import bluetooth.BluetoothRobot;
-import lejos.nxt.comm.Bluetooth;
 import model.Direction;
 import model.Grid;
 import model.Position;
 import model.Tile;
 import model.WallState;
+import bluetooth.BluetoothRobot;
 import captors.Movement;
 
 public class WallValuesExplorer extends AbstractExplorer {
 
-	public static final int MAX_DIST = 20;
+	public static final int MAX_DIST = 200;
 	
 	protected char tileValues[][];
-	private Point beginCorner;
 
 	private char[][] manhattanDistances;
 	private List<Point> parkoor;
@@ -64,9 +62,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 			}
 			
 			char[][] distances = this.getManhattanDistances(currentPoint,destination);
-			List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		
-			tmpParkoor = this.chooseParkoor(parkoors);
+			tmpParkoor = this.dummyTraceback(distances, currentPoint, destination);
+			
+			/*List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
+			tmpParkoor = this.chooseParkoor(parkoors);/**/
 			
 			if (this.parkoor == null || tmpParkoor.size()<this.parkoor.size())
 				this.parkoor = tmpParkoor;
@@ -91,9 +90,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 			}
 			
 		char[][] distances = this.getManhattanDistances(currentPoint,BluetoothRobot.bt.beginningCorner);
-		List<List<Point>> parkoors = this.tracebackDijktsra(distances, BluetoothRobot.bt.beginningCorner, currentPoint);
-	
-		this.parkoor = this.chooseParkoor(parkoors);
+		this.parkoor = this.dummyTraceback(distances, currentPoint, BluetoothRobot.bt.beginningCorner);
+		
+		/*List<List<Point>> parkoors = this.tracebackDijktsra(distances, BluetoothRobot.bt.beginningCorner, currentPoint);
+		this.parkoor = this.chooseParkoor(parkoors);/**/
 			
 		this.movement.followPath(this.parkoor, this.grid);
 	
@@ -132,9 +132,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 		}
 		
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
-
-		List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		this.parkoor = this.chooseParkoor(parkoors);
+		// TODO : Si le robot ne bouge pas, inverser les deux parametres.
+		this.parkoor = this.dummyTraceback (distances, currentPoint, destination);
+		/*List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
+		this.parkoor = this.chooseParkoor(parkoors);/**/
 		
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
@@ -144,7 +145,36 @@ public class WallValuesExplorer extends AbstractExplorer {
 	// ----------------------- Path selection -----------------------
 	// --------------------------------------------------------------
 	
-	public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
+	private List<Point> dummyTraceback(char[][] distances, Point start, Point dest) {
+		int dist = (int)distances[dest.x][dest.y];
+		Point[] path = new Point[dist+1];
+		path[dist] = dest;
+		
+		
+		while (dist > 0) {
+			Tile current = this.grid.getTile(path[dist]);
+			Tile[] neis = this.grid.getNeighbors(current);
+			for (Tile nei : neis) {
+				if (nei == null)
+					continue;
+				
+				if (distances[nei.getLine()][nei.getCol()] == dist-1) {
+					path[dist-1] = new Point(nei.getLine(), nei.getCol());
+					break;
+				}
+			}
+					
+			dist--;
+		}
+		
+		List<Point> list = new ArrayList<Point>(path.length);
+		for (Point p : path)
+			list.add(p);
+		return list;
+	}
+
+
+	/*public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
 		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
 		List<Point> tmp = new ArrayList<Point>();
 		
@@ -186,7 +216,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 					}
 					
 					current.add(reached);
-				}/**/
+				}
 			}
 			
 			possibleParkoors.addAll(toAdd);
@@ -224,7 +254,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			reverted.add(0, p);
 		
 		return reverted;
-	}
+	}/**/
 	
 	
 	// --------------------------------------------------------------
