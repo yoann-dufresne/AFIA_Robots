@@ -115,7 +115,7 @@ if __name__ == "__main__":
     server.server_activate()
     qin = deque(maxlen=40)
 
-    addrs = [ADRESSES_INV[1]]
+    addrs = [ADRESSES_INV[0]]
 
     bts = []
     for addr in addrs:
