@@ -102,8 +102,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 	
 	
 	/** tells if the grid is all discovered or not
-	 * TODO : Améliorer pour pas de n^2 !!!!
-	 *
 	 * @return if all tiles values are equal to 0
 	 */
 	public boolean isAllDiscovered(){
@@ -132,11 +130,9 @@ public class WallValuesExplorer extends AbstractExplorer {
 			return;
 		}
 		
+		BluetoothRobot.bt.send("DEBUG;dummy debug " + destination.x + " " + destination.y);
 		char[][] distances = this.getManhattanDistances(currentPoint,destination);
-		// TODO : Si le robot ne bouge pas, inverser les deux parametres.
 		this.parkoor = this.dummyTraceback (distances, currentPoint, destination);
-		/*List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
-		this.parkoor = this.chooseParkoor(parkoors);/**/
 		
 		String path = "";
 		for (Point p : this.parkoor)
@@ -177,89 +173,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 			list.add(p);
 		return list;
 	}
-
-
-	/*public List<List<Point>> tracebackDijktsra(char[][] dists, Point begin, Point dest){
-		List<List<Point>> possibleParkoors = new ArrayList<List<Point>>();
-		List<Point> tmp = new ArrayList<Point>();
-		
-		tmp.add(begin);
-		possibleParkoors.add(tmp);
-		
-		for (int dist=dists[begin.x][begin.y]; dist>0; dist--){
-			List<List<Point>> toAdd = new ArrayList<List<Point>>();
-			
-			for(List<Point> list : possibleParkoors){
-				Point p = list.get(list.size()-1);
-				List<Point> pointsReached = new ArrayList<Point>(4);
-				
-				for (Tile nei : this.grid.getNeighbors(p)) {
-					if (nei == null || dists[nei.getLine()][nei.getCol()] != dist-1)
-						continue;
-					
-					pointsReached.add(new Point(nei.getLine(), nei.getCol()));
-				}
-				BluetoothRobot.bt.send("DEBUG;traceback dijks, length: "+pointsReached.size());
-				try {
-					System.gc();
-					list.add(pointsReached.iterator().next());
-				} catch (IndexOutOfBoundsException e) {
-					try {
-						Thread.sleep(300);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-					e.printStackTrace();
-				}
-				/*int idx=0;
-				for (Point reached : pointsReached) {
-					List<Point> current = list;
-					
-					if (idx++ != pointsReached.size()-1) {
-						current = new ArrayList<Point>(current);
-						toAdd.add(current);
-					}
-					
-					current.add(reached);
-				}
-			}
-			
-			possibleParkoors.addAll(toAdd);
-		}
-		
-		return possibleParkoors;
-	}
-	
-	public List<Point> chooseParkoor(List<List<Point>> possibleParkoors){
-		List<Point> parkoor = new ArrayList<Point>();
-		int value;
-		int maxValue =-20000;
-		for (List<Point> list : possibleParkoors){
-			value = 0;
-			
-			int idxPoint = 0;
-			for (Point p : list){
-				value+= this.tileValues[p.x][p.y];
-				if (idxPoint>2){
-					if (!(list.get(idxPoint-1).x == list.get(idxPoint-2).x && list.get(idxPoint-1).x== p.x) &&
-							(!(list.get(idxPoint-2).y == list.get(idxPoint-1).y && list.get(idxPoint-1).y== p.y)))
-						value-=10;
-				}
-				
-				idxPoint++;
-			}
-			if (value>maxValue){
-				parkoor=list;
-			}
-		}
-
-		// Revert the list
-		List<Point> reverted = new ArrayList<Point>(parkoor.size());
-		for (Point p : parkoor)
-			reverted.add(0, p);
-		
-		return reverted;
-	}/**/
 	
 	
 	// --------------------------------------------------------------
@@ -352,6 +265,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 	/** affect a value to all tiles corresponding to the number of wall that can be detected
 	 * use the distance to adjust the value of the tile
 	 * @param p the point to compute scores from
+	 * TODO : Changer pour ne pas faire de n^2
 	 */
 	public void computeScores(Point p){
 		char[][] distances= this.getManhattanDistances(p);
