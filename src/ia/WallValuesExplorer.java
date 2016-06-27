@@ -151,9 +151,6 @@ public class WallValuesExplorer extends AbstractExplorer {
 		Point[] path = new Point[dist+1];
 		path[dist] = dest;
 		
-		P
-		Point next;
-		boolean already_visited = false;
 
 		while (dist > 0) {
 			Tile current = this.grid.getTile(path[dist]);
