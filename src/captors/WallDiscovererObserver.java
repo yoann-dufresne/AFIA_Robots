@@ -43,20 +43,21 @@ public class WallDiscovererObserver implements Observer {
 			
 			int absDist = 0;
 			while (dist > TILE_SIZE_CM) {
-				BluetoothRobot.bt.send("DEBUG;" + x + " " + y + " " + dir + " " + dist);
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;
 				absDist++;
 
+				boolean discovered = false;
 				int proba = 100;
 				try {
 					proba = this.grid.getProba(x, y, dir);
 					BluetoothRobot.bt.send("DEBUG;Proba " + proba + " " + absDist);
 				} catch (IllegalArgumentException e) {
+					proba = -1;
 					BluetoothRobot.bt.send("DEBUG;CATCH ! " + x + " " + y + " " + dir + " " + dist);
 				}
 				
-				boolean discovered = false;
+				
 				if (absDist < proba) {
 					this.grid.setEmpty(x, y, dir);
 					this.grid.setProba(x, y, dir, absDist);
