@@ -8,7 +8,6 @@ import collections
 
 from bt_socket import BlueSock
 
-
 ADRESSES = {"00:16:53:0C:C8:0A":1, "00:16:53:0F:F5:A9":2, "00:16:53:13:EF:A9":0}
 ADRESSES_INV = {0:"00:16:53:13:EF:A9", 2:"00:16:53:0F:F5:A9", 1:"00:16:53:0C:C8:0A"}
 
@@ -48,6 +47,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     allow_reuse_address = True
 
     def send_to_robots(self, data):
+        print("sending to all robots: {}".format(data))
         for bt in bts :
             bt.send(data)
 
@@ -63,11 +63,10 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             connections = {bt.host:bt for bt in bts}
 
             addresses_to_send = set(connections.keys()) - set([addr])
-            print("to send: {}".format(addresses_to_send))
-            print("shortIDs: {}".format([ADRESSES[i] for i in addresses_to_send]))
+            print("sending to other robots (shortIDs): {}".format([ADRESSES[i] for i in addresses_to_send]))
             for addr in addresses_to_send:
                 bt = connections[addr]
-                print("sent {} to {}".format(command, bt))
+                print("  sent {} to {}".format(command, bt))
                 bt.send(val)
 
 

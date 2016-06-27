@@ -3,6 +3,7 @@ var ctx = canvas.getContext('2d');
 var tileSize = 40;
 
 var globalData;
+var ColorsRobot = {};
 
 var update = function (data) {
 	data = JSON.parse(data);
@@ -91,7 +92,7 @@ var update = function (data) {
 
 	for (var idx=0 ; idx<data.robots.length ; idx++) {
 		var robot = data.robots[idx];
-		
+
 		ctx.beginPath();
 	    ctx.arc((robot.x+0.5) * tileSize, (robot.y+0.5) * tileSize, 0.4*tileSize, 0, 2 * Math.PI, false);
 	    ctx.closePath();

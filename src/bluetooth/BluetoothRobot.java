@@ -28,19 +28,19 @@ import util.Spliter;
 public class BluetoothRobot extends Observable implements Runnable  {
 	public static BluetoothRobot bt;
 	private boolean started;
-	
+
 	private Position position;
 	private Grid grid;
 	public Point destination;
 	public boolean conflict;
-	
+
 	private BTConnection btc;
 	private boolean ended;
 	//public boolean lock;
-	
+
 	public boolean computeInProgress;
 	public List<Point> distantPath;
-	
+
 	private BufferedReader br;
 	private BufferedWriter bw;
 
@@ -50,27 +50,27 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 	public int id;
 	public Position otherPosition;
-	
+
 	public Point beginningCorner;
-	
+
 	public BluetoothRobot(Position pos, Grid grid) {
 		BluetoothRobot.bt = this;
 		this.started = false;
 		this.ended = true;
 		this.inbox = new ArrayList<String>();
-		
+
 		this.position = pos;
-		this.otherPosition = new Position(0, 0, Direction.NORTH);
+		this.otherPosition = new Position(-2, -2, Direction.NORTH);
 		this.grid = grid;
 		this.main = new MainExplorer(grid, pos);
-		
+
 		this.beginningCorner = new Point(0,0);
 		//this.destination = new Point(-1, -1);
 		this.destination = new Point(2, 3);
-		
+
 		this.conflict = false;
 		//this.lock= true;
-		
+
 		System.out.println("BT waiting");
 		this.btc = Bluetooth.waitForConnection();
 		System.out.println("BT connected");
@@ -84,7 +84,6 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	@Override
 	public void run() {
 		this.ended = false;
-		this.send("DEBUG; BT TA MERE");
 
 		while(!this.ended){
 			while (this.btc.available() > 0) {
@@ -138,15 +137,15 @@ public class BluetoothRobot extends Observable implements Runnable  {
 					";" + current.east.toString() +
 					";" + current.south.toString() +
 					";" + current.west.toString();
-				
+
 			synchronized (this.inbox) {
 				this.inbox.add(up);
-			
+
 				// Vide la inbox
 				while (this.inbox.size() > 0){
 					String msg = null;
 					msg = this.inbox.remove(0);
-	
+
 					try {
 						this.bw.write(msg+'\n');
 						this.bw.flush();
@@ -173,19 +172,19 @@ public class BluetoothRobot extends Observable implements Runnable  {
 	public void stop () {
 		this.ended = true;
 	}
-	
+
 	private void init(List<String> words) {
 		int width = new Integer(words.get(2));
 		int height = new Integer(words.get(3));
 		this.grid = new Grid(height, width);
-		
+
 		int line = new Integer(words.get(4));
 		int col = new Integer(words.get(5));
 		Direction dir = Direction.values()[new Integer(words.get(6))];
-		
+
 		this.position = new Position(line + 0.5, col + 0.5, dir);
-		this.beginningCorner = new Point(line,col); 
-				
+		this.beginningCorner = new Point(line,col);
+
 		int idMain = new Integer(words.get(1));
 		System.out.println("Main " + idMain);
 		this.main = idMain == 0 ? new MainExplorer(this.grid, this.position) : new MainExploitation(this.grid, this.position);
@@ -202,7 +201,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 			this.started = true;
 		}
 	}
-	
+
 	private void stop(List<String> words) {
 		System.out.println("STOP");
 		this.ended = true;
@@ -227,19 +226,19 @@ public class BluetoothRobot extends Observable implements Runnable  {
 		Direction dir = Direction.directionFromString(words.get(3));
 		WallState state = WallState.stateFromString(words.get(4));
 		int quality = new Integer(words.get(5));
-		
+
 		try {
 			int proba = this.grid.getProba(x, y, dir);
 			if (quality > proba)
 				return;
-			
+
 			if (quality == proba && state == WallState.Wall)
 				return;
-			
+
 			this.grid.setState(x, y, dir, state);
 		} catch (IllegalArgumentException e) {};
 	}
-	
+
 	private void conflict(List<String> words) {
 		// TODO : débug !!!
 		this.conflict = true;
@@ -259,7 +258,7 @@ public class BluetoothRobot extends Observable implements Runnable  {
 
 	private void computedPath(List<String> words) {
 		words.remove(0);
-		
+
 		this.distantPath = new ArrayList<Point>(words.size()/2);
 		synchronized (this.distantPath) {
 			while (words.size() > 0) {
@@ -270,14 +269,14 @@ public class BluetoothRobot extends Observable implements Runnable  {
 			}
 		}
 	}
-	
-	
+
+
 	public void send(String msg){
 		synchronized (this.inbox) {
 			this.inbox.add(msg);
 		}
 	}
-	
+
 
 	public boolean started() {
 		return this.started;

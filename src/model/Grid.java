@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import bluetooth.BluetoothRobot;
+
 
 public class Grid {
 
@@ -46,6 +48,16 @@ public class Grid {
 	
 	
 	public Tile getTile(Point p){
+		try {
+			return this.getTile(p.x, p.y);
+		} catch (NullPointerException e) {
+			BluetoothRobot.bt.send("DEBUG;Null pointer exception " + p.x + " " + p.y);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
 		return this.getTile(p.x, p.y);
 	}
 	
