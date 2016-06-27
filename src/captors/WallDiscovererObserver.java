@@ -14,7 +14,7 @@ import api.Observer;
 public class WallDiscovererObserver implements Observer {
 
 	private static final int TILE_SIZE_CM = new Double(100*Config.TILE_SIZE).intValue();
-	public static final int MAX_DIST_CM = 4 * TILE_SIZE_CM;
+	public static final int MAX_DIST_CM = 6 * TILE_SIZE_CM;
 
 	private Grid grid;
 	private Position position;
