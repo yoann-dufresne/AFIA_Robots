@@ -108,7 +108,7 @@ public class WallDiscovererObserver implements Observer {
 						continue;
 					}
 					
-					if (absDist <= proba) {
+					if (absDist <= proba || new Point(this.x,this.y)!= BluetoothRobot.bt.otherPosition.getPoint()) {
 						this.grid.setProba(x, y, dir, absDist);
 						this.grid.setWall(x, y, dir);
 						
