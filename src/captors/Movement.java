@@ -43,7 +43,8 @@ public class Movement {
 			if (this.pathStopped) {
 				break;
 			}
-			
+			BluetoothRobot.bt.send("NEXT_POS;" + p.x + " " + p.y);
+
 			Point current = this.position.getPoint();
 			if(p.equals(current)){
 				continue;

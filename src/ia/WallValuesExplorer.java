@@ -203,7 +203,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 			
 			Tile[] neis = this.grid.getNeighbors(current);
 			for (Tile nei : neis) {
-				if (nei == null)
+				if (nei == null || this.tileValues[nei.getLine()][nei.getCol()]<0)
 					continue;
 				
 				if (dists[nei.getLine()][nei.getCol()] > val+1) {
@@ -280,7 +280,14 @@ public class WallValuesExplorer extends AbstractExplorer {
 					int score = this.tileScore(x, y);
 					this.tileValues[x][y] =  (char) Math.max(1,score-distances[x][y]);
 				} else
-					this.tileValues[x][y] = 0;
+					this.tileValues[x][y] = 0;				
+			}	
+		}
+		
+		if (BluetoothRobot.bt.otherPosition.getX() != -2){
+			this.tileValues[BluetoothRobot.bt.otherPosition.getPoint().x][BluetoothRobot.bt.otherPosition.getPoint().y] -= 5;
+			for(Tile t : this.grid.getNeighbors(BluetoothRobot.bt.otherPosition.getPoint())){
+				this.tileValues[t.getLine()][t.getCol()] -= 5;
 			}
 		}
 	}

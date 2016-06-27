@@ -29,7 +29,7 @@ robots[0] = {x:0, y:0, dir:"EAST"};
 robots[1] = {x:0, y:0, dir:"EAST"};
 var directions = {"NORTH": 0, "EAST": 1, "SOUTH": 2, "WEST": 3};
 var revertedDirections = ["NORTH", "EAST", "SOUTH", "WEST"];
-var ADDRESSES = {"00:16:53:0F:F5:A9":1, "00:16:53:13:EF:A9":0};
+var ADDRESSES = {"00:16:53:0F:F5:A9":2, "00:16:53:13:EF:A9":0, "00:16:53:0C:C8:0A":1};
 
 
 // Serveur web
