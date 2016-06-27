@@ -8,8 +8,10 @@ import collections
 
 from bt_socket import BlueSock
 
-ADRESSES = {"00:16:53:0C:C8:0A":1, "00:16:53:0F:F5:A9":2, "00:16:53:13:EF:A9":0}
-ADRESSES_INV = {0:"00:16:53:13:EF:A9", 2:"00:16:53:0F:F5:A9", 1:"00:16:53:0C:C8:0A"}
+ADRESSES = {"00:16:53:0F:F5:A9":0}
+ADRESSES_INV = {0:"00:16:53:0F:F5:A9", 2:"00:16:53:0F:F5:A9", 1:"00:16:53:0C:C8:0A"}
+
+CONNEXIONS = {"JAVA":None, "NODE":None}
 
 def ctrl_c_handler(signal, frame):
     time.sleep(1)
@@ -35,6 +37,10 @@ def connect_bt(addr, qin, bts):
         ctrl_c_handler(None, None)
 
 
+class MultipleClientsServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    pass
+
+
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     """
     The request handler class for our server.
@@ -45,6 +51,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     """
 
     allow_reuse_address = True
+
+    def __init__(self):
+        super(MyTCPHandler, this).__init__()
+        send_to_java = deque()
+
 
     def send_to_robots(self, data):
         print("sending to all robots: {}".format(data))
@@ -77,6 +88,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 addr, val = qin.popleft().items()[0]
                 self.send_to_other_robots(addr, val)
                 mess[addr].append(val)
+                if(...) in val:
+                    self.send_to_java.appendleft(val)
             except IndexError:
                 break
 
@@ -99,30 +112,39 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         running = True
         while running:
             datas = self.request.recv(16000).strip().split("\n")
-            for data in datas:
-                if "SENDLABY;" in data:
-                    self.send_laby(data.split(";")[1])
-                elif data is None:
-                    continue
-                elif data == "log":
-                    self.answer_clients()
-                else:
-                    self.send_to_robots(data)
-                if data == "stop":
-                    self.stop()
-                    break
-        print("end handle TCP")
+            print("received : {} -- from {}".format(datas, self.client_address))
+            if "NODE" in data:
+                CONNEXIONS["NODE"] = self.client_address
+            elif self.client_address == CONNEXIONS["JAVA"]:
+                self.send_to_java()
+                continue
+            else:
+                for data in datas:
+                    if "SENDLABY;" in data:
+                        self.send_laby(data.split(";")[1])
+                    elif "JAVA" in data:
+                        CONNEXIONS["JAVA"] = self.client_address
+                    elif data is None:
+                        continue
+                    elif data == "log":
+                        self.answer_clients()
+                    else:
+                        self.send_to_robots(data)
+                    if data == "stop":
+                        self.stop()
+                        break
+            print("end handle TCP")
 
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 10000
     # Create the server, binding to localhost on port 9999
-    SocketServer.TCPServer.allow_reuse_address = True
-    server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+    MultipleClientsServer.allow_reuse_address = True
+    server = MultipleClientsServer((HOST, PORT), MyTCPHandler)
     server.server_activate()
     qin = deque(maxlen=40)
 
-    addrs = [ADRESSES_INV[1]]
+    addrs = [ADRESSES_INV[0]]
 
     bts = []
     for addr in addrs:
