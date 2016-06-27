@@ -151,7 +151,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 		Point[] path = new Point[dist+1];
 		path[dist] = dest;
 		
-		
+		P
+		Point next;
+		boolean already_visited = false;
+
 		while (dist > 0) {
 			Tile current = this.grid.getTile(path[dist]);
 			Tile[] neis = this.grid.getNeighbors(current);
@@ -161,6 +164,8 @@ public class WallValuesExplorer extends AbstractExplorer {
 				
 				if (distances[nei.getLine()][nei.getCol()] == dist-1) {
 					path[dist-1] = new Point(nei.getLine(), nei.getCol());
+
+
 					break;
 				}
 			}
@@ -169,8 +174,23 @@ public class WallValuesExplorer extends AbstractExplorer {
 		}
 		
 		List<Point> list = new ArrayList<Point>(path.length);
-		for (Point p : path)
-			list.add(p);
+		for(int i = 1; i < path.size - 1; ++i)
+		{
+			Point p = path[i];	
+			Point previous = path[i-1];
+			Point next = path[i+1];
+
+			if(current.north != WallState.Undiscovered	&&
+				current.south != WallState.Undiscovered &&
+				current.east != WallState.Undiscovered &&
+				current.west != WallState.Undiscovered)
+			{
+
+				if(!(next.x == previous.x ||  next.y == previous.y))
+					list.add(p);
+			}
+		}
+
 		return list;
 	}
 	
