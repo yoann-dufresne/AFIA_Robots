@@ -138,6 +138,10 @@ public class WallValuesExplorer extends AbstractExplorer {
 		/*List<List<Point>> parkoors = this.tracebackDijktsra(distances, destination, currentPoint);
 		this.parkoor = this.chooseParkoor(parkoors);/**/
 		
+		String path = "";
+		for (Point p : this.parkoor)
+			path += "" + p.x + "," + p.y + " "; 
+		BluetoothRobot.bt.send("DEBUG;"+path);
 		this.movement.followPath(this.parkoor, this.grid);/**/
 	}
 
