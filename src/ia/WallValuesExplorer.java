@@ -61,6 +61,7 @@ public class WallValuesExplorer extends AbstractExplorer {
 				return;
 			}
 			
+			BluetoothRobot.bt.send("DEBUG;" + currentPoint + " " + destination);
 			char[][] distances = this.getManhattanDistances(currentPoint,destination);
 			tmpParkoor = this.dummyTraceback(distances, currentPoint, destination);
 			

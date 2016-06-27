@@ -8,7 +8,10 @@ import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
 import model.Direction;
+import model.Grid;
 import model.Position;
+import model.Tile;
+import model.WallState;
 import api.Observable;
 import api.Observer;
 
@@ -26,8 +29,10 @@ public class WallDiscoverer extends Observable implements Runnable {
 	
 	private int[] tmpDists;
 	private int[] previousDistances;
+
+	private Grid grid;
 	
-	public WallDiscoverer (Position robot, Movement move) {
+	public WallDiscoverer (Position robot, Movement move, Grid grid) {
 		this.front = new UltrasonicSensor(SensorPort.S2);
 		this.back = new UltrasonicSensor(SensorPort.S1);
 		this.front.continuous();
@@ -37,6 +42,7 @@ public class WallDiscoverer extends Observable implements Runnable {
 		this.robotPosition = robot;
 		this.previousDistances = new int[4];
 		this.previous = new Point(-1, -1);
+		this.grid = grid;
 		
 		this.tmpDists = new int[5];
 		this.movement = move;
@@ -68,7 +74,10 @@ public class WallDiscoverer extends Observable implements Runnable {
 				double dy = y - Math.floor(y);
 				
 				// Si le robot est au milieu de la case
-				if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7) {
+				Tile t = this.grid.getTile(pos);
+				if (dx > 0.3 && dx < 0.7 && dy > 0.3 && dy < 0.7 &&
+						(t.east == WallState.Undiscovered || t.west == WallState.Undiscovered ||
+						t.north == WallState.Undiscovered || t.south == WallState.Undiscovered)) {
 					this.previous = pos;
 					while (this.movement.isRotating)
 						try {

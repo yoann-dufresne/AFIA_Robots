@@ -17,7 +17,7 @@ public class MainExplorer extends AbstractMain {
 	public void start () {
 		Movement move = new Movement(this.pos);
 		
-		WallDiscoverer wd = new WallDiscoverer(this.pos, move);
+		WallDiscoverer wd = new WallDiscoverer(this.pos, move, this.grid);
 		wd.changeHeadPosition(); // Met vers l'avant
 		Thread wdThread = new Thread(wd);
 		wdThread.start();/**/
