@@ -246,8 +246,9 @@ var initRobot = function(command){
 
 var sendLaby = function(){
     console.log("init laby with exploitation")
-    var lines = fs.readFileSync(FNAME_LABY, "utf8").split("\n");
-    for(lineNb in lines){
-      client.write(lines[lineNb]+"\n");
-    }
+    // var lines = fs.readFileSync(FNAME_LABY, "utf8").split("\n");
+    // for(lineNb in lines){
+    //   client.write(lines[lineNb]+"\n");
+    // }
+    client.write("SENDLABY;"+FNAME_LABY)
 }

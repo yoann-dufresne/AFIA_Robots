@@ -87,17 +87,25 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         ctrl_c_handler(None, None)
         running = False
 
+    def send_laby(self, fpath):
+        print("sending data from: {}".format(fpath))
+        with open(fpath) as f:
+            for line in f:
+                self.send_to_robots(line)
+
     def handle(self):
         # self.request is the TCP socket connected to the client
         print("new connection")
         print "Client connected with ", self.client_address
         running = True
         while running:
-            datas = self.request.recv(4096).strip().split("\n")
+            datas = self.request.recv(16000).strip().split("\n")
             for data in datas:
-                if data is None:
+                if "SENDLABY;" in data:
+                    self.send_laby(data.split(";")[1])
+                elif data is None:
                     continue
-                if data == "log":
+                elif data == "log":
                     self.answer_clients()
                 else:
                     self.send_to_robots(data)
