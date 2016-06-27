@@ -9,8 +9,8 @@ import collections
 from bt_socket import BlueSock
 
 
-ADRESSES = {"00:16:53:0F:F5:A9":1, "00:16:53:13:EF:A9":0}
-ADRESSES_INV = {0:"00:16:53:13:EF:A9", 1:"00:16:53:0F:F5:A9"}
+ADRESSES = {"00:16:53:0C:C8:0A":1, "00:16:53:0F:F5:A9":2, "00:16:53:13:EF:A9":0}
+ADRESSES_INV = {0:"00:16:53:13:EF:A9", 2:"00:16:53:0F:F5:A9", 1:"00:16:53:0C:C8:0A"}
 
 def ctrl_c_handler(signal, frame):
     time.sleep(1)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     server.server_activate()
     qin = deque(maxlen=40)
 
-    addrs = [ADRESSES_INV[0]]
+    addrs = [ADRESSES_INV[1]]
 
     bts = []
     for addr in addrs:
