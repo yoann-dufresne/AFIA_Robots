@@ -6,7 +6,7 @@ import model.Position;
 import captors.LineObserver;
 import captors.Movement;
 import captors.WallDiscoverer;
-import captors.WallDiscovererObserver;
+import captors.WallDiscoverObserver;
 
 public class MainExplorer extends AbstractMain {
 	
@@ -26,7 +26,7 @@ public class MainExplorer extends AbstractMain {
 		this.ld.addObserver(lo);
 		this.ldThread.start();
 
-		WallDiscovererObserver wo = new WallDiscovererObserver(this.grid, this.pos);
+		WallDiscoverObserver wo = new WallDiscoverObserver(this.grid, this.pos);
 		wd.addObserver(wo);/**/
 		
 		WallValuesExplorer wve = new WallValuesExplorer(this.pos, move, this.grid);

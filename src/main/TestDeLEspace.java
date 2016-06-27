@@ -5,9 +5,9 @@ import model.Grid;
 import model.Position;
 import bluetooth.BluetoothRobot;
 
-public class Main extends AbstractMain {
+public class TestDeLEspace extends AbstractMain {
 
-	public Main() {
+	public TestDeLEspace() {
 		super(
 				new Grid(11, 23),
 				new Position(0.5, 0.5, Direction.EAST)
@@ -40,7 +40,7 @@ public class Main extends AbstractMain {
 	}
 	
 	public static void main(String[] args) {
-		Main main = new Main();
+		TestDeLEspace main = new TestDeLEspace();
 		main.start();
 	}
 }

@@ -11,7 +11,7 @@ import model.Position;
 import api.Observable;
 import api.Observer;
 
-public class WallDiscovererObserver implements Observer {
+public class WallDiscoverObserver implements Observer {
 
 	private static final int TILE_SIZE_CM = new Double(100*Config.TILE_SIZE).intValue();
 	public static final int MAX_DIST_CM = 6 * TILE_SIZE_CM;
@@ -20,7 +20,7 @@ public class WallDiscovererObserver implements Observer {
 	private Position position;
 
 
-	public WallDiscovererObserver(Grid grid, Position pos){
+	public WallDiscoverObserver(Grid grid, Position pos){
 		this.grid = grid;
 		this.position = pos;
 	}
@@ -43,21 +43,21 @@ public class WallDiscovererObserver implements Observer {
 			
 			int absDist = 0;
 			while (dist > TILE_SIZE_CM) {
+				BluetoothRobot.bt.send("DEBUG;" + x + " " + y + " " + dir + " " + dist);
 				if (x < 0 || x >= this.grid.getHeight() || y < 0 || y >= this.grid.getWidth())
 					break;
 				absDist++;
 
-				boolean discovered = false;
 				int proba = 100;
 				try {
 					proba = this.grid.getProba(x, y, dir);
 					BluetoothRobot.bt.send("DEBUG;Proba " + proba + " " + absDist);
 				} catch (IllegalArgumentException e) {
-					proba = -1;
 					BluetoothRobot.bt.send("DEBUG;CATCH ! " + x + " " + y + " " + dir + " " + dist);
+					proba = -1;
 				}
 				
-				
+				boolean discovered = false;
 				if (absDist < proba) {
 					this.grid.setEmpty(x, y, dir);
 					this.grid.setProba(x, y, dir, absDist);
@@ -108,7 +108,7 @@ public class WallDiscovererObserver implements Observer {
 						continue;
 					}
 					
-					if (absDist <= proba) {
+					if (absDist <= proba || new Point(x, y) != BluetoothRobot.bt.otherPosition.getPoint()) {
 						this.grid.setProba(x, y, dir, absDist);
 						this.grid.setWall(x, y, dir);
 						
