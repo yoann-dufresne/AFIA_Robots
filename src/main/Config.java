@@ -13,11 +13,11 @@ public class Config {
 	
 	/* Robot config */
 	public static final double WHEEL_RADIUS = 0.021;
-	public static final double WHEELS_DISTANCE = 0.135;
+	public static final double WHEELS_DISTANCE = 0.103;
 	public static final double WHEEL_CIRCUMFERENCE = 2 * Math.PI * WHEEL_RADIUS;
 	public static final double INTER_WHEELS_CIRCUMFERENCE = WHEELS_DISTANCE * Math.PI;
 	
-	public static final double LIGHTS_DISTANCE = 0.0825;
+	public static final double LIGHTS_DISTANCE = 0.065;
 	public static final double LIGHT_CENTER_DISTANCE = 0.04;
 	
 	public static final double CORRECTION_RATIO = LIGHT_CENTER_DISTANCE / TILE_SIZE;
